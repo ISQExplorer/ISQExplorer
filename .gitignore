@@ -1,0 +1,6 @@
+bin/*
+obj/*
+/packages/
+.idea/*
+ISQExplorer/bin
+ISQExplorer/obj
