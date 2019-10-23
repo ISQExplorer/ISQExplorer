@@ -23,8 +23,9 @@
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ISQEXPLORER_SERVER": "localhost",
         "ISQEXPLORER_DB": "isqexplorer",
-        "ISQEXPLORER_USER": "sa",
-        "ISQEXPLORER_PASSWORD": "Password1"
+        "ISQEXPLORER_USER": "root",
+        "ISQEXPLORER_PASSWORD": "root",
+        "ISQEXPLORER_IMPORT": "professors.csv"
       }
     }
   }

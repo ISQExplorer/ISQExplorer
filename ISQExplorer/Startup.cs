@@ -34,11 +34,11 @@ namespace ISQExplorer
             {
                 throw new ArgumentException("Environment variables ISQEXPLORER_SERVER, ISQEXPLORER_DB, ISQEXPLORER_USER, and ISQEXPLORER_PASSWORD must be set.");
             }
-            
+
             string connString =
-                $"Server={Environment.GetEnvironmentVariable("ISQEXPLORER_SERVER")};Database={Environment.GetEnvironmentVariable("ISQEXPLORER_DB")};User Id={Environment.GetEnvironmentVariable("ISQEXPLORER_USER")};Password={Environment.GetEnvironmentVariable("ISQEXPLORER_PASSWORD")};";
+                $"Server={Environment.GetEnvironmentVariable("ISQEXPLORER_SERVER")};Port={Environment.GetEnvironmentVariable("ISQEXPLORER_PORT") ?? "5432"};Database={Environment.GetEnvironmentVariable("ISQEXPLORER_DB")};User Id={Environment.GetEnvironmentVariable("ISQEXPLORER_USER")};Password={Environment.GetEnvironmentVariable("ISQEXPLORER_PASSWORD")};";
             
-            services.AddDbContext<ISQExplorerContext>(options => options.UseSqlServer(connString));
+            services.AddDbContext<ISQExplorerContext>(options => options.UseNpgsql(connString));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

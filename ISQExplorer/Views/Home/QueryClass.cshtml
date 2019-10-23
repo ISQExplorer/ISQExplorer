@@ -1,0 +1,27 @@
+@model IEnumerable<ISQExplorer.Models.ISQEntryModel>
+
+<table class="table">
+    <tbody>
+    <tr>
+        <th>Term</th>
+        <th>CRN</th>
+        <th>Professor</th>
+        <th>Number Responded / Enrolled</th>
+        <th>Percent Responded</th>
+        <th>Average Rating</th>
+        <th>Average GPA</th>
+    </tr>
+    @foreach (var mod in Model)
+    {
+        <tr>
+            <td>@mod.Term</td>
+            <td>@mod.Crn</td>
+            <td>@mod.Professor</td>
+            <td>@mod.NResponded/@mod.NEnrolled</td>
+            <td>@((100.0 * mod.NResponded / mod.NEnrolled).ToString("#.##"))</td>
+            <td>@(mod.Pct5 * 0.05 + mod.Pct4 * 0.04 + mod.Pct3 * 0.03 + mod.Pct2 * 0.02 + mod.Pct1 * 0.01)</td>
+            <td>@mod.MeanGpa</td>
+        </tr>
+    }
+    </tbody>
+</table>

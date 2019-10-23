@@ -1,10 +1,16 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace ISQExplorer.Models
 {
-    public class IsqEntryModel
+    public class ISQEntryModel
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
+
+        public string CourseCode { get; set; }
         public string Term { get; set; }
         public ProfessorModel Professor { get; set; }
         public int Crn { get; set; }
