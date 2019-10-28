@@ -25,7 +25,8 @@
         "ISQEXPLORER_DB": "isqexplorer",
         "ISQEXPLORER_USER": "root",
         "ISQEXPLORER_PASSWORD": "root",
-        "ISQEXPLORER_IMPORT": "professors.csv"
+        "ISQEXPLORER_PROFESSORS_IMPORT": "professors.csv",
+        "ISQEXPLORER_CLASSES_IMPORT": "classes.csv"
       }
     }
   }

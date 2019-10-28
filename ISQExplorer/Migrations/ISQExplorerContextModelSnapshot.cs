@@ -19,12 +19,89 @@ namespace ISQExplorer.Migrations
                 .HasAnnotation("ProductVersion", "3.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            modelBuilder.Entity("ISQExplorer.Models.CourseCodeModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("CourseCode")
+                        .IsRequired()
+                        .HasColumnType("character varying(12)")
+                        .HasMaxLength(12);
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("SinceTerm")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("SinceYear")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.ToTable("CourseCodes");
+                });
+
+            modelBuilder.Entity("ISQExplorer.Models.CourseModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Description");
+
+                    b.ToTable("Courses");
+                });
+
+            modelBuilder.Entity("ISQExplorer.Models.CourseNameModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("character varying(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<int?>("SinceTerm")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("SinceYear")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.ToTable("CourseNames");
+                });
+
             modelBuilder.Entity("ISQExplorer.Models.ISQEntryModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<int?>("CourseId")
+                        .HasColumnType("integer");
 
                     b.Property<int>("Crn")
                         .HasColumnType("integer");
@@ -89,10 +166,12 @@ namespace ISQExplorer.Migrations
                     b.Property<int?>("ProfessorId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Term")
-                        .HasColumnType("text");
+                    b.Property<int>("Term")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
 
                     b.HasIndex("ProfessorId");
 
@@ -113,12 +192,11 @@ namespace ISQExplorer.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("NNumber")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("NNumber");
+                    b.HasIndex("NNumber");
 
                     b.ToTable("Professors");
                 });
@@ -147,8 +225,30 @@ namespace ISQExplorer.Migrations
                     b.ToTable("Queries");
                 });
 
+            modelBuilder.Entity("ISQExplorer.Models.CourseCodeModel", b =>
+                {
+                    b.HasOne("ISQExplorer.Models.CourseModel", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ISQExplorer.Models.CourseNameModel", b =>
+                {
+                    b.HasOne("ISQExplorer.Models.CourseModel", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("ISQExplorer.Models.ISQEntryModel", b =>
                 {
+                    b.HasOne("ISQExplorer.Models.CourseModel", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId");
+
                     b.HasOne("ISQExplorer.Models.ProfessorModel", "Professor")
                         .WithMany()
                         .HasForeignKey("ProfessorId");

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ISQExplorer.Misc;
 using ISQExplorer.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -17,12 +18,19 @@ namespace ISQExplorer
         {
             var host = CreateHostBuilder(args).Build();
 
-            var professorCsv = Environment.GetEnvironmentVariable("ISQEXPLORER_IMPORT");
-            if (professorCsv != null)
+            using var scope = host.Services.CreateScope();
+            var services = scope.ServiceProvider;
+            
+            var professorJson = Environment.GetEnvironmentVariable("ISQEXPLORER_PROFESSORS_IMPORT");
+            if (professorJson != null)
             {
-                using var scope = host.Services.CreateScope();
-                var services = scope.ServiceProvider;
-                ProfessorSeeder.Initialize(services, professorCsv);
+                DatabaseImporter.ImportProfessors(services, professorJson);
+            }
+
+            var classJson = Environment.GetEnvironmentVariable("ISQEXPLORER_CLASSES_IMPORT");
+            if (classJson != null)
+            {
+                DatabaseImporter.ImportClasses(services, classJson);
             }
 
             host.Run();
