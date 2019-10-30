@@ -6,9 +6,16 @@
 
 
     <ItemGroup>
+      <PackageReference Include="AngleSharp" Version="0.13.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.0.0" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.0.1" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <Folder Include="Error" />
+      <Folder Include="Functional" />
     </ItemGroup>
 
 </Project>

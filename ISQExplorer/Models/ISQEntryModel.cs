@@ -4,15 +4,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ISQExplorer.Models
 {
-    public class ISQEntryModel
+    public class ISQEntryModel : IRangedModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         public CourseModel Course { get; set; }
-        public TermSeason Term { get; set; }
-        public int TermYear { get; set; }
+        public Season? Season { get; set; }
+        public int? Year { get; set; }
         public ProfessorModel Professor { get; set; }
         public int Crn { get; set; }
         public int NResponded { get; set; }
@@ -22,6 +22,7 @@ namespace ISQExplorer.Models
         public double Pct3 { get; set; }
         public double Pct2 { get; set; }
         public double Pct1 { get; set; }
+        public double PctNa { get; set; }
         public int NEnrolled { get; set; }
         public double PctA { get; set; }
         public double PctAMinus { get; set; }

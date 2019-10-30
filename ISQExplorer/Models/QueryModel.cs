@@ -11,9 +11,13 @@ namespace ISQExplorer.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        public string? FirstName { get; set; }
-        public string? LastName { get; set; }
-        public string? NNumber { get; set; }
+        public string? CourseCode { get; set; }
+        public string? CourseName { get; set; }
+        public string? ProfessorName { get; set; }
+        public Season? SeasonSince { get; set; }
+        public int? YearSince { get; set; }
+        public Season? SeasonUntil { get; set; }
+        public int? YearUntil { get; set; }
         public DateTime LastUpdated { get; set; }
 
         public QueryModel()

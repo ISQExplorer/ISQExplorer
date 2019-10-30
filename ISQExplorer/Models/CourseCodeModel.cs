@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ISQExplorer.Models
 {
-    public class CourseCodeModel
+    public class CourseCodeModel : IRangedModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -14,7 +14,7 @@ namespace ISQExplorer.Models
         
         [StringLength(12)]
         public string CourseCode { get; set; }
-        public TermSeason? SinceTerm { get; set; }
-        public int? SinceYear { get; set; }
+        public Season? Season { get; set; }
+        public int? Year { get; set; }
     }
 }

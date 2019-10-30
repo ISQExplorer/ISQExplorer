@@ -67,8 +67,8 @@ namespace ISQExplorer.Misc
                     continue;
                 }
 
-                var existingNames = context.CourseNames.Select(x => new {x.Name, x.SinceTerm, x.SinceYear}).ToHashSet();
-                var existingCodes = context.CourseCodes.Select(x => new {x.CourseCode, x.SinceTerm, x.SinceYear})
+                var existingNames = context.CourseNames.Select(x => new {x.Name, SinceTerm = x.Season, SinceYear = x.Year}).ToHashSet();
+                var existingCodes = context.CourseCodes.Select(x => new {x.CourseCode, SinceTerm = x.Season, SinceYear = x.Year})
                     .ToHashSet();
 
                 var model = new CourseModel {Description = entry.Description};
@@ -76,28 +76,28 @@ namespace ISQExplorer.Misc
 
                 foreach (var name in entry.Names)
                 {
-                    var (SinceTerm, SinceYear) = TermMethods.ParseTermNullable(name.Since);
+                    var (SinceTerm, SinceYear) = Term.FromNullableString(name.Since);
                     var candidate = new {name.Name, SinceTerm, SinceYear};
                     if (!existingNames.Contains(candidate))
                     {
                         context.CourseNames.Add(new CourseNameModel
                         {
-                            Course = model, SinceTerm = candidate.SinceTerm, Name = name.Name,
-                            SinceYear = candidate.SinceYear
+                            Course = model, Season = candidate.SinceTerm, Name = name.Name,
+                            Year = candidate.SinceYear
                         });
                     }
                 }
 
                 foreach (var code in entry.CourseCodes)
                 {
-                    var (SinceTerm, SinceYear) = TermMethods.ParseTermNullable(code.Since);
+                    var (SinceTerm, SinceYear) = Term.FromNullableString(code.Since);
                     var candidate = new {CourseCode = code.Code, SinceTerm, SinceYear};
                     if (!existingCodes.Contains(candidate))
                     {
                         context.CourseCodes.Add(new CourseCodeModel
                         {
-                            Course = model, SinceTerm = candidate.SinceTerm, CourseCode =  candidate.CourseCode,
-                            SinceYear = candidate.SinceYear
+                            Course = model, Season = candidate.SinceTerm, CourseCode =  candidate.CourseCode,
+                            Year = candidate.SinceYear
                         });
                     }
                 }
