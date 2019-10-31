@@ -8,9 +8,9 @@ namespace ISQExplorer.Repositories
 {
     public interface IQueryRepository
     {
-        Task<IEnumerable<ISQEntryModel>> Query(string? courseCode = null, string? courseName = null,
+        Task<IEnumerable<ISQEntryModel>> QueryClass(string? courseCode = null, string? courseName = null,
             string? professorName = null, Term? since = null, Term? until = null);
-
-        Task<IEnumerable<ProfessorModel>> QueryProfessor(string professorName);
+        Task<IEnumerable<ISQEntryModel>> QueryProfessor(string professorName);
+        Task<IEnumerable<ProfessorModel>> NameToProfessor(string professorName);
     }
 }
