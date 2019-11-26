@@ -1,48 +1,28 @@
 using System.Linq;
+using System.Threading.Tasks;
 using ISQExplorer.Models;
+using ISQExplorer.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ISQExplorer.Controllers
 {
     public class QueryController : Controller
     {
-        private readonly ISQExplorerContext _context;
+        private readonly IQueryRepository _repo;
 
-        public QueryController(ISQExplorerContext context)
+        public QueryController(IQueryRepository repo)
         {
-            _context = context;
+            _repo = repo;
         }
 
-        public IActionResult QueryClass(string courseCode = null, string nNumber = null, string name = null)
+        public async Task<IActionResult> QueryClass(string? courseCode = null, string? courseName = null,
+            string? professorName = null, Season? sinceSeason = null, int? sinceYear = null,
+            Season? untilSeason = null, int? untilYear = null)
         {
-            var chain = _context.IsqEntries.Select(x => x);
-
-            if (courseCode != null)
-            {
-                // chain = chain.Where(x => x.CourseCode.StartsWith(courseCode));
-            }
-
-            if (nNumber != null)
-            {
-                chain = chain.Where(x => x.Professor.NNumber.StartsWith(nNumber));
-            }
-
-            if (name != null)
-            {
-                if (!name.Contains(' '))
-                {
-                    chain = chain.Where(x => x.Professor.LastName.StartsWith(name));
-                }
-                else
-                {
-                    var spl = name.Split();
-                    var lname = spl.Last();
-                    var fname = string.Join(" ", spl.SkipLast(1));
-                    chain = chain.Where(x => x.Professor.LastName.StartsWith(lname) && x.Professor.FirstName.StartsWith(fname));
-                }
-            }
-
-            return View(chain.ToList());
+            var query = new QueryParams(courseCode, courseName, professorName);
+            query.Since = new Term(sinceSeason ?? Season.Spring, sinceYear ?? 0);
+            query.Until = new Term(untilSeason ?? Season.Fall, untilYear ?? int.MaxValue);
+            return View(await _repo.QueryClass(query));
         }
     }
 }

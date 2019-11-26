@@ -34,10 +34,10 @@ namespace ISQExplorer.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("SinceTerm")
+                    b.Property<int?>("Season")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("SinceYear")
+                    b.Property<int?>("Year")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -80,10 +80,10 @@ namespace ISQExplorer.Migrations
                         .HasColumnType("character varying(255)")
                         .HasMaxLength(255);
 
-                    b.Property<int?>("SinceTerm")
+                    b.Property<int?>("Season")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("SinceYear")
+                    b.Property<int?>("Year")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -160,13 +160,19 @@ namespace ISQExplorer.Migrations
                     b.Property<double>("PctF")
                         .HasColumnType("double precision");
 
+                    b.Property<double>("PctNa")
+                        .HasColumnType("double precision");
+
                     b.Property<double>("PctWithdraw")
                         .HasColumnType("double precision");
 
                     b.Property<int?>("ProfessorId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Term")
+                    b.Property<int>("Season")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Year")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -174,6 +180,8 @@ namespace ISQExplorer.Migrations
                     b.HasIndex("CourseId");
 
                     b.HasIndex("ProfessorId");
+
+                    b.HasIndex("Crn", "Season", "Year");
 
                     b.ToTable("IsqEntries");
                 });
@@ -208,17 +216,29 @@ namespace ISQExplorer.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<string>("FirstName")
+                    b.Property<string>("CourseCode")
                         .HasColumnType("text");
 
-                    b.Property<string>("LastName")
+                    b.Property<string>("CourseName")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("NNumber")
+                    b.Property<string>("ProfessorName")
                         .HasColumnType("text");
+
+                    b.Property<int?>("SeasonSince")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("SeasonUntil")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("YearSince")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("YearUntil")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 

@@ -13,5 +13,15 @@ namespace ISQExplorer.Misc
                 yield return line;
             }
         }
+
+        public static IEnumerable<(T elem, int index)> Enumerate<T>(this IEnumerable<T> x)
+        {
+            var i = 0;
+            foreach (var y in x)
+            {
+                yield return (elem: y, index: i);
+                i++;
+            }
+        }
     }
 }

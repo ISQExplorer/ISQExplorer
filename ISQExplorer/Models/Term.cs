@@ -1,4 +1,5 @@
 using System;
+using Microsoft.VisualBasic.CompilerServices;
 
 namespace ISQExplorer.Models
 {
@@ -9,8 +10,30 @@ namespace ISQExplorer.Models
         Fall = 2
     }
 
-    public class Term : IComparable<Term>
+    public class Term : IComparable<Term>, IEquatable<Term>
     {
+        public bool Equals(Term other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Season == other.Season && Year == other.Year;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj.GetType() == GetType() && Equals((Term) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return ((int) Season * 397) ^ Year;
+            }
+        }
+
         public readonly Season Season;
         public readonly int Year;
 
@@ -73,6 +96,9 @@ namespace ISQExplorer.Models
 
             return this.Season - other.Season;
         }
+
+        public static bool operator ==(Term t1, Term t2) => t1 != null && t1.Equals(t2);
+        public static bool operator !=(Term t1, Term t2) => t1 == null || !t1.Equals(t2);
 
         public int CompareSql(Season? season, int? year)
         {

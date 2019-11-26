@@ -4,15 +4,41 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ISQExplorer.Models
 {
-    public class ISQEntryModel : IRangedModel
+    public class ISQEntryModel
     {
+        protected bool Equals(ISQEntryModel other)
+        {
+            return Season == other.Season && Year == other.Year && Crn == other.Crn;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj.GetType() == this.GetType() && Equals((ISQEntryModel) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = Season.GetHashCode();
+                hashCode = (hashCode * 397) ^ Year.GetHashCode();
+                hashCode = (hashCode * 397) ^ Crn;
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(ISQEntryModel i1, ISQEntryModel i2) => i1 != null && i1.Equals(i2);
+        public static bool operator !=(ISQEntryModel i1, ISQEntryModel i2) => i1 == null || i1.Equals(i2);
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         public CourseModel Course { get; set; }
-        public Season? Season { get; set; }
-        public int? Year { get; set; }
+        public Season Season { get; set; }
+        public int Year { get; set; }
         public ProfessorModel Professor { get; set; }
         public int Crn { get; set; }
         public int NResponded { get; set; }

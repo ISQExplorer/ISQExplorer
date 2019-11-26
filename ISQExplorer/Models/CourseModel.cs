@@ -6,6 +6,24 @@ namespace ISQExplorer.Models
 {
     public class CourseModel
     {
+        protected bool Equals(CourseModel other)
+        {
+            return Description == other.Description;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((CourseModel) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return (Description != null ? Description.GetHashCode() : 0);
+        }
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }

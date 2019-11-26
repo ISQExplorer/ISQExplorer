@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ISQExplorer.Models;
+using ISQExplorer.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -39,6 +40,7 @@ namespace ISQExplorer
                 $"Server={Environment.GetEnvironmentVariable("ISQEXPLORER_SERVER")};Port={Environment.GetEnvironmentVariable("ISQEXPLORER_PORT") ?? "5432"};Database={Environment.GetEnvironmentVariable("ISQEXPLORER_DB")};User Id={Environment.GetEnvironmentVariable("ISQEXPLORER_USER")};Password={Environment.GetEnvironmentVariable("ISQEXPLORER_PASSWORD")};";
             
             services.AddDbContext<ISQExplorerContext>(options => options.UseNpgsql(connString));
+            services.AddScoped<IQueryRepository, QueryRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

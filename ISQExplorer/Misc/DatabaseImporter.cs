@@ -1,12 +1,12 @@
 #nullable enable
 using System;
-using System.Data;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 using ISQExplorer.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 
 namespace ISQExplorer.Misc
 {
@@ -44,9 +44,18 @@ namespace ISQExplorer.Misc
                 serviceProvider.GetRequiredService<
                     DbContextOptions<ISQExplorerContext>>());
 
-            var fileEntries = JsonSerializer.Deserialize<ProfessorEntry[]>(File.ReadAllText(professorJson));
-            context.Professors.AddRange(fileEntries.Select(x => new ProfessorModel
-                {FirstName = x.FirstName, LastName = x.LastName, NNumber = x.NNumber}));
+            var existingNNumber = context.Professors.Select(x => x.NNumber).ToHashSet();
+            
+            var fileEntries = JsonConvert.DeserializeObject<List<ProfessorEntry>>(File.ReadAllText(professorJson));
+            if (fileEntries.Any(x => x.NNumber == null || x.LastName == null))
+            {
+                throw new ArgumentException("Professor N-Number/last name cannot be null.");
+            }
+            
+            context.Professors.AddRange(fileEntries
+                .Select(x => new ProfessorModel
+                {FirstName = x.FirstName, LastName = x.LastName, NNumber = x.NNumber})
+                .Where(x => !existingNNumber.Contains(x.NNumber)));
 
             context.SaveChanges();
         }
@@ -57,7 +66,7 @@ namespace ISQExplorer.Misc
                 serviceProvider.GetRequiredService<
                     DbContextOptions<ISQExplorerContext>>());
 
-            var entries = JsonSerializer.Deserialize<CourseEntry[]>(File.ReadAllText(classJson));
+            var entries = JsonConvert.DeserializeObject<CourseEntry[]>(File.ReadAllText(classJson));
             var existingDescriptions = context.Courses.Select(x => x.Description).ToHashSet();
 
             foreach (var entry in entries)
