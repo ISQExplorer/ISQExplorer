@@ -6,6 +6,15 @@ namespace ISQExplorer.Models
 {
     public class CourseModel
     {
+        public CourseModel()
+        {
+        }
+
+        public CourseModel(string description)
+        {
+            Description = description;
+        }
+
         protected bool Equals(CourseModel other)
         {
             return Description == other.Description;

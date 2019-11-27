@@ -6,6 +6,15 @@ namespace ISQExplorer.Models
 {
     public class CourseNameModel : IRangedModel
     {
+        public CourseNameModel()
+        {
+        }
+
+        public CourseNameModel(CourseModel course, string name, Season? season, int? year)
+        {
+            (Course, Name, Season, Year) = (course, name, season, year);
+        }
+
         protected bool Equals(CourseNameModel other)
         {
             return Equals(Course, other.Course) && Name == other.Name && Season == other.Season && Year == other.Year;
