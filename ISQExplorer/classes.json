@@ -1,0 +1,40 @@
+[
+  {
+    "Description": "An introduction to object-oriented concepts using Java",
+    "Names": [
+      {
+        "Name": "Programming 2",
+        "Since": "Fall 2019"
+      },
+      {
+        "Name": "Computer Science 2",
+        "Since": null
+      }
+    ],
+    "CourseCodes": [
+      {
+        "Code": "COP3503",
+        "Since": null
+      }
+    ]
+  },
+  {
+    "Description": "An introduction to the basics of programming using C",
+    "Names": [
+      {
+        "Name": "Programming 1",
+        "Since": "Fall 2019"
+      },
+      {
+        "Name": "Computer Science 1",
+        "Since": null
+      }
+    ],
+    "CourseCodes": [
+      {
+        "Code": "COP2220",
+        "Since": null
+      }
+    ]
+  }
+]

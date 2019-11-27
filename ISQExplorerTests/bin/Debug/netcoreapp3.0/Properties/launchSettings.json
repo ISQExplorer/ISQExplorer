@@ -1,0 +1,33 @@
+﻿{
+  "iisSettings": {
+    "windowsAuthentication": false, 
+    "anonymousAuthentication": true, 
+    "iisExpress": {
+      "applicationUrl": "http://localhost:56916",
+      "sslPort": 44385
+    }
+  },
+  "profiles": {
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "ISQExplorer": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:5001;http://localhost:5000",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ISQEXPLORER_SERVER": "localhost",
+        "ISQEXPLORER_DB": "isqexplorer",
+        "ISQEXPLORER_USER": "root",
+        "ISQEXPLORER_PASSWORD": "root",
+        "ISQEXPLORER_PROFESSORS_IMPORT": "professors.json",
+        "ISQEXPLORER_CLASSES_IMPORT": "classes.json"
+      }
+    }
+  }
+}
