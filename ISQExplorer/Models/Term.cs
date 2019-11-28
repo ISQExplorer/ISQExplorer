@@ -1,4 +1,5 @@
 using System;
+using System.Security.Cryptography.Xml;
 using Microsoft.VisualBasic.CompilerServices;
 
 namespace ISQExplorer.Models
@@ -97,8 +98,11 @@ namespace ISQExplorer.Models
             return this.Season - other.Season;
         }
 
-        public static bool operator ==(Term t1, Term t2) => t1 != null && t1.Equals(t2);
-        public static bool operator !=(Term t1, Term t2) => t1 == null || !t1.Equals(t2);
+        // DO NOT USE `t1 != null` HERE. it causes infinite recursion
+        public static bool operator ==(Term t1, Term t2) =>
+            ReferenceEquals(t1, t2) || (!ReferenceEquals(t1, null) && t1.Equals(t2));
+
+        public static bool operator !=(Term t1, Term t2) => !(t1 == t2);
 
         public int CompareSql(Season? season, int? year)
         {
@@ -109,10 +113,10 @@ namespace ISQExplorer.Models
 
             if (Year != year)
             {
-                return Year - (int)year;
+                return Year - (int) year;
             }
 
-            return Season - (Season)season;
+            return Season - (Season) season;
         }
 
         public (Season, int) ToTuple()

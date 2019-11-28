@@ -10,9 +10,10 @@ namespace ISQExplorer.Models
         {
         }
 
-        public CourseModel(string description)
+        public CourseModel(string description, int? id = null)
         {
             Description = description;
+            Id = id ?? 0;
         }
 
         protected bool Equals(CourseModel other)

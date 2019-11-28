@@ -17,7 +17,7 @@ namespace ISQExplorerTests
         public void Setup()
         {
             var contextOptions =
-                new DbContextOptionsBuilder<ISQExplorerContext>().UseInMemoryDatabase(databaseName: "Test");
+                new DbContextOptionsBuilder<ISQExplorerContext>().UseInMemoryDatabase("Test").EnableSensitiveDataLogging();
             _ctx = new ISQExplorerContext(contextOptions.Options);
 
             var courses = new[]
@@ -40,10 +40,11 @@ namespace ISQExplorerTests
                 new CourseNameModel(courses[1], "Dutta Modeling", null, null),
                 new CourseNameModel(courses[1], "Intro to Databases", Season.Fall, 2019),
             };
-            
+
             _ctx.Courses.AddRange(courses);
             _ctx.CourseCodes.AddRange(courseCodes);
             _ctx.CourseNames.AddRange(courseNames);
+            _ctx.SaveChanges();
             _logger = LoggerFactory.Create(logging => { }).CreateLogger<QueryRepository>();
         }
 
@@ -52,7 +53,7 @@ namespace ISQExplorerTests
         {
             QueryHelper qh = new QueryHelper(_ctx, _logger);
             var res = (await qh.WebScrapeCourseCode("COP3503")).ToList();
-            var courseMap = _ctx.CourseCodes.GroupBy(x => x.Course).ToDictionary(x => x.Key, x => x.Select(x => x.CourseCode).ToHashSet());
+            var courseMap = _ctx.CourseCodes.AsEnumerable().GroupBy(x => x.Course).ToDictionary(x => x.Key, x => x.Select(x => x.CourseCode).ToHashSet());
             Assert.True(res.All(x => courseMap.ContainsKey(x.Course) || courseMap[x.Course].Contains("COP3503")));
             Assert.True(res.Any());
         }

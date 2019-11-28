@@ -29,7 +29,8 @@ namespace ISQExplorer.Repositories
             var (sinceSeason, sinceYear) = Term.ToTuple(p.Since);
             var (untilSeason, untilYear) = Term.ToTuple(p.Until);
             return await (from query in _context.Queries
-                where (query.CourseCode == null || p.CourseCode != null && query.CourseCode == p.CourseCode.ToUpper()) &&
+                where (query.CourseCode == null ||
+                       p.CourseCode != null && query.CourseCode == p.CourseCode.ToUpper()) &&
                       (query.CourseName == p.CourseName || query.CourseName == null) &&
                       (query.ProfessorName == p.ProfessorName || query.ProfessorName == null) &&
                       (query.SeasonSince == sinceSeason || query.SeasonSince == null) &&
@@ -50,11 +51,11 @@ namespace ISQExplorer.Repositories
 
         public async Task<CourseModel> CourseCodeToCourse(string courseCode, Term? since = null, Term? until = null)
         {
-            var courses = (await Task.Run(() => from code in _context.CourseCodes
-                where string.Equals(code.CourseCode, courseCode, StringComparison.CurrentCultureIgnoreCase) &&
-                      (since == null || since.CompareSql(code.Season, code.Year) <= 0) &&
-                      (until == null || until.CompareSql(code.Season, code.Year) >= 0)
-                select code.Course)).ToList();
+            courseCode = courseCode.ToUpper();
+
+            var courses = QueryRepository.Ranged(await Task.Run(() => from code in _context.CourseCodes
+                where courseCode == code.CourseCode
+                select code), since, until).Select(x => x.Course).ToList();
 
             if (courses.Count == 0)
             {
@@ -110,10 +111,12 @@ namespace ISQExplorer.Repositories
                 $"https://banner.unf.edu/pls/nfpo/wksfwbs.p_course_isq_grade?pv_course_id={courseCode.ToUpper()}";
             var config = Configuration.Default;
             var browsingContext = BrowsingContext.New(config);
+            using var webClient = new WebClient();
+            var webContent = await Task.Run(() => webClient.DownloadString(url));
 
-            var document = await browsingContext.OpenAsync(req => req.Address(new Url(url)));
+            var document = await browsingContext.OpenAsync(req => req.Content(webContent));
             var tables = document.QuerySelectorAll("table.datadisplaytable > tbody").ToList();
-            if (tables.Count < 7)
+            if (tables.Count < 6)
             {
                 _logger.LogWarning(
                     $"Malformed page at url '{url}'. Most likely the given course code '{courseCode}' is invalid. Returning a blank list.");
@@ -121,7 +124,7 @@ namespace ISQExplorer.Repositories
             }
 
             var isqTable = tables[3];
-            var gpaTable = tables[6];
+            var gpaTable = tables[5];
 
             var professorCache = new ConcurrentDictionary<string, ProfessorModel>();
 
@@ -132,9 +135,9 @@ namespace ISQExplorer.Repositories
                     var professors = (await NameToProfessors(name)).ToList();
                     if (professors.Count == 0)
                     {
-                        string msg = $"No professors found for name '${name}'. Returning null for this entry.";
+                        string msg = $"No professors found for name '{name}'. Returning null for this entry.";
                         _logger.LogWarning(msg);
-                        throw new ArgumentException(msg);
+                        return null;
                     }
 
                     if (professors.Count > 1)
@@ -152,14 +155,10 @@ namespace ISQExplorer.Repositories
             return (await Task.WhenAll(isqTable.Children.Skip(2).Zip(gpaTable.Children.Skip(2)).Select(async x =>
             {
                 var (isq, gpa) = x;
-                var childText = isq.Children.Select(y => y.InnerHtml).ToList();
-                var gpaText = gpa.Children.Select(y => y.InnerHtml).ToList();
+                var childText = isq.Children.Select(y => y.Children.Length == 0 ? y.InnerHtml.Trim() : y.Children.First().InnerHtml.Trim()).ToList();
+                var gpaText = gpa.Children.Select(y => y.Children.Length == 0 ? y.InnerHtml.Trim() : y.Children.First().InnerHtml.Trim()).ToList();
                 var term = new Term(childText[0]);
                 var professor = await GetProfessor(childText[2]);
-                if (professor == null)
-                {
-                    return null;
-                }
 
                 return new ISQEntryModel
                 {
@@ -170,12 +169,12 @@ namespace ISQExplorer.Repositories
                     Professor = professor,
                     NEnrolled = int.Parse(childText[3]),
                     NTotal = int.Parse(childText[4]),
-                    Pct5 = double.Parse(childText[5]),
-                    Pct4 = double.Parse(childText[6]),
-                    Pct3 = double.Parse(childText[7]),
-                    Pct2 = double.Parse(childText[8]),
-                    Pct1 = double.Parse(childText[9]),
-                    PctNa = double.Parse(childText[10]),
+                    Pct5 = double.Parse(childText[6]),
+                    Pct4 = double.Parse(childText[7]),
+                    Pct3 = double.Parse(childText[8]),
+                    Pct2 = double.Parse(childText[9]),
+                    Pct1 = double.Parse(childText[10]),
+                    PctNa = double.Parse(childText[11]),
                     PctA = double.Parse(childText[4]),
                     PctAMinus = double.Parse(gpaText[5]),
                     PctBPlus = double.Parse(gpaText[6]),
@@ -188,7 +187,7 @@ namespace ISQExplorer.Repositories
                     PctWithdraw = double.Parse(gpaText[13]),
                     MeanGpa = double.Parse(gpaText[14])
                 };
-            }))).Where(x => x != null);
+            })));
         }
 
         public async Task<IEnumerable<ISQEntryModel>> WebScrapeNNumber(string nNumber)
@@ -278,51 +277,61 @@ namespace ISQExplorer.Repositories
             _helper = new QueryHelper(context, logger);
         }
 
-        private static IQueryable<(ISQEntryModel, T)> Ranged<T>(IQueryable<(ISQEntryModel, T)> input, Term? since,
+        public static IQueryable<T> Ranged<T>(IQueryable<T> input, Term? since,
             Term? until)
             where T : IRangedModel
         {
             if (since != null && until != null)
             {
                 return from t in input
-                    where since.CompareSql(t.Item2.Season, t.Item2.Year) <= 0 &&
-                          until.CompareSql(t.Item2.Season, t.Item2.Year) >= 0
+                    where (since.Year < t.Year || (since.Year == t.Year && since.Season <= t.Season)) &&
+                          (until.Year > t.Year || (until.Year == t.Year && until.Season >= t.Season))
                     select t;
             }
 
             if (since != null)
             {
                 return from t in input
-                    where since.CompareSql(t.Item2.Season, t.Item2.Year) <= 0
+                    where (since.Year < t.Year || (since.Year == t.Year && since.Season <= t.Season))
                     select t;
             }
 
             if (until != null)
             {
                 return from t in input
-                    where until.CompareSql(t.Item2.Season, t.Item2.Year) >= 0
+                    where (until.Year > t.Year || (until.Year == t.Year && until.Season >= t.Season))
                     select t;
             }
 
             return input;
         }
 
-        private static IQueryable<ISQEntryModel> RangedEntryModel(IQueryable<ISQEntryModel> input, Term? since,
+        public static IQueryable<ISQEntryModel> Ranged(IQueryable<ISQEntryModel> input, Term? since,
             Term? until)
         {
-            IQueryable<ISQEntryModel> ret = input;
+            if (since != null && until != null)
+            {
+                return from t in input
+                    where (since.Year < t.Year || (since.Year == t.Year && since.Season <= t.Season)) &&
+                          (until.Year > t.Year || (until.Year == t.Year && until.Season >= t.Season))
+                    select t;
+            }
 
             if (since != null)
             {
-                ret = ret.Where(x => since.CompareSql(x.Season, x.Year) <= 0);
+                return from t in input
+                    where (since.Year < t.Year || (since.Year == t.Year && since.Season <= t.Season))
+                    select t;
             }
 
             if (until != null)
             {
-                ret = ret.Where(x => until.CompareSql(x.Season, x.Year) >= 0);
+                return from t in input
+                    where (until.Year > t.Year || (until.Year == t.Year && until.Season >= t.Season))
+                    select t;
             }
 
-            return ret;
+            return input;
         }
 
         private IEnumerable<ISQEntryModel> QueryClassSqlLookup(QueryParams qp)
@@ -344,7 +353,7 @@ namespace ISQExplorer.Repositories
 
             if (courseCodes != null)
             {
-                query = RangedEntryModel(from entry in query
+                query = Ranged(from entry in query
                     join course in _context.Courses
                         on entry.Course equals course
                     join code in _context.CourseCodes
@@ -378,7 +387,7 @@ namespace ISQExplorer.Repositories
                 }
             }
 
-            return RangedEntryModel(query, qp.Since, qp.Until);
+            return Ranged(query, qp.Since, qp.Until);
         }
 
         private async Task<IEnumerable<ISQEntryModel>> QueryClassWebLookup(QueryParams qp)
@@ -406,18 +415,18 @@ namespace ISQExplorer.Repositories
 
             if (courseQuery != null && professorQuery != null)
             {
-                return RangedEntryModel((await courseQuery).Intersect(await professorQuery).AsQueryable(), qp.Since,
+                return Ranged((await courseQuery).Intersect(await professorQuery).AsQueryable(), qp.Since,
                     qp.Until);
             }
             else if (courseQuery != null)
             {
-                return RangedEntryModel((await courseQuery).AsQueryable(), qp.Since, qp.Until);
+                return Ranged((await courseQuery).AsQueryable(), qp.Since, qp.Until);
             }
             else if (professorQuery != null)
             {
-                return RangedEntryModel((await professorQuery).AsQueryable(), qp.Since, qp.Until);
+                return Ranged((await professorQuery).AsQueryable(), qp.Since, qp.Until);
             }
-            
+
             return new List<ISQEntryModel>().AsQueryable();
         }
 
