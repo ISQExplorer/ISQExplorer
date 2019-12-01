@@ -42,14 +42,13 @@ namespace ISQExplorer.Models
         public ProfessorModel Professor { get; set; }
         public int Crn { get; set; }
         public int NResponded { get; set; }
-        public int NTotal { get; set; }
+        public int NEnrolled { get; set; }
         public double Pct5 { get; set; }
         public double Pct4 { get; set; }
         public double Pct3 { get; set; }
         public double Pct2 { get; set; }
         public double Pct1 { get; set; }
         public double PctNa { get; set; }
-        public int NEnrolled { get; set; }
         public double PctA { get; set; }
         public double PctAMinus { get; set; }
         public double PctBPlus { get; set; }

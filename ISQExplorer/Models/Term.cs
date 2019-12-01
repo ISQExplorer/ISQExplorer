@@ -99,24 +99,49 @@ namespace ISQExplorer.Models
         }
 
         // DO NOT USE `t1 != null` HERE. it causes infinite recursion
-        public static bool operator ==(Term t1, Term t2) =>
+        public static bool operator ==(Term? t1, Term? t2) =>
             ReferenceEquals(t1, t2) || (!ReferenceEquals(t1, null) && t1.Equals(t2));
 
-        public static bool operator !=(Term t1, Term t2) => !(t1 == t2);
+        public static bool operator !=(Term? t1, Term? t2) => !(t1 == t2);
 
-        public int CompareSql(Season? season, int? year)
+        public static bool operator >(Term? t1, Term? t2)
         {
-            if (season == null || year == null)
+            if (t1 == t2 || t1 == null)
             {
-                return 1;
+                return false;
             }
 
-            if (Year != year)
+            if (t2 == null)
             {
-                return Year - (int) year;
+                return true;
             }
 
-            return Season - (Season) season;
+            return t1.Year > t2.Year || (t1.Year == t2.Year && t1.Season > t2.Season);
+        }
+
+        public static bool operator <(Term? t1, Term? t2)
+        {
+            if (t1 == t2 || t2 == null)
+            {
+                return false;
+            }
+
+            if (t1 == null)
+            {
+                return true;
+            }
+            
+            return t1.Year < t2.Year || (t1.Year == t2.Year && t1.Season < t2.Season);
+        }
+
+        public static bool operator >=(Term? t1, Term? t2)
+        {
+            return t1 == t2 || t1 > t2;
+        }
+
+        public static bool operator <=(Term? t1, Term? t2)
+        {
+            return t1 == t2 || t1 < t2;
         }
 
         public (Season, int) ToTuple()

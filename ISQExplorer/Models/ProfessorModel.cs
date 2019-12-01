@@ -6,6 +6,15 @@ namespace ISQExplorer.Models
 {
     public class ProfessorModel
     {
+        public ProfessorModel()
+        {
+        }
+
+        public ProfessorModel(string nNumber, string firstName, string lastName)
+        {
+            (NNumber, FirstName, LastName) = (nNumber, firstName, lastName);
+        }
+
         protected bool Equals(ProfessorModel other)
         {
             return NNumber == other.NNumber;

@@ -104,6 +104,7 @@ namespace ISQExplorer.Repositories
             }
             catch (ArgumentException)
             {
+                _logger.LogWarning($"No course found in database with course code '{courseCode}'.");
                 return new ISQEntryModel[0];
             }
 
@@ -155,8 +156,10 @@ namespace ISQExplorer.Repositories
             return (await Task.WhenAll(isqTable.Children.Skip(2).Zip(gpaTable.Children.Skip(2)).Select(async x =>
             {
                 var (isq, gpa) = x;
-                var childText = isq.Children.Select(y => y.Children.Length == 0 ? y.InnerHtml.Trim() : y.Children.First().InnerHtml.Trim()).ToList();
-                var gpaText = gpa.Children.Select(y => y.Children.Length == 0 ? y.InnerHtml.Trim() : y.Children.First().InnerHtml.Trim()).ToList();
+                var childText = isq.Children.Select(y =>
+                    y.Children.Length == 0 ? y.InnerHtml.Trim() : y.Children.First().InnerHtml.Trim()).ToList();
+                var gpaText = gpa.Children.Select(y =>
+                    y.Children.Length == 0 ? y.InnerHtml.Trim() : y.Children.First().InnerHtml.Trim()).ToList();
                 var term = new Term(childText[0]);
                 var professor = await GetProfessor(childText[2]);
 
@@ -167,8 +170,8 @@ namespace ISQExplorer.Repositories
                     Year = term.Year,
                     Crn = int.Parse(childText[1]),
                     Professor = professor,
-                    NEnrolled = int.Parse(childText[3]),
-                    NTotal = int.Parse(childText[4]),
+                    NEnrolled = int.Parse(gpaText[3]),
+                    NResponded = int.Parse(childText[4]),
                     Pct5 = double.Parse(childText[6]),
                     Pct4 = double.Parse(childText[7]),
                     Pct3 = double.Parse(childText[8]),
@@ -197,57 +200,74 @@ namespace ISQExplorer.Repositories
             var config = Configuration.Default;
             var context = BrowsingContext.New(config);
 
-            var document = await context.OpenAsync(req => req.Address(new Url(url)));
+            using var webClient = new WebClient();
+            var webContent = await Task.Run(() => webClient.DownloadString(url));
+            var document = await context.OpenAsync(req => req.Content(webContent));
+
             var tables = document.QuerySelectorAll("table.datadisplaytable > tbody").ToList();
             var isqTable = tables[3];
-            var gpaTable = tables[6];
+            var gpaTable = tables[5];
 
-            var professorCache = new ConcurrentDictionary<string, ProfessorModel>();
-
-            async Task<ProfessorModel?> GetProfessor(string name)
+            ProfessorModel professor;
+            try
             {
-                if (!professorCache.ContainsKey(name))
-                {
-                    var professors = (await NameToProfessors(name)).ToList();
-                    if (professors.Count == 0)
-                    {
-                        string msg = $"No professors found for name '${name}'. Returning null for this entry.";
-                        _logger.LogWarning(msg);
-                        throw new ArgumentException(msg);
-                    }
-
-                    if (professors.Count > 1)
-                    {
-                        _logger.LogWarning(
-                            $"More than one professor found for name '${name}' with first names [{string.Join(", ", professors.Select(x => x.FirstName))}]. Using the first one in the list.");
-                    }
-
-                    professorCache[name] = professors.First();
-                }
-
-                return professorCache[name];
+                professor = _context.Professors.First(x => x.NNumber.Equals(nNumber.ToUpper()));
+            }
+            catch (InvalidOperationException)
+            {
+                _logger.LogWarning($"No professor found in database with N-Number '{nNumber}'.");
+                return new ISQEntryModel[0];
             }
 
             return await Task.WhenAll(isqTable.Children.Skip(2).Zip(gpaTable.Children.Skip(2)).Select(async x =>
             {
                 var (isq, gpa) = x;
-                var childText = isq.Children.Select(y => y.InnerHtml).ToList();
-                var gpaText = gpa.Children.Select(y => y.InnerHtml).ToList();
+                var childText = isq.Children.Select(y =>
+                    y.Children.Length == 0 ? y.InnerHtml.Trim() : y.Children.First().InnerHtml.Trim()).ToList();
+                var gpaText = gpa.Children.Select(y =>
+                    y.Children.Length == 0 ? y.InnerHtml.Trim() : y.Children.First().InnerHtml.Trim()).ToList();
                 var term = new Term(childText[0]);
+                var courseCandidates = QueryRepository.Ranged(from course in _context.CourseCodes
+                    where course.CourseCode == childText[2]
+                    select course, null, term).ToList();
+
+                CourseModel cs;
+                if (courseCandidates.Count == 0)
+                {
+                    _logger.LogWarning(
+                        $"No courses found with course code '{childText[2]}' before term '{term}'. Returning null.");
+                    cs = null;
+                }
+                else
+                {
+                    cs = courseCandidates.Aggregate((a, c) =>
+                    {
+                        Term? aterm = a.Season == null || a.Year == null
+                            ? null
+                            : new Term((Season) a.Season, (int) a.Year);
+                        Term? cterm = c.Season == null || c.Year == null
+                            ? null
+                            : new Term((Season) c.Season, (int) c.Year);
+                        return aterm >= cterm ? a : c;
+                    }).Course;
+                }
+
+
                 return new ISQEntryModel
                 {
                     Season = term.Season,
                     Year = term.Year,
+                    Course = cs,
                     Crn = int.Parse(childText[1]),
-                    Professor = await GetProfessor(childText[2]),
-                    NEnrolled = int.Parse(childText[3]),
-                    NTotal = int.Parse(childText[4]),
-                    Pct5 = double.Parse(childText[5]),
-                    Pct4 = double.Parse(childText[6]),
-                    Pct3 = double.Parse(childText[7]),
-                    Pct2 = double.Parse(childText[8]),
-                    Pct1 = double.Parse(childText[9]),
-                    PctNa = double.Parse(childText[10]),
+                    Professor = professor,
+                    NEnrolled = int.Parse(gpaText[3]),
+                    NResponded = int.Parse(childText[4]),
+                    Pct5 = double.Parse(childText[6]),
+                    Pct4 = double.Parse(childText[7]),
+                    Pct3 = double.Parse(childText[8]),
+                    Pct2 = double.Parse(childText[9]),
+                    Pct1 = double.Parse(childText[10]),
+                    PctNa = double.Parse(childText[11]),
                     PctA = double.Parse(childText[4]),
                     PctAMinus = double.Parse(gpaText[5]),
                     PctBPlus = double.Parse(gpaText[6]),
@@ -285,7 +305,7 @@ namespace ISQExplorer.Repositories
             {
                 return from t in input
                     where (since.Year < t.Year || (since.Year == t.Year && since.Season <= t.Season)) &&
-                          (until.Year > t.Year || (until.Year == t.Year && until.Season >= t.Season))
+                          (t.Year == null && until.Year > t.Year || (until.Year == t.Year && until.Season >= t.Season))
                     select t;
             }
 
@@ -299,7 +319,7 @@ namespace ISQExplorer.Repositories
             if (until != null)
             {
                 return from t in input
-                    where (until.Year > t.Year || (until.Year == t.Year && until.Season >= t.Season))
+                    where (t.Year == null || until.Year > t.Year || (until.Year == t.Year && until.Season >= t.Season))
                     select t;
             }
 
