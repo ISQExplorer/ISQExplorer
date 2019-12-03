@@ -37,7 +37,7 @@ namespace ISQExplorer.Repositories
                       (query.SeasonUntil == untilSeason || query.SeasonUntil == null) &&
                       (query.YearSince == sinceYear || query.YearSince == null) &&
                       (query.YearUntil == untilYear || query.YearUntil == null) &&
-                      DateTime.UtcNow.AddHours(-24) > query.LastUpdated
+                      query.LastUpdated > DateTime.UtcNow.AddHours(-24)
                 select query).AnyAsync();
         }
 
@@ -415,7 +415,7 @@ namespace ISQExplorer.Repositories
             Task<IEnumerable<ISQEntryModel>>? courseQuery = null;
             Task<IEnumerable<ISQEntryModel>>? professorQuery = null;
 
-            if (qp.CourseName != null)
+            if (qp.CourseCode != null)
             {
                 courseQuery = _helper.WebScrapeCourseCode(qp.CourseCode);
             }
@@ -450,29 +450,14 @@ namespace ISQExplorer.Repositories
             return new List<ISQEntryModel>().AsQueryable();
         }
 
-        public async Task<IEnumerable<ProfessorModel>> NameToProfessor(string professorName)
-        {
-            if (professorName.Contains(" "))
-            {
-                var name = professorName.Split(" ").ToList();
-                var fname = string.Join(" ", name.SkipLast(1));
-                var lname = name.Last();
-
-                return from prof in _context.Professors
-                    where prof.FirstName == fname &&
-                          prof.LastName == lname
-                    select prof;
-            }
-            else
-            {
-                return from prof in _context.Professors
-                    where prof.LastName == professorName
-                    select prof;
-            }
-        }
-
         public async Task<IEnumerable<ISQEntryModel>> QueryClass(QueryParams qp)
         {
+            // we don't really care when this is done as long as it's done eventually, so don't await
+#pragma warning disable 4014
+            _context.Queries.Where(x => DateTime.UtcNow.AddHours(-24) > x.LastUpdated)
+                .ForEachAsync(x => _context.Remove(x));
+#pragma warning restore 4014
+            
             if (await _helper.QueryIsCached(qp))
             {
                 return QueryClassSqlLookup(qp);
@@ -480,6 +465,17 @@ namespace ISQExplorer.Repositories
 
             var results = (await QueryClassWebLookup(qp)).ToList();
             _context.IsqEntries.AddRange(results);
+            _context.Queries.Add(new QueryModel
+            {
+                CourseCode = qp.CourseCode,
+                CourseName = qp.CourseName,
+                ProfessorName = qp.ProfessorName,
+                SeasonSince = qp.Since?.Season,
+                SeasonUntil = qp.Until?.Season,
+                YearSince = qp.Since?.Year,
+                YearUntil = qp.Until?.Year
+            });
+            _context.SaveChanges();
             return results;
         }
 

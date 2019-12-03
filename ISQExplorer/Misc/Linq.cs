@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -21,6 +22,14 @@ namespace ISQExplorer.Misc
             {
                 yield return (elem: y, index: i);
                 i++;
+            }
+        }
+
+        public static void ForEach<T>(this IEnumerable<T> x, Action<T> func)
+        {
+            foreach (var y in x)
+            {
+                func(y);
             }
         }
     }
