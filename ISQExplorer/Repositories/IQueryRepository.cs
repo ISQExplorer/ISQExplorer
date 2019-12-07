@@ -9,62 +9,6 @@ namespace ISQExplorer.Repositories
 {
     public class QueryParams : IEquatable<QueryParams>
     {
-        public bool Equals(QueryParams other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return _courseCode == other._courseCode && _courseName == other._courseName &&
-                   ProfessorName == other.ProfessorName && Equals(Since, other.Since) && Equals(Until, other.Until);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((QueryParams) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = (_courseCode != null ? _courseCode.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (_courseName != null ? _courseName.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (ProfessorName != null ? ProfessorName.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (Since != null ? Since.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (Until != null ? Until.GetHashCode() : 0);
-                return hashCode;
-            }
-        }
-
-        public static bool operator ==(QueryParams q1, QueryParams q2) =>
-            ReferenceEquals(q1, q2) || (!ReferenceEquals(q1, null) && q1.Equals(q2));
-
-        public static bool operator !=(QueryParams q1, QueryParams q2) => !(q1 == q2);
-
-        public static bool operator ==(QueryParams qp, QueryModel qm)
-        {
-            return (ReferenceEquals(qp, null) && ReferenceEquals(qm, null)) ||
-                (!ReferenceEquals(qp, null) && !ReferenceEquals(qm, null) &&
-                 qp.CourseCode == qm.CourseCode &&
-                 qp.CourseName == qm.CourseName &&
-                 qp.ProfessorName == qm.ProfessorName &&
-                 qp.Since == (qm.SeasonSince != null && qm.YearSince != null
-                     ? new Term(qm.SeasonSince ?? 0, qm.YearSince ?? 0)
-                     : null) &&
-                 qp.Until == (qm.SeasonUntil != null && qm.YearUntil != null
-                     ? new Term(qm.SeasonUntil ?? 0, qm.YearUntil ?? 0)
-                     : null));
-        }
-
-        public static bool operator !=(QueryParams qp, QueryModel qm) => !(qp == qm);
-
-        public static bool operator ==(QueryModel qm, QueryParams qp) => qp == qm;
-
-        public static bool operator !=(QueryModel qm, QueryParams qp) => qp != qm;
-
-
         private string? _courseCode;
 
         public string? CourseCode
@@ -113,6 +57,40 @@ namespace ISQExplorer.Repositories
         public QueryParams(QueryParams other) : this(other.CourseCode, other.CourseName, other.ProfessorName,
             other.Since, other.Until)
         {
+        }
+
+        public bool Equals(QueryParams other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return _courseCode == other._courseCode && _courseName == other._courseName &&
+                   ProfessorName == other.ProfessorName && Equals(Since, other.Since) && Equals(Until, other.Until);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((QueryParams) obj);
+        }
+
+        public static bool operator ==(QueryParams q1, QueryParams q2) =>
+            ReferenceEquals(q1, q2) || (!ReferenceEquals(q1, null) && q1.Equals(q2));
+
+        public static bool operator !=(QueryParams q1, QueryParams q2) => !(q1 == q2);
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = (_courseCode != null ? _courseCode.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (_courseName != null ? _courseName.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (ProfessorName != null ? ProfessorName.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Since != null ? Since.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Until != null ? Until.GetHashCode() : 0);
+                return hashCode;
+            }
         }
     }
 

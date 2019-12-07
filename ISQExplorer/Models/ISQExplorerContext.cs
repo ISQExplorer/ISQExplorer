@@ -12,19 +12,18 @@ namespace ISQExplorer.Models
 
         public DbSet<ISQEntryModel> IsqEntries { get; set; }
         public DbSet<ProfessorModel> Professors { get; set; }
-        public DbSet<QueryModel> Queries { get; set; }
         public DbSet<CourseModel> Courses { get; set; }
-        public DbSet<CourseNameModel> CourseNames { get; set; }
-        public DbSet<CourseCodeModel> CourseCodes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<CourseModel>()
-                .HasIndex(c => c.Description);
+                .HasIndex(c => c.CourseCode);
+            modelBuilder.Entity<DepartmentModel>()
+                .HasIndex(c => c.Name);
+            modelBuilder.Entity<ISQEntryModel>()
+                .HasIndex(c => new {c.Course, c.Crn, c.Season, c.Year});
             modelBuilder.Entity<ProfessorModel>()
                 .HasIndex(c => c.NNumber);
-            modelBuilder.Entity<ISQEntryModel>()
-                .HasIndex(c => new {c.Crn, c.Season, c.Year});
         }
     }
 }

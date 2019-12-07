@@ -1,24 +1,24 @@
 #nullable enable
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ISQExplorer.Models
 {
-    public class CourseModel
+    public class CourseModel : IEquatable<CourseModel>
     {
-        public CourseModel()
-        {
-        }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
 
-        public CourseModel(string description, int? id = null)
-        {
-            Description = description;
-            Id = id ?? 0;
-        }
+        public string CourseCode { get; set; }
+        public string Name { get; set; }
 
-        protected bool Equals(CourseModel other)
+        public bool Equals(CourseModel other)
         {
-            return Description == other.Description;
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Id == other.Id && CourseCode == other.CourseCode && Name == other.Name;
         }
 
         public override bool Equals(object obj)
@@ -29,14 +29,20 @@ namespace ISQExplorer.Models
             return Equals((CourseModel) obj);
         }
 
+        public static bool operator ==(CourseModel? p1, CourseModel? p2) =>
+            ReferenceEquals(p1, p2) || (!ReferenceEquals(p1, null) && p1.Equals(p2));
+
+        public static bool operator !=(CourseModel? p1, CourseModel? p2) => !(p1 == p2);
+
         public override int GetHashCode()
         {
-            return (Description != null ? Description.GetHashCode() : 0);
+            unchecked
+            {
+                var hashCode = Id;
+                hashCode = (hashCode * 397) ^ (CourseCode != null ? CourseCode.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Name != null ? Name.GetHashCode() : 0);
+                return hashCode;
+            }
         }
-
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-        public string Description { get; set; }
     }
 }

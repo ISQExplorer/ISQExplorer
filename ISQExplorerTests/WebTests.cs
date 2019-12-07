@@ -28,23 +28,23 @@ namespace ISQExplorerTests
 
             var courses = new[]
             {
-                new CourseModel("Work with computer"),
-                new CourseModel("BIG DATA"),
+                new CourseModel{Description = "Work with computer"},
+                new CourseModel{Description = "BIG DATA"},
             };
 
             var courseCodes = new[]
             {
-                new CourseCodeModel(courses[0], "COP3503", null, null),
-                new CourseCodeModel(courses[1], "COP4710", null, null),
-                new CourseCodeModel(courses[1], "COP3991", Season.Fall, 2019),
+                new CourseCodeModel{Course = courses[0], CourseCode = "COP3503", Season = null, Year = null},
+                new CourseCodeModel{Course = courses[1], "COP4710", Season = null, Year = null},
+                new CourseCodeModel{Course = courses[1], "COP3991", Season = Season.Fall, Year = 2019},
             };
 
             var courseNames = new[]
             {
-                new CourseNameModel(courses[0], "Intro to Jesus", null, null),
-                new CourseNameModel(courses[0], "Computer Science 2", Season.Fall, 2018),
-                new CourseNameModel(courses[1], "Dutta Modeling", null, null),
-                new CourseNameModel(courses[1], "Intro to Databases", Season.Fall, 2019),
+                new CourseNameModel{Course = courses[0], Name = "Intro to Jesus", Season = null, Year = null},
+                new CourseNameModel{Course = courses[0], Name = "Computer Science 2", Season = Season.Fall, Year = 2018},
+                new CourseNameModel{Course = courses[1], Name = "Dutta Modeling", Season = null, Year = null},
+                new CourseNameModel{Course = courses[1], Name = "Intro to Databases", Season = Season.Fall, Year = 2019},
             };
 
             var professors = new[]
@@ -98,7 +98,7 @@ namespace ISQExplorerTests
             Assert.AreEqual(0, res4.Count);
         }
 
-        private static object ConditionToObject(Action<List<ISQEntryModel>, List<ISQEntryModel>> a)
+        private static object ConditionToObject(Action<List<ISQEntryModel>, List<ISQEntryModel>, Dictionary<CourseModel, HashSet<string>>> a)
         {
             return a;
         }
@@ -108,17 +108,34 @@ namespace ISQExplorerTests
             new[]
             {
                 new QueryParams {CourseCode = "COP3503"},
-                ConditionToObject(CollectionAssert.AreEquivalent)
+                ConditionToObject((a, b, c) =>
+                {
+                    CollectionAssert.AreEquivalent(a, b);
+                    Assert.True(a.All(x => c[x.Course].Contains("COP3503")));
+                })
             },
             new[]
             {
                 new QueryParams {ProfessorName = "Reddivari"},
-                ConditionToObject(CollectionAssert.AreEquivalent)
+                ConditionToObject((a, b, c) =>
+                {
+                    CollectionAssert.AreEquivalent(a, b);
+                    Assert.True(a.All(x => x.Professor.LastName.Equals("Reddivari")));
+                })
+            },
+            new[]
+            {
+                 new QueryParams {CourseName = "Dutta Modeling"},
+                 ConditionToObject((a, b, c) =>
+                 {
+                     CollectionAssert.AreEquivalent(a, b);
+                     Assert.True(a.All(x => x.Course.Description.Equals("BIG DATA")));
+                 })               
             }
         };
 
         [Test, TestCaseSource(nameof(_queryCases))]
-        public async Task TestQueryClass(QueryParams qp, Action<List<ISQEntryModel>, List<ISQEntryModel>> assertion)
+        public async Task TestQueryClass(QueryParams qp, Action<List<ISQEntryModel>, List<ISQEntryModel>, Dictionary<CourseModel, HashSet<string>>> assertion)
         {
             // make sure we start out with no entries as a sanity check
             var qr = new QueryRepository(_ctx, _logger);
@@ -146,7 +163,7 @@ namespace ISQExplorerTests
             Assert.True(qp == queries.First());
 
             // run the given assertion function on the two lists
-            assertion(res1, res2);
+            assertion(res1, res2, _courseMap);
         }
     }
 }

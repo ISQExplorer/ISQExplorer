@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +8,6 @@ using System.Threading.Tasks;
 using AngleSharp;
 using ISQExplorer.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Logging;
 
 namespace ISQExplorer.Repositories
@@ -26,8 +24,8 @@ namespace ISQExplorer.Repositories
 
         public async Task<bool> QueryIsCached(QueryParams p)
         {
-            var (sinceSeason, sinceYear) = Term.ToTuple(p.Since);
-            var (untilSeason, untilYear) = Term.ToTuple(p.Until);
+            var (sinceSeason, sinceYear) = p.Since;
+            var (untilSeason, untilYear) = p.Until;
             return await (from query in _context.Queries
                 where (query.CourseCode == null ||
                        p.CourseCode != null && query.CourseCode == p.CourseCode.ToUpper()) &&
@@ -457,7 +455,7 @@ namespace ISQExplorer.Repositories
             _context.Queries.Where(x => DateTime.UtcNow.AddHours(-24) > x.LastUpdated)
                 .ForEachAsync(x => _context.Remove(x));
 #pragma warning restore 4014
-            
+
             if (await _helper.QueryIsCached(qp))
             {
                 return QueryClassSqlLookup(qp);

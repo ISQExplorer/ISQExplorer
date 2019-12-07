@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace ISQExplorer.Misc
+namespace ISQExplorer.Misc.Linq
 {
     public static class Linq
     {

@@ -1,37 +1,12 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace ISQExplorer.Models
 {
-    public class ISQEntryModel
+    public class ISQEntryModel : ITimedModel, IEquatable<ISQEntryModel>
     {
-        protected bool Equals(ISQEntryModel other)
-        {
-            return Season == other.Season && Year == other.Year && Crn == other.Crn;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            return obj.GetType() == this.GetType() && Equals((ISQEntryModel) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = Season.GetHashCode();
-                hashCode = (hashCode * 397) ^ Year.GetHashCode();
-                hashCode = (hashCode * 397) ^ Crn;
-                return hashCode;
-            }
-        }
-
-        public static bool operator ==(ISQEntryModel i1, ISQEntryModel i2) => i1 != null && i1.Equals(i2);
-        public static bool operator !=(ISQEntryModel i1, ISQEntryModel i2) => i1 == null || i1.Equals(i2);
-
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -60,5 +35,37 @@ namespace ISQExplorer.Models
         public double PctF { get; set; }
         public double PctWithdraw { get; set; }
         public double MeanGpa { get; set; }
+
+        public bool Equals(ISQEntryModel other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Equals(Course, other.Course) && Season == other.Season && Year == other.Year && Crn == other.Crn;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((ISQEntryModel) obj);
+        }
+
+        public static bool operator ==(ISQEntryModel? p1, ISQEntryModel? p2) =>
+            ReferenceEquals(p1, p2) || (!ReferenceEquals(p1, null) && p1.Equals(p2));
+
+        public static bool operator !=(ISQEntryModel? p1, ISQEntryModel? p2) => !(p1 == p2);
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = (Course != null ? Course.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (int) Season;
+                hashCode = (hashCode * 397) ^ Year;
+                hashCode = (hashCode * 397) ^ Crn;
+                return hashCode;
+            }
+        }
     }
 }

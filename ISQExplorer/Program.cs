@@ -18,9 +18,10 @@ namespace ISQExplorer
         {
             var host = CreateHostBuilder(args).Build();
 
+            /*
             using var scope = host.Services.CreateScope();
             var services = scope.ServiceProvider;
-            
+           
             var professorJson = Environment.GetEnvironmentVariable("ISQEXPLORER_PROFESSORS_IMPORT");
             if (professorJson != null)
             {
@@ -32,6 +33,7 @@ namespace ISQExplorer
             {
                 DatabaseImporter.ImportClasses(services, classJson);
             }
+            */
 
             host.Run();
         }

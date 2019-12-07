@@ -83,6 +83,18 @@ namespace ISQExplorer.Models
             (Season, Year) = other;
         }
 
+        public Term(DateTime dt)
+        {
+            Year = dt.Year;
+            Season = dt.Month switch
+            {
+                var x when x >= 1 && x <= 4 => Season.Spring,
+                var x when x >= 5 && x <= 7 => Season.Summer,
+                var x when x >= 8 && x <= 12 => Season.Fall,
+                _ => Season.Spring
+            };
+        }
+
         public void Deconstruct(out Season season, out int year)
         {
             (season, year) = (Season, Year);
@@ -116,7 +128,7 @@ namespace ISQExplorer.Models
                 return true;
             }
 
-            return t1.Year > t2.Year || (t1.Year == t2.Year && t1.Season > t2.Season);
+            return t1.CompareTo(t2) > 0;
         }
 
         public static bool operator <(Term? t1, Term? t2)
@@ -130,8 +142,8 @@ namespace ISQExplorer.Models
             {
                 return true;
             }
-            
-            return t1.Year < t2.Year || (t1.Year == t2.Year && t1.Season < t2.Season);
+
+            return t1.CompareTo(t2) < 0;
         }
 
         public static bool operator >=(Term? t1, Term? t2)
@@ -144,20 +156,49 @@ namespace ISQExplorer.Models
             return t1 == t2 || t1 < t2;
         }
 
-        public (Season, int) ToTuple()
+        public static Term operator -(Term t, int val)
         {
-            return (Season, Year);
-        }
-
-        public static (Season?, int?) ToTuple(Term? x)
-        {
-            if (x == null)
+            var nEnum = Enum.GetNames(typeof(Season)).Length;
+            
+            if (val < 0)
             {
-                return (null, null);
+                return t + -val;
+            }
+            
+            var (season, year) = t;
+            var newYear = year - val / nEnum;
+            var newSeason = (int) season - val % nEnum;
+            if (newSeason < 0)
+            {
+                newYear -= 1;
+                newSeason += nEnum;
             }
 
-            return x.ToTuple();
+            return new Term((Season) newSeason, newYear);
         }
+
+        public static Term operator +(Term t, int val)
+        {
+            var nEnum = Enum.GetNames(typeof(Season)).Length;
+            
+            if (val < 0)
+            {
+                return t - -val;
+            }
+            
+            var (season, year) = t;
+            var newYear = year + val / nEnum;
+            var newSeason = (int) season + val % nEnum;
+            if (newSeason > nEnum - 1)
+            {
+                newYear += 1;
+                newSeason += nEnum;
+            }
+
+            return new Term((Season) newSeason, newYear);
+        }
+
+        public static implicit operator Term(DateTime dt) => new Term(dt);
 
         public override string ToString() => $"{Season} {Year}";
     }
