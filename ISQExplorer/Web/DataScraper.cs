@@ -1,19 +1,30 @@
+#nullable enable
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime;
 using System.Threading.Tasks;
 using AngleSharp;
 using AngleSharp.Dom;
 using ISQExplorer.Functional;
 using ISQExplorer.Misc;
 using ISQExplorer.Models;
+using ISQExplorer.Repositories;
+using Microsoft.Extensions.Logging;
 
 namespace ISQExplorer.Web
 {
     public class DataScraper
     {
+        private readonly ILogger<DataScraper> _logger;
+
+        public DataScraper(ILogger<DataScraper> logger)
+        {
+            _logger = logger;
+        }
+
         public static async Task<IDocument> ToDocument(string html)
         {
             var config = Configuration.Default;
@@ -27,7 +38,7 @@ namespace ISQExplorer.Web
             return html ? new Try<IDocument, IOException>(await ToDocument(html.Value)) : html.Exception;
         }
 
-        public async Task<Try<DepartmentModel, IOException>> GetDepartments()
+        public static async Task<Try<IEnumerable<DepartmentModel>, IOException>> ScrapeDepartmentIds()
         {
             const string url = "https://banner.unf.edu/pls/nfpo/wksfwbs.p_dept_schd";
             var html = await Requests.Get(url);
@@ -49,9 +60,9 @@ namespace ISQExplorer.Web
 
         public async Task<Optional<IOException>> ScrapeDepartment(
             int dept,
-            ConcurrentDictionary<string, ProfessorModel> professors,
-            ConcurrentDictionary<string, CourseModel> courses,
-            Term? when = null
+            Term? when = null,
+            Action<CourseModel>? onCourse = null,
+            Action<ProfessorModel>? onProfessor = null
         )
         {
             var (season, year) = when ?? new Term(DateTime.UtcNow) - 1;
@@ -74,13 +85,13 @@ namespace ISQExplorer.Web
             throw new NotImplementedException();
         }
 
-        private async Task<Try<IEnumerable<ISQEntryModel>, IOException>> ScrapeCourseCode(
+        private async Task<Try<IEnumerable<ISQEntryModel>, IOException>> ScrapeDepartmentCourse(
             CourseModel course,
-            ConcurrentDictionary<string, ProfessorModel> professors
+            Func<string, Task<ProfessorModel?>>? lastNameToProfessor = null
         )
         {
             var url =
-                $"https://banner.unf.edu/pls/nfpo/wksfwbs.p_course_isq_grade?pv_course_id={course.CourseCode.ToUpper()}";
+                $"https://banner.unf.edu/pls/nfpo/wksfwbs.p_course_isq_grade?pv_course_id={course.CourseCode}";
             var document = await ToDocument(await Requests.Get(url));
             if (!document)
             {
@@ -105,7 +116,12 @@ namespace ISQExplorer.Web
                 var gpaText = gpa.Children.Select(y =>
                     y.Children.Length == 0 ? y.InnerHtml.Trim() : y.Children.First().InnerHtml.Trim()).ToList();
                 var (season, year) = new Term(childText[0]);
-                var professor = professors.ContainsKey(childText[2]) ? professors[childText[2]] : null;
+                var professor = lastNameToProfessor != null ? await lastNameToProfessor(childText[2]) : null;
+
+                if (professor == null)
+                {
+                    _logger.LogWarning($"No professor found in the cache with last name '{childText[2]}'.");
+                }
 
                 return new ISQEntryModel
                 {
@@ -137,11 +153,12 @@ namespace ISQExplorer.Web
             })));
         }
 
-        public async Task<Try<IEnumerable<ISQEntryModel>, IOException>> ScrapeProfessor(
-            string nNumber,
-            ConcurrentDictionary<string, ProfessorModel> professors,
-            ConcurrentDictionary<string, CourseModel> courses
-        )
+        public async Task<Try<(ProfessorModel Professor, IEnumerable<ISQEntryModel> Entries), IOException>>
+            ScrapeDepartmentProfessor(
+                string nNumber,
+                DepartmentModel dept,
+                Func<string, Task<CourseModel>> courseCodeToCourse
+            )
         {
             var url =
                 $"https://banner.unf.edu/pls/nfpo/wksfwbs.p_instructor_isq_grade?pv_instructor={nNumber}";
@@ -153,34 +170,54 @@ namespace ISQExplorer.Web
             }
 
             var tables = document.Value.QuerySelectorAll("table.datadisplaytable > tbody").ToList();
-            
-            if (!professors.ContainsKey(nNumber))
+
+
+            var name = tables[1].Children[0].Children[1].InnerHtml.Split(" ");
+            if (name.Length < 2)
             {
-                var name = tables[1].Children[0].Children[1].InnerHtml.Split(" ");
-                if (name.Length < 2)
-                {
-                    return new IOException("Error while reading professor name.");
-                }
-                
-                var fname = name.SkipLast(1).Join(" ");
-                var lname = name.Last();
+                return new IOException("Error while reading professor name.");
             }
+
+            var fname = string.Join(" ", name.SkipLast(1));
+            var lname = name.Last();
+
+            var prof = new ProfessorModel
+                {Department = dept, FirstName = fname, LastName = lname, NNumber = nNumber};
+
+            var entries = await ProfessorTablesToEntries(prof, tables[3], tables[5], courseCodeToCourse);
+
+            return (prof, entries);
+        }
+
+        public async Task<Try<IEnumerable<ISQEntryModel>, IOException>>
+            ScrapeDepartmentProfessor(
+                ProfessorModel professor,
+                Func<string, Task<CourseModel>> courseCodeToCourse
+            )
+        {
+            var url =
+                $"https://banner.unf.edu/pls/nfpo/wksfwbs.p_instructor_isq_grade?pv_instructor={professor.NNumber}";
+
+            var document = await ToDocument(await Requests.Get(url));
+            if (!document)
+            {
+                return new IOException($"Error while scraping NNumber '{professor.NNumber}'.", document.Exception);
+            }
+
+            var tables = document.Value.QuerySelectorAll("table.datadisplaytable > tbody").ToList();
 
             var isqTable = tables[3];
             var gpaTable = tables[5];
 
-            ProfessorModel professor;
-            try
-            {
-                professor = _context.Professors.First(x => x.NNumber.Equals(nNumber.ToUpper()));
-            }
-            catch (InvalidOperationException)
-            {
-                _logger.LogWarning($"No professor found in database with N-Number '{nNumber}'.");
-                return new ISQEntryModel[0];
-            }
+            return new Try<IEnumerable<ISQEntryModel>, IOException>(
+                await ProfessorTablesToEntries(professor, isqTable, gpaTable, courseCodeToCourse));
+        }
 
-            return await Task.WhenAll(isqTable.Children.Skip(2).Zip(gpaTable.Children.Skip(2)).Select(async x =>
+        private async Task<IEnumerable<ISQEntryModel>> ProfessorTablesToEntries(ProfessorModel professor,
+            IElement childTable,
+            IElement gpaTable, Func<string, Task<CourseModel>> courseCodeToCourse)
+        {
+            return await Task.WhenAll(childTable.Children.Skip(2).Zip(gpaTable.Children.Skip(2)).Select(async x =>
             {
                 var (isq, gpa) = x;
                 var childText = isq.Children.Select(y =>
@@ -188,37 +225,18 @@ namespace ISQExplorer.Web
                 var gpaText = gpa.Children.Select(y =>
                     y.Children.Length == 0 ? y.InnerHtml.Trim() : y.Children.First().InnerHtml.Trim()).ToList();
                 var term = new Term(childText[0]);
-                var courseCandidates = QueryRepository.Ranged(from course in _context.CourseCodes
-                    where course.CourseCode == childText[2]
-                    select course, null, term).ToList();
 
-                CourseModel cs;
-                if (courseCandidates.Count == 0)
+                var course = await courseCodeToCourse(childText[2]);
+                if (course == null)
                 {
-                    _logger.LogWarning(
-                        $"No courses found with course code '{childText[2]}' before term '{term}'. Returning null.");
-                    cs = null;
+                    _logger.LogWarning($"No course found in the cache with course code '{childText[2]}'.");
                 }
-                else
-                {
-                    cs = courseCandidates.Aggregate((a, c) =>
-                    {
-                        Term? aterm = a.Season == null || a.Year == null
-                            ? null
-                            : new Term((Season) a.Season, (int) a.Year);
-                        Term? cterm = c.Season == null || c.Year == null
-                            ? null
-                            : new Term((Season) c.Season, (int) c.Year);
-                        return aterm >= cterm ? a : c;
-                    }).Course;
-                }
-
 
                 return new ISQEntryModel
                 {
                     Season = term.Season,
                     Year = term.Year,
-                    Course = cs,
+                    Course = course,
                     Crn = int.Parse(childText[1]),
                     Professor = professor,
                     NEnrolled = int.Parse(gpaText[3]),

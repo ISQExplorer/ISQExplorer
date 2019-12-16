@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Extensions.FileSystemGlobbing.Internal;
 
 namespace ISQExplorer.Functional
 {
@@ -7,7 +8,7 @@ namespace ISQExplorer.Functional
         private T _value;
         private TException _ex;
         public bool HasValue { get; }
-        
+
         public Try(T val)
         {
             (_value, _ex, HasValue) = (val, default, true);
@@ -26,6 +27,7 @@ namespace ISQExplorer.Functional
                 {
                     return _value;
                 }
+
                 throw new InvalidOperationException($"This Try has an exception, not a value. Exception: '{_ex}'.");
             }
         }
@@ -38,6 +40,7 @@ namespace ISQExplorer.Functional
                 {
                     return _ex;
                 }
+
                 throw new InvalidOperationException($"This Try has a value, not an exception. Value: '{_value}'.");
             }
         }
@@ -56,8 +59,13 @@ namespace ISQExplorer.Functional
             }
         }
 
+        public Try<TRes, TException> Select<TRes>(Func<T, TRes> func) => Match(
+            val => new Try<TRes, TException>(func(Value)),
+            ex => ex
+        );
+
         public static implicit operator Try<T, TException>(T val) => new Try<T, TException>(val);
-        
+
         public static implicit operator Try<T, TException>(TException ex) => new Try<T, TException>(ex);
 
         public static explicit operator T(Try<T, TException> t) => t.Value;
