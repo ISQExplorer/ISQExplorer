@@ -4,10 +4,12 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Runtime;
 using System.Threading.Tasks;
 using AngleSharp;
 using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
 using ISQExplorer.Functional;
 using ISQExplorer.Misc;
 using ISQExplorer.Models;
@@ -16,15 +18,8 @@ using Microsoft.Extensions.Logging;
 
 namespace ISQExplorer.Web
 {
-    public class DataScraper
+    public static class DataScraper
     {
-        private readonly ILogger<DataScraper> _logger;
-
-        public DataScraper(ILogger<DataScraper> logger)
-        {
-            _logger = logger;
-        }
-
         public static async Task<IDocument> ToDocument(string html)
         {
             var config = Configuration.Default;
@@ -55,11 +50,29 @@ namespace ISQExplorer.Web
                     $"Encountered malformed page while retrieving departments. Expected one #dept_id, found {selectors.Count}.");
             }
 
-            throw new NotImplementedException();
+            return new Try<IEnumerable<DepartmentModel>, IOException>(() => selectors.First().Children.Skip(1).Select(
+                x =>
+                {
+                    if (!(x is IHtmlOptionElement opt))
+                    {
+                        throw new IOException(
+                            $"Non option element found as child of selector with OuterHTML '{x.OuterHtml}'.");
+                    }
+
+                    var id = Parse.Int(opt.Value);
+                    var label = opt.Label;
+
+                    if (!id)
+                    {
+                        throw new IOException($"Invalid id found '{opt.Value}'.");
+                    }
+
+                    return new DepartmentModel {Id = id.Value, Name = label};
+                }));
         }
 
-        public async Task<Optional<IOException>> ScrapeDepartment(
-            int dept,
+        public static async Task<Optional<IOException>> ScrapeDepartment(
+            DepartmentModel dept,
             Term? when = null,
             Action<CourseModel>? onCourse = null,
             Action<ProfessorModel>? onProfessor = null
@@ -76,16 +89,38 @@ namespace ISQExplorer.Web
             };
 
             var document = await ToDocument(await Requests.Post("https://banner.unf.edu/pls/nfpo/wksfwbs.p_dept_schd",
-                $"pv_term={no}&pv_dept={dept}&pv_ptrm=&pv_campus=&pv_sub=Submit"));
+                $"pv_term={no}&pv_dept={dept.Id}&pv_ptrm=&pv_campus=&pv_sub=Submit"));
             if (!document)
             {
                 return new IOException($"Error while retrieving department page {dept}.", document.Exception);
             }
 
+            document.Value
+                .QuerySelectorAll("table.datadisplaytable > tbody > tr")
+                .Skip(3)
+                .ForEach(x =>
+                {
+                    var children = x.Children.ToList();
+
+                    onCourse?.Invoke(new CourseModel
+                    {
+                        CourseCode = children[2].Children.First().InnerHtml,
+                        Department = dept,
+                        Name = children[3].InnerHtml
+                    });
+
+                    var professorCell = children[16];
+
+                    onProfessor?.Invoke(new ProfessorModel
+                    {
+                        Department = dept,
+                    });
+                });
+
             throw new NotImplementedException();
         }
 
-        private async Task<Try<IEnumerable<ISQEntryModel>, IOException>> ScrapeDepartmentCourse(
+        private static async Task<Try<IEnumerable<ISQEntryModel>, IOException>> ScrapeDepartmentCourse(
             CourseModel course,
             Func<string, Task<ProfessorModel?>>? lastNameToProfessor = null
         )
@@ -118,11 +153,6 @@ namespace ISQExplorer.Web
                 var (season, year) = new Term(childText[0]);
                 var professor = lastNameToProfessor != null ? await lastNameToProfessor(childText[2]) : null;
 
-                if (professor == null)
-                {
-                    _logger.LogWarning($"No professor found in the cache with last name '{childText[2]}'.");
-                }
-
                 return new ISQEntryModel
                 {
                     Course = course,
@@ -153,7 +183,7 @@ namespace ISQExplorer.Web
             })));
         }
 
-        public async Task<Try<(ProfessorModel Professor, IEnumerable<ISQEntryModel> Entries), IOException>>
+        public static async Task<Try<(ProfessorModel Professor, IEnumerable<ISQEntryModel> Entries), IOException>>
             ScrapeDepartmentProfessor(
                 string nNumber,
                 DepartmentModel dept,
@@ -189,10 +219,10 @@ namespace ISQExplorer.Web
             return (prof, entries);
         }
 
-        public async Task<Try<IEnumerable<ISQEntryModel>, IOException>>
+        public static async Task<Try<IEnumerable<ISQEntryModel>, IOException>>
             ScrapeDepartmentProfessor(
                 ProfessorModel professor,
-                Func<string, Task<CourseModel>> courseCodeToCourse
+                Func<string, Task<CourseModel?>> courseCodeToCourse
             )
         {
             var url =
@@ -213,9 +243,9 @@ namespace ISQExplorer.Web
                 await ProfessorTablesToEntries(professor, isqTable, gpaTable, courseCodeToCourse));
         }
 
-        private async Task<IEnumerable<ISQEntryModel>> ProfessorTablesToEntries(ProfessorModel professor,
+        private static async Task<IEnumerable<ISQEntryModel>> ProfessorTablesToEntries(ProfessorModel professor,
             IElement childTable,
-            IElement gpaTable, Func<string, Task<CourseModel>> courseCodeToCourse)
+            IElement gpaTable, Func<string, Task<CourseModel?>> courseCodeToCourse)
         {
             return await Task.WhenAll(childTable.Children.Skip(2).Zip(gpaTable.Children.Skip(2)).Select(async x =>
             {
@@ -227,10 +257,6 @@ namespace ISQExplorer.Web
                 var term = new Term(childText[0]);
 
                 var course = await courseCodeToCourse(childText[2]);
-                if (course == null)
-                {
-                    _logger.LogWarning($"No course found in the cache with course code '{childText[2]}'.");
-                }
 
                 return new ISQEntryModel
                 {

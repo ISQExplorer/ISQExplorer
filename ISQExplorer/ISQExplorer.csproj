@@ -17,6 +17,6 @@
 
     <ItemGroup>
       <Folder Include="Error" />
-    </ItemGroup>
+  </ItemGroup>
 
 </Project>

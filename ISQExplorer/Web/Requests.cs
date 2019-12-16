@@ -40,7 +40,10 @@ namespace ISQExplorer.Misc
 
         public static async Task<Try<string, IOException>> Post(string url, string data)
         {
-            var request = WebRequest.Create(url);
+            var request = (HttpWebRequest) WebRequest.Create(url);
+
+            request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+            
             var payload = Encoding.UTF8.GetBytes(data);
 
             request.Method = "POST";

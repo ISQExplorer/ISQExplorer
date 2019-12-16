@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace ISQExplorer.Misc.Linq
+namespace ISQExplorer.Misc
 {
     public static class Linq
     {
@@ -32,5 +32,7 @@ namespace ISQExplorer.Misc.Linq
                 func(y);
             }
         }
+
+        public static string Join(this IEnumerable<string> x, string delim) => string.Join(delim, x);
     }
 }

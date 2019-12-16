@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 
 namespace ISQExplorer.Functional
@@ -34,7 +35,7 @@ namespace ISQExplorer.Functional
 
         public TRes Match<TRes>(Func<T, TRes> val, TRes empty) => HasValue ? val(Value) : empty;
         
-        public void Match(Action<T> val, Action empty)
+        public void Match(Action<T> val, Action? empty = null)
         {
             if (HasValue)
             {
@@ -42,9 +43,14 @@ namespace ISQExplorer.Functional
             }
             else
             {
-                empty();
+                empty?.Invoke();
             }
         }
+
+        public Optional<TRes> Select<TRes>(Func<T, TRes> func) => Match(
+            val => func(val),
+            () => new Optional<TRes>()
+        );
 
         public static implicit operator Optional<T>(T val) => new Optional<T>(val);
         

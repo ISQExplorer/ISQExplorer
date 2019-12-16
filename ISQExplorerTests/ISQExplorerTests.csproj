@@ -21,6 +21,6 @@
       <Reference Include="Microsoft.Extensions.Logging.Console, Version=3.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
         <HintPath>..\..\..\..\..\opt\dotnet\packs\Microsoft.AspNetCore.App.Ref\3.0.0\ref\netcoreapp3.0\Microsoft.Extensions.Logging.Console.dll</HintPath>
       </Reference>
-    </ItemGroup>
+  </ItemGroup>
 
 </Project>

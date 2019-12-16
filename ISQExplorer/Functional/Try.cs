@@ -3,6 +3,17 @@ using Microsoft.Extensions.FileSystemGlobbing.Internal;
 
 namespace ISQExplorer.Functional
 {
+    public class Try<T> : Try<T, Exception> {
+        public Try(T val) : base(val) {
+        }
+
+        public Try(Exception ex) : base(ex) {
+        }
+
+        public Try(Func<T> func) : base(func) {
+        }
+    }
+
     public class Try<T, TException> where TException : Exception
     {
         private T _value;
@@ -17,6 +28,18 @@ namespace ISQExplorer.Functional
         public Try(TException ex)
         {
             (_value, _ex, HasValue) = (default, ex, false);
+        }
+
+        public Try(Func<T> func)
+        {
+            try
+            {
+                (_value, _ex, HasValue) = (func(), default, true);
+            }
+            catch (TException ex)
+            {
+                (_value, _ex, HasValue) = (default, ex, false);
+            }
         }
 
         public T Value

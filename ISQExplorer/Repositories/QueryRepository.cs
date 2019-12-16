@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AngleSharp;
+using ISQExplorer.Misc;
 using ISQExplorer.Models;
 using ISQExplorer.Web;
 using Microsoft.EntityFrameworkCore;
@@ -16,28 +17,28 @@ namespace ISQExplorer.Repositories
     public class QueryRepository : IQueryRepository
     {
         private readonly ISQExplorerContext _context;
-        private readonly DataScraper _ds;
+        private readonly ILogger<QueryRepository> _logger;
 
-        public QueryRepository(ISQExplorerContext context, DataScraper ds)
+        public QueryRepository(ISQExplorerContext context, ILogger<QueryRepository> logger)
         {
             _context = context;
-            _ds = ds;
+            _logger = logger;
         }
 
-        private IEnumerable<ISQEntryModel> QueryClassSqlLookup(QueryParams qp)
+        private async Task<IEnumerable<ISQEntryModel>> QueryClassSqlLookup(QueryParams qp)
         {
             IQueryable<ISQEntryModel> query = _context.IsqEntries;
 
-            IEnumerable<string> courseCodes = null;
+            ISet<string> courseCodes = null;
             if (qp.CourseName != null)
             {
-                courseCodes = from course in _context.Courses
+                courseCodes = await Task.Run(() => (from course in _context.Courses
                     where course.Name.ToUpper().Contains(qp.CourseName.ToUpper())
-                    select course.CourseCode;
+                    select course.CourseCode).ToHashSet());
             }
             else if (qp.CourseCode != null)
             {
-                courseCodes = new List<string> {qp.CourseCode};
+                courseCodes = new HashSet<string> {qp.CourseCode};
             }
 
             if (courseCodes != null)
@@ -79,40 +80,34 @@ namespace ISQExplorer.Repositories
 
         private async Task<IEnumerable<ISQEntryModel>> QueryClassWebLookup(QueryParams qp)
         {
+            throw new NotImplementedException();
         }
 
         public async Task<IEnumerable<ISQEntryModel>> QueryClass(QueryParams qp)
         {
-            // we don't really care when this is done as long as it's done eventually, so don't await
-#pragma warning disable 4014
-            _context.Queries.Where(x => DateTime.UtcNow.AddHours(-24) > x.LastUpdated)
-                .ForEachAsync(x => _context.Remove(x));
-#pragma warning restore 4014
-
-            if (await _helper.QueryIsCached(qp))
-            {
-                return QueryClassSqlLookup(qp);
-            }
-
-            var results = (await QueryClassWebLookup(qp)).ToList();
-            _context.IsqEntries.AddRange(results);
-            _context.Queries.Add(new QueryModel
-            {
-                CourseCode = qp.CourseCode,
-                CourseName = qp.CourseName,
-                ProfessorName = qp.ProfessorName,
-                SeasonSince = qp.Since?.Season,
-                SeasonUntil = qp.Until?.Season,
-                YearSince = qp.Since?.Year,
-                YearUntil = qp.Until?.Year
-            });
-            _context.SaveChanges();
-            return results;
+            return await QueryClassSqlLookup(qp);
         }
 
-        public Task<IEnumerable<ProfessorModel>> NameToProfessors(string professorName)
+        public async Task<IEnumerable<ProfessorModel>> NameToProfessors(string professorName)
         {
-            return _helper.NameToProfessors(professorName);
+            if (!professorName.Contains(" "))
+            {
+                var lname = professorName.ToUpper();
+                
+                return from prof in _context.Professors
+                    where prof.LastName.ToUpper().Equals(lname)
+                    select prof;
+            }
+            else
+            {
+                var fname = professorName.Split(" ").SkipLast(1).Join(" ").ToUpper();
+                var lname = professorName.Split(" ").Last().ToUpper();
+
+                return from prof in _context.Professors
+                    where prof.LastName.ToUpper().Equals(lname) &&
+                          prof.FirstName.ToUpper().Equals(fname)
+                    select prof;
+            }
         }
     }
 }
