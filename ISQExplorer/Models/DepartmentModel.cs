@@ -43,5 +43,7 @@ namespace ISQExplorer.Models
                 return (Id * 397) ^ (Name != null ? Name.GetHashCode() : 0);
             }
         }
+
+        public override string ToString() => $"{Id} - {Name}";
     }
 }

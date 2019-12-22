@@ -4,8 +4,10 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection.Emit;
 using System.Runtime;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AngleSharp;
 using AngleSharp.Dom;
@@ -75,7 +77,8 @@ namespace ISQExplorer.Web
             DepartmentModel dept,
             Term? when = null,
             Action<CourseModel>? onCourse = null,
-            Action<ProfessorModel>? onProfessor = null
+            Action<ProfessorModel>? onProfessor = null,
+            ILogger? logger = null
         )
         {
             var (season, year) = when ?? new Term(DateTime.UtcNow) - 1;
@@ -87,7 +90,7 @@ namespace ISQExplorer.Web
                 Season.Fall => 80,
                 _ => 0
             };
-
+            
             var document = await ToDocument(await Requests.Post("https://banner.unf.edu/pls/nfpo/wksfwbs.p_dept_schd",
                 $"pv_term={no}&pv_dept={dept.Id}&pv_ptrm=&pv_campus=&pv_sub=Submit"));
             if (!document)
@@ -95,12 +98,26 @@ namespace ISQExplorer.Web
                 return new IOException($"Error while retrieving department page {dept}.", document.Exception);
             }
 
-            document.Value
+            var urlToProf = new ConcurrentDictionary<string, ProfessorModel>();
+
+            var res = await document.Value
                 .QuerySelectorAll("table.datadisplaytable > tbody > tr")
                 .Skip(3)
-                .ForEach(x =>
+                .TryAllParallel(async x =>
                 {
                     var children = x.Children.ToList();
+
+                    if (children.Count != 20)
+                    {
+                        logger?.LogInformation(
+                            $"Malformed row. Incorrect number of columns in table. Expected 20, got {children.Count}");
+                        return;
+                    }
+
+                    if (WebUtility.HtmlDecode(children.First().InnerHtml)?.Trim() != "")
+                    {
+                        return;
+                    }
 
                     onCourse?.Invoke(new CourseModel
                     {
@@ -109,15 +126,32 @@ namespace ISQExplorer.Web
                         Name = children[3].InnerHtml
                     });
 
-                    var professorCell = children[16];
-
-                    onProfessor?.Invoke(new ProfessorModel
+                    if (children[17].Children.None() ||
+                        !(children[17].Children.First() is IHtmlAnchorElement professorCell))
                     {
-                        Department = dept,
-                    });
-                });
+                        logger?.LogWarning("Expected anchor element in 17th column, did not get one.");
+                        return;
+                    }
 
-            throw new NotImplementedException();
+                    var url = $"https://banner.unf.edu/pls/nfpo{professorCell.PathName}{professorCell.Search}";
+
+                    if (!urlToProf.ContainsKey(url))
+                    {
+                        var profTry = await ScrapeDepartmentProfessor(url, dept);
+
+                        if (!profTry)
+                        {
+                            logger?.LogWarning(profTry.Exception.ToString());
+                            return;
+                        }
+
+                        urlToProf[url] = profTry.Value;
+                    }
+
+                    onProfessor?.Invoke(urlToProf[url]);
+                });
+            
+            return res.Select(e => new IOException("An error occured while scraping the department.", e));
         }
 
         private static async Task<Try<IEnumerable<ISQEntryModel>, IOException>> ScrapeDepartmentCourse(
@@ -183,15 +217,19 @@ namespace ISQExplorer.Web
             })));
         }
 
-        public static async Task<Try<(ProfessorModel Professor, IEnumerable<ISQEntryModel> Entries), IOException>>
+        public static async Task<Try<ProfessorModel, IOException>>
             ScrapeDepartmentProfessor(
-                string nNumber,
-                DepartmentModel dept,
-                Func<string, Task<CourseModel>> courseCodeToCourse
+                string url,
+                DepartmentModel dept
             )
         {
-            var url =
-                $"https://banner.unf.edu/pls/nfpo/wksfwbs.p_instructor_isq_grade?pv_instructor={nNumber}";
+            var nNumberOpt = url.Capture(".*(N.*?)$");
+            if (!nNumberOpt)
+            {
+                return new IOException($"Malformed url '{url}'. N-Number must be at end.");
+            }
+
+            var nNumber = nNumberOpt.Value;
 
             var document = await ToDocument(await Requests.Get(url));
             if (!document)
@@ -201,6 +239,15 @@ namespace ISQExplorer.Web
 
             var tables = document.Value.QuerySelectorAll("table.datadisplaytable > tbody").ToList();
 
+            if (tables.Count < 6)
+            {
+                return new IOException($"Not enough tables in the url '{url}'.");
+            }
+
+            if (tables[1].Children.Length < 1 || tables[1].Children.First().Children.Length < 2)
+            {
+                return new IOException($"Malformed page at '{url}'.");
+            }
 
             var name = tables[1].Children[0].Children[1].InnerHtml.Split(" ");
             if (name.Length < 2)
@@ -211,12 +258,8 @@ namespace ISQExplorer.Web
             var fname = string.Join(" ", name.SkipLast(1));
             var lname = name.Last();
 
-            var prof = new ProfessorModel
+            return new ProfessorModel
                 {Department = dept, FirstName = fname, LastName = lname, NNumber = nNumber};
-
-            var entries = await ProfessorTablesToEntries(prof, tables[3], tables[5], courseCodeToCourse);
-
-            return (prof, entries);
         }
 
         public static async Task<Try<IEnumerable<ISQEntryModel>, IOException>>

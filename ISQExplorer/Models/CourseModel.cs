@@ -15,8 +15,8 @@ namespace ISQExplorer.Models
         private string _courseCode;
         public string CourseCode
         {
-            get { return _courseCode; }
-            set { _courseCode = value.ToUpper(); }
+            get => _courseCode;
+            set => _courseCode = value.ToUpper();
         }
 
         public string Name { get; set; }
@@ -51,5 +51,7 @@ namespace ISQExplorer.Models
                 return hashCode;
             }
         }
+
+        public override string ToString() => $"{CourseCode} - {Name}";
     }
 }

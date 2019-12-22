@@ -23,6 +23,7 @@ namespace ISQExplorerTests
                 {
                     var ids = val.ToList();
                     Assert.Greater(ids.Count, 0);
+                    Assert.AreEqual(ids.Count, ids.ToHashSet().Count);
                 },
                 ex => Assert.Fail(ex.Message)
             );
@@ -43,20 +44,37 @@ namespace ISQExplorerTests
                 Assert.Fail(dept.Exception.Message);
             }
 
-            (await DataScraper.ScrapeDepartment(
+            var courseCount = 0;
+            var profCount = 0;
+
+            var scrape = await DataScraper.ScrapeDepartment(
                 dept.Value,
                 null,
                 course =>
                 {
+                    courseCount++;
                     Assert.NotNull(course);
-                    Assert.AreEqual(dept, course.Department);
+                    Assert.NotNull(course.CourseCode);
+                    Assert.NotNull(course.Name);
+                    Assert.NotNull(course.Department);
+                    Assert.AreEqual(dept.Value, course.Department);
                 },
                 professor =>
                 {
+                    profCount++;
                     Assert.NotNull(professor);
-                    Assert.AreEqual(dept, professor.Department);
+                    Assert.NotNull(professor.Department);
+                    Assert.NotNull(professor.FirstName);
+                    Assert.NotNull(professor.LastName);
+                    Assert.NotNull(professor.NNumber);
+                    Assert.AreEqual(dept.Value, professor.Department);
                 }
-            )).Match(val => Assert.Fail(val.Message));
+            );
+
+            scrape.Match(val => Assert.Fail(val.Message));
+            
+            Assert.Greater(courseCount, 0);
+            Assert.Greater(profCount, 0);
         }
     }
 }

@@ -67,5 +67,7 @@ namespace ISQExplorer.Models
                 return hashCode;
             }
         }
+
+        public override string ToString() => $"{new Term(Season, Year)} {Crn} - {Course} {Professor}";
     }
 }
