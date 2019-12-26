@@ -5,9 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Reflection.Emit;
-using System.Runtime;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AngleSharp;
 using AngleSharp.Dom;
@@ -15,7 +12,6 @@ using AngleSharp.Html.Dom;
 using ISQExplorer.Functional;
 using ISQExplorer.Misc;
 using ISQExplorer.Models;
-using ISQExplorer.Repositories;
 using Microsoft.Extensions.Logging;
 
 namespace ISQExplorer.Web
@@ -90,7 +86,7 @@ namespace ISQExplorer.Web
                 Season.Fall => 80,
                 _ => 0
             };
-            
+
             var document = await ToDocument(await Requests.Post("https://banner.unf.edu/pls/nfpo/wksfwbs.p_dept_schd",
                 $"pv_term={no}&pv_dept={dept.Id}&pv_ptrm=&pv_campus=&pv_sub=Submit"));
             if (!document)
@@ -150,11 +146,11 @@ namespace ISQExplorer.Web
 
                     onProfessor?.Invoke(urlToProf[url]);
                 });
-            
+
             return res.Select(e => new IOException("An error occured while scraping the department.", e));
         }
 
-        private static async Task<Try<IEnumerable<ISQEntryModel>, IOException>> ScrapeDepartmentCourse(
+        public static async Task<Try<IEnumerable<ISQEntryModel>, IOException>> ScrapeDepartmentCourseEntries(
             CourseModel course,
             Func<string, Task<ProfessorModel?>>? lastNameToProfessor = null
         )
@@ -263,7 +259,13 @@ namespace ISQExplorer.Web
         }
 
         public static async Task<Try<IEnumerable<ISQEntryModel>, IOException>>
-            ScrapeDepartmentProfessor(
+            ScrapeDepartmentProfessorEntries(
+                ProfessorModel professor,
+                Func<string, CourseModel?> courseCodeToCourse
+            ) => await ScrapeDepartmentProfessorEntries(professor, str => Task.Run(() => courseCodeToCourse(str)));
+
+        public static async Task<Try<IEnumerable<ISQEntryModel>, IOException>>
+            ScrapeDepartmentProfessorEntries(
                 ProfessorModel professor,
                 Func<string, Task<CourseModel?>> courseCodeToCourse
             )

@@ -1,15 +1,10 @@
 #nullable enable
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
-using AngleSharp;
 using ISQExplorer.Misc;
 using ISQExplorer.Models;
-using ISQExplorer.Web;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace ISQExplorer.Repositories

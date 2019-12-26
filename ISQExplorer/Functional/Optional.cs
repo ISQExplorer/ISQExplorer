@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 
 namespace ISQExplorer.Functional
 {
@@ -7,9 +8,9 @@ namespace ISQExplorer.Functional
     /// Represents a value that can or can not be present.
     /// </summary>
     /// <typeparam name="T">The type of the underlying optional value.</typeparam>
-    public struct Optional<T>
+    public struct Optional<T> : IEquatable<Optional<T>>
     {
-        private T _value;
+        private readonly T _value;
 
         public bool HasValue { get; }
 
@@ -82,5 +83,51 @@ namespace ISQExplorer.Functional
         public static explicit operator T(Optional<T> val) => val.Value;
 
         public static implicit operator bool(Optional<T> val) => val.HasValue;
+
+        public bool Equals(Optional<T> other)
+        {
+            return EqualityComparer<T>.Default.Equals(Value, other.Value) && HasValue == other.HasValue;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is Optional<T> other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(_value, HasValue);
+        }
+
+        public static bool operator ==(Optional<T> left, Optional<T> right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Optional<T> left, Optional<T> right)
+        {
+            return !left.Equals(right);
+        }
+
+        public static bool operator ==(Optional<T> left, T right)
+        {
+            return !left.HasValue && right == null ||
+                   right != null && EqualityComparer<T>.Default.Equals(left.Value, right);
+        }
+
+        public static bool operator !=(Optional<T> left, T right)
+        {
+            return !(left == right);
+        }
+
+        public static bool operator ==(T left, Optional<T> right)
+        {
+            return right == left;
+        }
+
+        public static bool operator !=(T left, Optional<T> right)
+        {
+            return !(left == right);
+        }
     }
 }

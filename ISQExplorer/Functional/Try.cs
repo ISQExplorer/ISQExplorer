@@ -1,7 +1,29 @@
+#nullable enable
 using System;
 
 namespace ISQExplorer.Functional
 {
+    public static class Try
+    {
+        /// <summary>
+        /// Executes the given function, constructing the Try out of the return value, or the exception the function might throw.
+        /// </summary>
+        /// <param name="func">The function to execute.</param>
+        /// <typeparam name="T">The type of the Try.</typeparam>
+        /// <returns>A Try of the same type as the return value of the function.</returns>
+        public static Try<T> Of<T>(Func<T> func) => new Try<T>(func);
+
+        /// <summary>
+        /// Executes the given function, constructing the Try out of the return value, or the exception the function might throw.
+        /// </summary>
+        /// <param name="func">The function to execute.</param>
+        /// <typeparam name="T">The type of the Try.</typeparam>
+        /// <typeparam name="TException">The type of the Try's exception.</typeparam>
+        /// <returns>A Try of the same type as the return value of the function.</returns>
+        public static Try<T, TException> Of<T, TException>(Func<T> func) where TException : Exception =>
+            new Try<T, TException>(func);
+    }
+
     /// <summary>
     /// Contains a value, or an exception detailing why said value is not present.
     /// </summary>
@@ -38,11 +60,11 @@ namespace ISQExplorer.Functional
     /// </summary>
     /// <typeparam name="T">The underlying value.</typeparam>
     /// <typeparam name="TException">The type of the exception. This is Exception by default.</typeparam>
-    public class Try<T, TException> where TException : Exception
+    public class Try<T, TException> : IEquatable<Try<T, TException>> where TException : Exception
     {
-        private T _value;
-        private TException _ex;
-        public bool HasValue { get; }
+        private readonly T _value;
+        private readonly TException _ex;
+        public readonly bool HasValue;
 
         /// <summary>
         /// Constructs a Try out of the given value.
@@ -160,5 +182,78 @@ namespace ISQExplorer.Functional
         public static explicit operator TException(Try<T, TException> t) => t.Exception;
 
         public static implicit operator bool(Try<T, TException> t) => t.HasValue;
+
+        public bool Equals(Try<T, TException> other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return HasValue == other.HasValue &&
+                   (HasValue && Equals(Value, other.Value) || !HasValue && Equals(Exception, other.Exception));
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((Try<T, TException>) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return HasValue ? Value.GetHashCode() : Exception.GetHashCode();
+        }
+
+        public static bool operator ==(Try<T, TException>? left, Try<T, TException>? right)
+        {
+            return ReferenceEquals(left, right) || left != null && Equals(left, right);
+        }
+
+        public static bool operator !=(Try<T, TException>? left, Try<T, TException>? right)
+        {
+            return !(left == right);
+        }
+
+        public static bool operator ==(Try<T, TException>? left, T right)
+        {
+            return ReferenceEquals(right, null) && ReferenceEquals(left, null) ||
+                   !ReferenceEquals(left, null) && left.HasValue && Equals(left.Value, right);
+        }
+
+        public static bool operator !=(Try<T, TException>? left, T right)
+        {
+            return !(left == right);
+        }
+
+        public static bool operator ==(T left, Try<T, TException> right)
+        {
+            return right == left;
+        }
+
+        public static bool operator !=(T left, Try<T, TException> right)
+        {
+            return !(left == right);
+        }
+
+        public static bool operator ==(Try<T, TException>? left, TException right)
+        {
+            return ReferenceEquals(right, null) && ReferenceEquals(left, null) ||
+                   !ReferenceEquals(left, null) && left.HasValue && Equals(left.Value, right);
+        }
+
+        public static bool operator !=(Try<T, TException>? left, TException right)
+        {
+            return !(left == right);
+        }
+
+        public static bool operator ==(TException left, Try<T, TException> right)
+        {
+            return right == left;
+        }
+
+        public static bool operator !=(TException left, Try<T, TException> right)
+        {
+            return !(left == right);
+        }
     }
 }

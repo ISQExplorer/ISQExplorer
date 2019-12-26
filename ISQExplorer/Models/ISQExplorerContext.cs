@@ -1,5 +1,3 @@
-using System;
-using System.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace ISQExplorer.Models

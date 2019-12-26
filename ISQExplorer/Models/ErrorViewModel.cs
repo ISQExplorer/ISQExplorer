@@ -1,5 +1,3 @@
-using System;
-
 namespace ISQExplorer.Models
 {
     public class ErrorViewModel

@@ -1,4 +1,3 @@
-using System;
 using ISQExplorer.Functional;
 
 namespace ISQExplorer.Misc
@@ -10,6 +9,6 @@ namespace ISQExplorer.Misc
         /// </summary>
         /// <param name="s">The string to parse.</param>
         /// <returns>A Try containing the parsed int, or the exception thrown if the string could not be parsed.</returns>
-        public static Try<int> Int(string s) => new Try<int>(() => int.Parse(s));
+        public static Try<int> Int(string s) => Try.Of(() => int.Parse(s));
     }
 }
