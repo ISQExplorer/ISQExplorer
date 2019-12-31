@@ -27,10 +27,10 @@ namespace ISQExplorer.Misc
         }
 
         /// <summary>
-        /// Executes the given actiontion for each element of the input.
+        /// Executes the given action for each element of the input.
         /// </summary>
         /// <param name="enumerable">The input enumerable.</param>
-        /// <param name="action">The actiontion to execute.</param>
+        /// <param name="action">The action to execute.</param>
         /// <typeparam name="T"></typeparam>
         public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
         {
@@ -72,6 +72,28 @@ namespace ISQExplorer.Misc
         /// <typeparam name="T">The type of the enumerable.</typeparam>
         /// <returns>True if the enumerable contains no elements. False if not.</returns>
         public static bool None<T>(this IEnumerable<T> enumerable) => !enumerable.Any();
+
+        /// <summary>
+        /// Executes a function for each element of the input enumerable, indicating if any of them threw an exception.
+        /// This fails fast if any of the instances throw.
+        /// </summary>
+        /// <param name="enumerable">The enumerable.</param>
+        /// <param name="action">The function.</param>
+        /// <typeparam name="T">The type of the enumerable.</typeparam>
+        /// <returns>An Optional[Exception] containing the first exception thrown.</returns>
+        public static async Task<Optional<Exception>> TryAllParallel<T>(this IEnumerable<T> enumerable,
+            Func<T, Task<Optional<Exception>>> action)
+        {
+            try
+            {
+                var res = await Task.WhenAll(enumerable.Select(action));
+                return res.Any(x => x.HasValue) ? res.First(x => x.HasValue) : new Optional<Exception>();
+            }
+            catch (Exception e)
+            {
+                return e;
+            }
+        }
 
         /// <summary>
         /// Executes a function for each element of the input enumerable, indicating if any of them threw an exception.

@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Threading.Tasks;
 
 namespace ISQExplorer.Functional
 {
@@ -53,6 +54,15 @@ namespace ISQExplorer.Functional
         public Try(Func<T> func) : base(func)
         {
         }
+
+        /// <summary>
+        /// Copy constructor for Try[T].
+        /// </summary>
+        /// <param name="other">The other Try.</param>
+        // ReSharper disable once SuggestBaseTypeForParameter
+        public Try(Try<T> other) : base(other)
+        {
+        }
     }
 
     /// <summary>
@@ -98,6 +108,15 @@ namespace ISQExplorer.Functional
             {
                 (_value, _ex, HasValue) = (default, ex, false);
             }
+        }
+
+        /// <summary>
+        /// Copy constructor for Try[T, TException].
+        /// </summary>
+        /// <param name="other">The other Try.</param>
+        public Try(Try<T, TException> other)
+        {
+            (_value, _ex, HasValue) = (other._value, other._ex, other.HasValue);
         }
 
         public T Value

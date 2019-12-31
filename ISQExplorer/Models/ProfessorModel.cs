@@ -17,7 +17,7 @@ namespace ISQExplorer.Models
 
         protected bool Equals(ProfessorModel other)
         {
-            return NNumber == other.NNumber;
+            return other != null && NNumber == other.NNumber;
         }
 
         public override bool Equals(object obj)

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ISQExplorer.Functional;
 
-namespace ISQExplorer.Misc
+namespace ISQExplorer.Web
 {
     public static class Requests
     {

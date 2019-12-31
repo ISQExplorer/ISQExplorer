@@ -12,6 +12,7 @@ using AngleSharp.Html.Dom;
 using ISQExplorer.Functional;
 using ISQExplorer.Misc;
 using ISQExplorer.Models;
+using Microsoft.AspNetCore.Mvc.TagHelpers.Cache;
 using Microsoft.Extensions.Logging;
 
 namespace ISQExplorer.Web
@@ -31,6 +32,11 @@ namespace ISQExplorer.Web
             return html ? new Try<IDocument, IOException>(await ToDocument(html.Value)) : html.Exception;
         }
 
+        /// <summary>
+        /// Retrieves a list of departments from the web.
+        /// </summary>
+        /// <returns>A Try containing a list of departments, or an IOException detailing why it could not be returned.</returns>
+        /// <exception cref="IOException">Details the type of error.</exception>
         public static async Task<Try<IEnumerable<DepartmentModel>, IOException>> ScrapeDepartmentIds()
         {
             const string url = "https://banner.unf.edu/pls/nfpo/wksfwbs.p_dept_schd";
@@ -69,11 +75,22 @@ namespace ISQExplorer.Web
                 }));
         }
 
+        /// <summary>
+        /// Scrapes courses and professors from a department.
+        /// Use <see cref="ScrapeDepartmentIds"/> to get a list of departments.
+        /// </summary>
+        /// <param name="dept">The department to scrape.</param>
+        /// <param name="when">The Term to scrape entries from. By default this is one semester before the current one
+        /// So if it is currently Fall 2019, this function would scrape entries from Summer 2019.</param>
+        /// <param name="onCourse">A function that receives a <see cref="CourseModel"/> and handles it. This function must not throw.</param>
+        /// <param name="onProfessor">A function that receives a <see cref="ProfessorModel"/> and handles it. This function must not throw.</param>
+        /// <param name="logger">A logger that will receive any warnings/errors produced while scraping the department.</param>
+        /// <returns>An Optional containing an IOException on failure, or nothing on success.</returns>
         public static async Task<Optional<IOException>> ScrapeDepartment(
             DepartmentModel dept,
             Term? when = null,
-            Action<CourseModel>? onCourse = null,
-            Action<ProfessorModel>? onProfessor = null,
+            Func<CourseModel, Task<Optional<Exception>>>? onCourse = null,
+            Func<ProfessorModel, Task<Optional<Exception>>>? onProfessor = null,
             ILogger? logger = null
         )
         {
@@ -107,26 +124,34 @@ namespace ISQExplorer.Web
                     {
                         logger?.LogInformation(
                             $"Malformed row. Incorrect number of columns in table. Expected 20, got {children.Count}");
-                        return;
+                        return null;
                     }
 
                     if (WebUtility.HtmlDecode(children.First().InnerHtml)?.Trim() != "")
                     {
-                        return;
+                        return null;
                     }
 
-                    onCourse?.Invoke(new CourseModel
+                    if (onCourse != null)
                     {
-                        CourseCode = children[2].Children.First().InnerHtml,
-                        Department = dept,
-                        Name = children[3].InnerHtml
-                    });
+                        var courseRes = await onCourse(new CourseModel
+                        {
+                            CourseCode = children[2].Children.First().InnerHtml,
+                            Department = dept,
+                            Name = children[3].InnerHtml
+                        });
+
+                        if (courseRes != null && courseRes.HasValue)
+                        {
+                            return courseRes.Value;
+                        }
+                    }
 
                     if (children[17].Children.None() ||
                         !(children[17].Children.First() is IHtmlAnchorElement professorCell))
                     {
                         logger?.LogWarning("Expected anchor element in 17th column, did not get one.");
-                        return;
+                        return null;
                     }
 
                     var url = $"https://banner.unf.edu/pls/nfpo{professorCell.PathName}{professorCell.Search}";
@@ -138,17 +163,37 @@ namespace ISQExplorer.Web
                         if (!profTry)
                         {
                             logger?.LogWarning(profTry.Exception.ToString());
-                            return;
+                            return null;
                         }
 
                         urlToProf[url] = profTry.Value;
                     }
 
-                    onProfessor?.Invoke(urlToProf[url]);
+                    if (onProfessor != null)
+                    {
+                        var profRes = await onProfessor(urlToProf[url]);
+
+                        if (profRes != null && profRes.HasValue)
+                        {
+                            return profRes.Value;
+                        }
+                    }
+
+                    return null;
                 });
 
-            return res.Select(e => new IOException("An error occured while scraping the department.", e));
+            return res.Select(e =>
+                e is IOException exception
+                    ? exception
+                    : new IOException("An error occured while scraping the department.", e));
         }
+
+
+        public static async Task<Try<IEnumerable<ISQEntryModel>, IOException>> ScrapeDepartmentCourseEntries(
+            CourseModel course,
+            Func<string, ProfessorModel?> lastNameToProfessor
+        ) => await ScrapeDepartmentCourseEntries(course, str => Task.Run(() => lastNameToProfessor(str)));
+
 
         public static async Task<Try<IEnumerable<ISQEntryModel>, IOException>> ScrapeDepartmentCourseEntries(
             CourseModel course,
@@ -213,11 +258,10 @@ namespace ISQExplorer.Web
             })));
         }
 
-        public static async Task<Try<ProfessorModel, IOException>>
-            ScrapeDepartmentProfessor(
-                string url,
-                DepartmentModel dept
-            )
+        public static async Task<Try<ProfessorModel, IOException>> ScrapeDepartmentProfessor(
+            string url,
+            DepartmentModel dept
+        )
         {
             var nNumberOpt = url.Capture(".*(N.*?)$");
             if (!nNumberOpt)
@@ -258,16 +302,31 @@ namespace ISQExplorer.Web
                 {Department = dept, FirstName = fname, LastName = lname, NNumber = nNumber};
         }
 
+        /*
         public static async Task<Try<IEnumerable<ISQEntryModel>, IOException>>
             ScrapeDepartmentProfessorEntries(
                 ProfessorModel professor,
-                Func<string, CourseModel?> courseCodeToCourse
-            ) => await ScrapeDepartmentProfessorEntries(professor, str => Task.Run(() => courseCodeToCourse(str)));
+                Func<string, Try<CourseModel>> courseCodeToCourse
+            ) => await ScrapeDepartmentProfessorEntries(professor, (str, _) => Task.Run(() => courseCodeToCourse(str)));
 
         public static async Task<Try<IEnumerable<ISQEntryModel>, IOException>>
             ScrapeDepartmentProfessorEntries(
                 ProfessorModel professor,
-                Func<string, Task<CourseModel?>> courseCodeToCourse
+                Func<string, Term, Try<CourseModel>> courseCodeToCourse
+            ) => await ScrapeDepartmentProfessorEntries(professor,
+            (str, term) => Task.Run(() => courseCodeToCourse(str, term)));
+        */
+
+        public static async Task<Try<IEnumerable<ISQEntryModel>, IOException>>
+            ScrapeDepartmentProfessorEntries(
+                ProfessorModel professor,
+                Func<string, Task<Try<CourseModel>>> courseCodeToCourse
+            ) => await ScrapeDepartmentProfessorEntries(professor, (str, _) => courseCodeToCourse(str));
+
+        public static async Task<Try<IEnumerable<ISQEntryModel>, IOException>>
+            ScrapeDepartmentProfessorEntries(
+                ProfessorModel professor,
+                Func<string, Term, Task<Try<CourseModel>>> courseCodeToCourse
             )
         {
             var url =
@@ -290,7 +349,7 @@ namespace ISQExplorer.Web
 
         private static async Task<IEnumerable<ISQEntryModel>> ProfessorTablesToEntries(ProfessorModel professor,
             IElement childTable,
-            IElement gpaTable, Func<string, Task<CourseModel?>> courseCodeToCourse)
+            IElement gpaTable, Func<string, Term, Task<CourseModel?>> courseCodeToCourse)
         {
             return await Task.WhenAll(childTable.Children.Skip(2).Zip(gpaTable.Children.Skip(2)).Select(async x =>
             {
@@ -301,7 +360,7 @@ namespace ISQExplorer.Web
                     y.Children.Length == 0 ? y.InnerHtml.Trim() : y.Children.First().InnerHtml.Trim()).ToList();
                 var term = new Term(childText[0]);
 
-                var course = await courseCodeToCourse(childText[2]);
+                var course = await courseCodeToCourse(childText[2], term);
 
                 return new ISQEntryModel
                 {
@@ -331,6 +390,59 @@ namespace ISQExplorer.Web
                     MeanGpa = double.Parse(gpaText[14])
                 };
             }));
+        }
+
+        public static Func<TKey, TValue> ToFunc<TKey, TValue>(this IDictionary<TKey, TValue> dict)
+            where TValue : class =>
+            key => dict.ContainsKey(key) ? dict[key] : null;
+
+        public static async Task<Optional<IOException>> ScrapeAll(ConcurrentSet<CourseModel> courses,
+            ConcurrentSet<ProfessorModel> professors)
+        {
+            var depts = await ScrapeDepartmentIds();
+            if (!depts)
+            {
+                return depts.Exception;
+            }
+
+            var courseCodeToCourse =
+                new ConcurrentDictionary<string, CourseModel>(courses.ToDictionary(c => c.CourseCode, c => c));
+
+            async Task<Optional<IOException>> ScrapeAllRec(DepartmentModel dept, Term when)
+            {
+                var res = await ScrapeDepartment(
+                    dept,
+                    when,
+                    course =>
+                    {
+                        courses.Add(course);
+                        courseCodeToCourse[course.CourseCode] = course;
+                        return null;
+                    },
+                    async professor =>
+                    {
+                        professors.Add(professor);
+                        var profEntries = await ScrapeDepartmentProfessorEntries(professor, async (code, term) =>
+                        {
+                            if (!courseCodeToCourse.ContainsKey(code))
+                            {
+                                var courseRes = await ScrapeAllRec(dept, term);
+                                if (courseRes)
+                                {
+                                    return courseRes.Value;
+                                }
+                            }
+
+                            return courseCodeToCourse[code];
+                        });
+                        return null;
+                    }
+                );
+
+                return null;
+            }
+
+            return null;
         }
     }
 }

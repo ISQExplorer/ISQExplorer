@@ -111,7 +111,7 @@ namespace ISQExplorerTests
                 Assert.Fail(res.Exception.Message);
             }
 
-            var dept = new Try<DepartmentModel>(() => res.Value.First(x => x.Name == "Computing"));
+            var dept = Try.Of(() => res.Value.First(x => x.Name == "Computing"));
             if (!dept)
             {
                 Assert.Fail(dept.Exception.Message);
@@ -138,7 +138,10 @@ namespace ISQExplorerTests
                 Assert.Fail("No professor found with last name 'Reddivari'");
             }
 
-            var res3 = await DataScraper.ScrapeDepartmentProfessorEntries(prof.Value, x => courses[x]);
+            var res3 = await DataScraper.ScrapeDepartmentProfessorEntries(
+                prof.Value,
+                courses.ToFunc()
+            );
 
             if (!res3)
             {
@@ -147,7 +150,84 @@ namespace ISQExplorerTests
 
             var entries = res3.Value.ToList();
             Assert.Greater(entries.Count, 0);
-            entries.ForEach(x => { });
+            entries.ForEach(x =>
+            {
+                Assert.AreNotEqual(0, x.Crn);
+                Assert.Greater(x.Pct1 + x.Pct2 + x.Pct3 + x.Pct4 + x.Pct5 + x.PctNa, 0.95);
+                Assert.Greater(
+                    x.PctA + x.PctAMinus + x.PctBPlus + x.PctB + x.PctBMinus + x.PctCPlus + x.PctC + x.PctD + x.PctF +
+                    x.PctWithdraw, 0.90);
+                Assert.NotNull(x.Professor);
+                Assert.AreNotEqual(0, x.Year);
+                Assert.AreNotEqual(0, x.NEnrolled);
+                Assert.AreNotEqual(0.0, x.MeanGpa);
+            });
+            Assert.True(entries.Any(x => x.NResponded > 0));
+            Assert.True(entries.Any(x => x.Course != null));
+        }
+
+        [Test]
+        public async Task TestScrapeDepartmentCourseEntries()
+        {
+            var res = await DataScraper.ScrapeDepartmentIds();
+            if (!res)
+            {
+                Assert.Fail(res.Exception.Message);
+            }
+
+            var dept = Try.Of(() => res.Value.First(x => x.Name == "Computing"));
+            if (!dept)
+            {
+                Assert.Fail(dept.Exception.Message);
+            }
+
+            var profs = new ConcurrentDictionary<string, ProfessorModel>();
+            var courses = new ConcurrentDictionary<string, CourseModel>();
+
+            var res2 = await DataScraper.ScrapeDepartment(
+                dept.Value,
+                null,
+                course => courses[course.CourseCode] = course,
+                professor => profs[professor.LastName] = professor
+            );
+
+            if (res2)
+            {
+                Assert.Fail(res2.Value.Message);
+            }
+
+            var crn = Try.Of(() => courses["COP3503"]);
+            if (!crn)
+            {
+                Assert.Fail("No course found with code 'COP3503'");
+            }
+
+            var res3 = await DataScraper.ScrapeDepartmentCourseEntries(
+                crn.Value,
+                profs.ToFunc()
+            );
+
+            if (!res3)
+            {
+                Assert.Fail(res3.Exception.Message);
+            }
+
+            var entries = res3.Value.ToList();
+            Assert.Greater(entries.Count, 0);
+            entries.ForEach(x =>
+            {
+                Assert.AreNotEqual(0, x.Crn);
+                Assert.Greater(x.Pct1 + x.Pct2 + x.Pct3 + x.Pct4 + x.Pct5 + x.PctNa, 0.95);
+                Assert.Greater(
+                    x.PctA + x.PctAMinus + x.PctBPlus + x.PctB + x.PctBMinus + x.PctCPlus + x.PctC + x.PctD + x.PctF +
+                    x.PctWithdraw, 0.90);
+                Assert.NotNull(x.Course);
+                Assert.AreNotEqual(0, x.Year);
+                Assert.AreNotEqual(0, x.NEnrolled);
+                Assert.AreNotEqual(0.0, x.MeanGpa);
+            });
+            Assert.True(entries.Any(x => x.NResponded > 0));
+            Assert.True(entries.Any(x => x.Professor != null));
         }
     }
 }
