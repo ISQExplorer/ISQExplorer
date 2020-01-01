@@ -138,6 +138,8 @@ namespace ISQExplorerTests
                 Assert.Fail("No professor found with last name 'Reddivari'");
             }
 
+            var qqq = courses.ToFunc();
+
             var res3 = await DataScraper.ScrapeDepartmentProfessorEntries(
                 prof.Value,
                 courses.ToFunc()
