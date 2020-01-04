@@ -137,9 +137,7 @@ namespace ISQExplorerTests
             {
                 Assert.Fail("No professor found with last name 'Reddivari'");
             }
-
-            var qqq = courses.ToFunc();
-
+            
             var res3 = await DataScraper.ScrapeDepartmentProfessorEntries(
                 prof.Value,
                 courses.ToFunc()
@@ -230,6 +228,20 @@ namespace ISQExplorerTests
             });
             Assert.True(entries.Any(x => x.NResponded > 0));
             Assert.True(entries.Any(x => x.Professor != null));
+        }
+
+        [Test]
+        public async Task TestScrapeAll()
+        {
+            var res = await DataScraper.ScrapeAll();
+            if (!res)
+            {
+                Assert.Fail(res.Exception.Message);
+            }
+            var (courses, professors, entries) = res.Value;
+            Assert.Greater(courses.Count, 0);
+            Assert.Greater(professors.Count, 0);
+            Assert.Greater(entries.Count, 0);
         }
     }
 }

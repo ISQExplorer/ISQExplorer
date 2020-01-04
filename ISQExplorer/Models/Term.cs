@@ -11,28 +11,6 @@ namespace ISQExplorer.Models
 
     public class Term : IComparable<Term>, IEquatable<Term>
     {
-        public bool Equals(Term other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return Season == other.Season && Year == other.Year;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            return obj.GetType() == GetType() && Equals((Term) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return ((int) Season * 397) ^ Year;
-            }
-        }
-
         public readonly Season Season;
         public readonly int Year;
 
@@ -91,6 +69,10 @@ namespace ISQExplorer.Models
                 var x when x >= 8 && x <= 12 => Season.Fall,
                 _ => Season.Spring
             };
+        }
+
+        public Term() : this(DateTime.Now)
+        {
         }
 
         public void Deconstruct(out Season season, out int year)
@@ -157,12 +139,12 @@ namespace ISQExplorer.Models
         public static Term operator -(Term t, int val)
         {
             var nEnum = Enum.GetNames(typeof(Season)).Length;
-            
+
             if (val < 0)
             {
                 return t + -val;
             }
-            
+
             var (season, year) = t;
             var newYear = year - val / nEnum;
             var newSeason = (int) season - val % nEnum;
@@ -178,12 +160,12 @@ namespace ISQExplorer.Models
         public static Term operator +(Term t, int val)
         {
             var nEnum = Enum.GetNames(typeof(Season)).Length;
-            
+
             if (val < 0)
             {
                 return t - -val;
             }
-            
+
             var (season, year) = t;
             var newYear = year + val / nEnum;
             var newSeason = (int) season + val % nEnum;
@@ -199,5 +181,27 @@ namespace ISQExplorer.Models
         public static implicit operator Term(DateTime dt) => new Term(dt);
 
         public override string ToString() => $"{Season} {Year}";
+
+        public bool Equals(Term other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Season == other.Season && Year == other.Year;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj.GetType() == GetType() && Equals((Term) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return ((int) Season * 397) ^ Year;
+            }
+        }
     }
 }

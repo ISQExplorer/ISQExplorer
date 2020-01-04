@@ -38,6 +38,6 @@ namespace ISQExplorer.Models
             return NNumber != null ? NNumber.GetHashCode() : 0;
         }
 
-        public override string ToString() => $"{NNumber} - {FirstName} {LastName}";
+        public override string ToString() => $"{NNumber} - {FirstName} {LastName} - {Department?.Name}";
     }
 }
