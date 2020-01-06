@@ -179,6 +179,8 @@ namespace ISQExplorer.Models
         }
 
         public static implicit operator Term(DateTime dt) => new Term(dt);
+        
+        public static implicit operator Term((Season, int) tuple) => new Term(tuple.Item1, tuple.Item2);
 
         public override string ToString() => $"{Season} {Year}";
 

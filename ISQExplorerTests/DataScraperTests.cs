@@ -74,29 +74,33 @@ namespace ISQExplorerTests
 
             var scrape = await DataScraper.ScrapeDepartment(
                 dept.Value,
-                null,
-                course =>
-                {
-                    courseCount++;
-                    Assert.NotNull(course);
-                    Assert.NotNull(course.CourseCode);
-                    Assert.NotNull(course.Name);
-                    Assert.NotNull(course.Department);
-                    Assert.AreEqual(dept.Value, course.Department);
-                },
-                professor =>
-                {
-                    profCount++;
-                    Assert.NotNull(professor);
-                    Assert.NotNull(professor.Department);
-                    Assert.NotNull(professor.FirstName);
-                    Assert.NotNull(professor.LastName);
-                    Assert.NotNull(professor.NNumber);
-                    Assert.AreEqual(dept.Value, professor.Department);
-                }
+                null
             );
 
-            scrape.Match(val => Assert.Fail(val.Message));
+            scrape.Match(val => { }, ex => Assert.Fail(ex.Message));
+
+            var (courses, professors, exceptions) = scrape.Value;
+
+            courses.ForEach(course =>
+            {
+                courseCount++;
+                Assert.NotNull(course);
+                Assert.NotNull(course.CourseCode);
+                Assert.NotNull(course.Name);
+                Assert.NotNull(course.Department);
+                Assert.AreEqual(dept.Value, course.Department);
+            });
+
+            professors.ForEach(professor =>
+            {
+                profCount++;
+                Assert.NotNull(professor);
+                Assert.NotNull(professor.Department);
+                Assert.NotNull(professor.FirstName);
+                Assert.NotNull(professor.LastName);
+                Assert.NotNull(professor.NNumber);
+                Assert.AreEqual(dept.Value, professor.Department);
+            });
 
             Assert.Greater(courseCount, 0);
             Assert.Greater(profCount, 0);
@@ -120,24 +124,20 @@ namespace ISQExplorerTests
             var profs = new ConcurrentDictionary<string, ProfessorModel>();
             var courses = new ConcurrentDictionary<string, CourseModel>();
 
-            var res2 = await DataScraper.ScrapeDepartment(
-                dept.Value,
-                null,
-                course => courses[course.CourseCode] = course,
-                professor => profs[professor.LastName] = professor
-            );
+            var res2 = await DataScraper.ScrapeDepartment(dept.Value);
 
-            if (res2)
-            {
-                Assert.Fail(res2.Value.Message);
-            }
+            res2.Match(val => { }, ex => Assert.Fail(res2.Exception.Message));
+
+            var (coursesRes, professorsRes, errorsRes) = res2.Value;
+            coursesRes.ForEach(course => courses[course.CourseCode] = course);
+            professorsRes.ForEach(professor => profs[professor.LastName] = professor);
 
             var prof = Try.Of(() => profs["Reddivari"]);
             if (!prof)
             {
                 Assert.Fail("No professor found with last name 'Reddivari'");
             }
-            
+
             var res3 = await DataScraper.ScrapeDepartmentProfessorEntries(
                 prof.Value,
                 courses.ToFunc()
@@ -184,17 +184,13 @@ namespace ISQExplorerTests
             var profs = new ConcurrentDictionary<string, ProfessorModel>();
             var courses = new ConcurrentDictionary<string, CourseModel>();
 
-            var res2 = await DataScraper.ScrapeDepartment(
-                dept.Value,
-                null,
-                course => courses[course.CourseCode] = course,
-                professor => profs[professor.LastName] = professor
-            );
+            var res2 = await DataScraper.ScrapeDepartment(dept.Value);
 
-            if (res2)
-            {
-                Assert.Fail(res2.Value.Message);
-            }
+            res2.Match(val => { }, ex => Assert.Fail(res2.Exception.Message));
+
+            var (coursesRes, professorsRes, errorsRes) = res2.Value;
+            coursesRes.ForEach(course => courses[course.CourseCode] = course);
+            professorsRes.ForEach(professor => profs[professor.LastName] = professor);
 
             var crn = Try.Of(() => courses["COP3503"]);
             if (!crn)
@@ -238,7 +234,12 @@ namespace ISQExplorerTests
             {
                 Assert.Fail(res.Exception.Message);
             }
-            var (courses, professors, entries) = res.Value;
+
+            var result = res.Value;
+            var courses = result.Courses.Succeeded.ToList();
+            var professors = result.Professors.Succeeded.ToList();
+            var entries = result.Entries.ToList();
+
             Assert.Greater(courses.Count, 0);
             Assert.Greater(professors.Count, 0);
             Assert.Greater(entries.Count, 0);
