@@ -26,14 +26,14 @@ namespace ISQExplorer.Functional
         /// Constructs a Try out of the given value if the condition is true, otherwise constructs it out of the given exception.
         /// </summary>
         /// <param name="condition">True if the value should be used, false if the exception should be used.</param>
-        /// <param name="val">The value to use.</param>
-        /// <param name="ex">The exception to use.</param>
+        /// <param name="val">A function returning the value to use.</param>
+        /// <param name="ex">A function returning the exception to use.</param>
         /// <typeparam name="T">The type of the value.</typeparam>
         /// <typeparam name="TException">The type of the exception.</typeparam>
         /// <returns>A new Try{T, TException} out of either the given value or the given exception.</returns>
-        public static Try<T, TException> Of<T, TException>(bool condition, T val, TException ex)
+        public static Try<T, TException> Of<T, TException>(bool condition, Func<T> val, Func<TException> ex)
             where TException : Exception =>
-            condition ? val : new Try<T, TException>(ex);
+            condition ? val() : new Try<T, TException>(ex());
 
         /// <summary>
         /// Executes the given function, constructing the Try out of the return value, or the exception the function might throw.
@@ -269,6 +269,8 @@ namespace ISQExplorer.Functional
         {
             return !(left == right);
         }
+        
+        public override string ToString() => Match(val => val.ToString(), ex => ex.ToString());
     }
 
     /// <summary>
@@ -486,5 +488,7 @@ namespace ISQExplorer.Functional
         {
             return !(left == right);
         }
+
+        public override string ToString() => Match(val => val.ToString(), ex => ex.ToString());
     }
 }

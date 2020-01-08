@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AngleSharp;
+using AngleSharp.Common;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using ISQExplorer.Exceptions;
@@ -309,51 +310,51 @@ namespace ISQExplorer.Web
             (str, term) => Task.Run(() => courseCodeToCourse(str, term)));
         */
 
-        public static async Task<Try<IEnumerable<ISQEntryModel>, IOException>>
+        public static async Task<Try<IEnumerable<Try<ISQEntryModel>>>>
             ScrapeDepartmentProfessorEntries(
                 ProfessorModel professor,
                 Func<string, CourseModel> courseCodeToCourse
             ) => await ScrapeDepartmentProfessorEntries(professor, courseCodeToCourse.ToAsync());
 
-        public static async Task<Try<IEnumerable<ISQEntryModel>, IOException>>
+        public static async Task<Try<IEnumerable<Try<ISQEntryModel>>>>
             ScrapeDepartmentProfessorEntries(
                 ProfessorModel professor,
                 Func<string, Term, CourseModel> courseCodeToCourse
             ) => await ScrapeDepartmentProfessorEntries(professor, courseCodeToCourse.ToAsync());
 
-        public static async Task<Try<IEnumerable<ISQEntryModel>, IOException>>
+        public static async Task<Try<IEnumerable<Try<ISQEntryModel>>>>
             ScrapeDepartmentProfessorEntries(
                 ProfessorModel professor,
                 Func<string, Try<CourseModel>> courseCodeToCourse
             ) => await ScrapeDepartmentProfessorEntries(professor, courseCodeToCourse.ToAsync());
 
-        public static async Task<Try<IEnumerable<ISQEntryModel>, IOException>>
+        public static async Task<Try<IEnumerable<Try<ISQEntryModel>>>>
             ScrapeDepartmentProfessorEntries(
                 ProfessorModel professor,
                 Func<string, Term, Try<CourseModel>> courseCodeToCourse
             ) => await ScrapeDepartmentProfessorEntries(professor, courseCodeToCourse.ToAsync());
 
-        public static async Task<Try<IEnumerable<ISQEntryModel>, IOException>>
+        public static async Task<Try<IEnumerable<Try<ISQEntryModel>>>>
             ScrapeDepartmentProfessorEntries(
                 ProfessorModel professor,
                 Func<string, Task<CourseModel>> courseCodeToCourse
             ) => await ScrapeDepartmentProfessorEntries(professor,
             async (str, _) => new Try<CourseModel>(await courseCodeToCourse(str)));
 
-        public static async Task<Try<IEnumerable<ISQEntryModel>, IOException>>
+        public static async Task<Try<IEnumerable<Try<ISQEntryModel>>>>
             ScrapeDepartmentProfessorEntries(
                 ProfessorModel professor,
                 Func<string, Term, Task<CourseModel>> courseCodeToCourse
             ) => await ScrapeDepartmentProfessorEntries(professor,
             async (str, term) => new Try<CourseModel>(await courseCodeToCourse(str, term)));
 
-        public static async Task<Try<IEnumerable<ISQEntryModel>, IOException>>
+        public static async Task<Try<IEnumerable<Try<ISQEntryModel>>>>
             ScrapeDepartmentProfessorEntries(
                 ProfessorModel professor,
                 Func<string, Task<Try<CourseModel>>> courseCodeToCourse
             ) => await ScrapeDepartmentProfessorEntries(professor, (str, _) => courseCodeToCourse(str));
 
-        public static async Task<Try<IEnumerable<ISQEntryModel>, IOException>>
+        public static async Task<Try<IEnumerable<Try<ISQEntryModel>>>>
             ScrapeDepartmentProfessorEntries(
                 ProfessorModel professor,
                 Func<string, Term, Task<Try<CourseModel>>> courseCodeToCourse
@@ -373,61 +374,98 @@ namespace ISQExplorer.Web
             var isqTable = tables[3];
             var gpaTable = tables[5];
 
-            return new Try<IEnumerable<ISQEntryModel>, IOException>(
-                await ProfessorTablesToEntries(professor, isqTable, gpaTable, courseCodeToCourse));
+            return await ProfessorTablesToEntries(professor, isqTable, gpaTable, courseCodeToCourse);
         }
 
-        private static async Task<IEnumerable<ISQEntryModel>> ProfessorTablesToEntries(ProfessorModel professor,
-            IElement childTable,
-            IElement gpaTable, Func<string, Term, Task<Try<CourseModel>>> courseCodeToCourse)
+        private static async Task<Try<IEnumerable<Try<ISQEntryModel>>, MalformedPageException>>
+            ProfessorTablesToEntries(ProfessorModel professor,
+                IElement childTable,
+                IElement gpaTable, Func<string, Term, Task<Try<CourseModel>>> courseCodeToCourse)
         {
-            return await Task.WhenAll(childTable.Children.Skip(2).Zip(gpaTable.Children.Skip(2)).Select(async x =>
+            var childTableChildren = childTable.Children.ToList();
+            var gpaTableChildren = gpaTable.Children.ToList();
+
+            if (childTableChildren.Count < 3 || gpaTableChildren.Count < 3)
             {
-                var (isq, gpa) = x;
-                var childText = isq.Children.Select(y =>
-                    y.Children.Length == 0 ? y.InnerHtml.Trim() : y.Children.First().InnerHtml.Trim()).ToList();
-                var gpaText = gpa.Children.Select(y =>
-                    y.Children.Length == 0 ? y.InnerHtml.Trim() : y.Children.First().InnerHtml.Trim()).ToList();
-                var term = new Term(childText[0]);
+                return new MalformedPageException(
+                    $"Expected at least 3 rows in both child table and GPA table. Got {childTableChildren.Count} in child table and {gpaTableChildren.Count} in GPA table.");
+            }
 
-                var courseTry = await courseCodeToCourse(childText[2], term);
-                var course = courseTry.HasValue ? courseTry.Value : null;
+            // the top 2 rows on either table is heading, so we skip it
+            // for each cell of each row, get the inner html if it doesn't have any children (plain text), otherwise get the innerhtml of the first child (link)
+            var childRows = childTable.Children.Skip(2).Select(x => x.Children.Select(y =>
+                y.Children.Length == 0 ? y.InnerHtml.Trim() : y.Children.First().InnerHtml.Trim()).ToList()).ToList();
+            var gpaRows = gpaTable.Children.Skip(2).Select(x => x.Children.Select(y =>
+                y.Children.Length == 0 ? y.InnerHtml.Trim() : y.Children.First().InnerHtml.Trim()).ToList()).ToList();
 
-                return new ISQEntryModel
+            var crnToChildRows = childRows.GroupBy(x => x[1]);
+            var gpaToChildRows = gpaRows.GroupBy(x => x[1]);
+
+            var crnToChildRow = crnToChildRows.ToDictionary(x => x.Key, x => x.First());
+            var gpaToChildRow = gpaToChildRows.ToDictionary(x => x.Key, x => x.First());
+
+            return await Task.WhenAll(crnToChildRow
+                .Join(gpaToChildRow,
+                    x => x.Key,
+                    y => y.Key,
+                    (x, y) => (x.Value, y.Value)
+                )
+                .Select(async x =>
                 {
-                    Season = term.Season,
-                    Year = term.Year,
-                    Course = course,
-                    Crn = int.Parse(childText[1]),
-                    Professor = professor,
-                    NEnrolled = int.Parse(gpaText[3]),
-                    NResponded = int.Parse(childText[4]),
-                    Pct5 = double.Parse(childText[6]),
-                    Pct4 = double.Parse(childText[7]),
-                    Pct3 = double.Parse(childText[8]),
-                    Pct2 = double.Parse(childText[9]),
-                    Pct1 = double.Parse(childText[10]),
-                    PctNa = double.Parse(childText[11]),
-                    PctA = double.Parse(childText[4]),
-                    PctAMinus = double.Parse(gpaText[5]),
-                    PctBPlus = double.Parse(gpaText[6]),
-                    PctB = double.Parse(gpaText[7]),
-                    PctBMinus = double.Parse(gpaText[8]),
-                    PctCPlus = double.Parse(gpaText[9]),
-                    PctC = double.Parse(gpaText[10]),
-                    PctD = double.Parse(gpaText[11]),
-                    PctF = double.Parse(gpaText[12]),
-                    PctWithdraw = double.Parse(gpaText[13]),
-                    MeanGpa = double.Parse(gpaText[14])
-                };
-            }));
+                    var (childText, gpaText) = x;
+                    var term = new Term(childText[0]);
+
+                    var courseTry = await courseCodeToCourse(childText[2], term);
+
+                    if (!courseTry)
+                    {
+                        return courseTry.Exception;
+                    }
+
+                    var course = courseTry.Value;
+
+                    var entry = Try.Of(() => new ISQEntryModel
+                    {
+                        Season = term.Season,
+                        Year = term.Year,
+                        Course = course,
+                        Crn = int.Parse(childText[1]),
+                        Professor = professor,
+                        NEnrolled = int.Parse(gpaText[3]),
+                        NResponded = int.Parse(childText[4]),
+                        Pct5 = double.Parse(childText[6]),
+                        Pct4 = double.Parse(childText[7]),
+                        Pct3 = double.Parse(childText[8]),
+                        Pct2 = double.Parse(childText[9]),
+                        Pct1 = double.Parse(childText[10]),
+                        PctNa = double.Parse(childText[11]),
+                        PctA = double.Parse(gpaText[4]),
+                        PctAMinus = double.Parse(gpaText[5]),
+                        PctBPlus = double.Parse(gpaText[6]),
+                        PctB = double.Parse(gpaText[7]),
+                        PctBMinus = double.Parse(gpaText[8]),
+                        PctCPlus = double.Parse(gpaText[9]),
+                        PctC = double.Parse(gpaText[10]),
+                        PctD = double.Parse(gpaText[11]),
+                        PctF = double.Parse(gpaText[12]),
+                        PctWithdraw = double.Parse(gpaText[13]),
+                        MeanGpa = double.Parse(gpaText[14])
+                    });
+
+                    if (!entry)
+                    {
+                        return entry.Exception;
+                    }
+
+                    return Try.Of(entry.Value);
+                }));
         }
 
         public static Func<TKey, Try<TValue>> ToFunc<TKey, TValue>(
             this IDictionary<TKey, TValue> dict)
             where TValue : class =>
-            key => Try.Of(dict.ContainsKey(key), dict[key],
-                new ArgumentException($"Key '{key}' not found in dictionary."));
+            key => Try.Of(dict.ContainsKey(key), () => dict[key],
+                () => new ArgumentException($"Key '{key}' not found in dictionary."));
 
         public static Func<TParam, Task<TRes>> ToAsync<TParam, TRes>(this Func<TParam, TRes> func) =>
             param => Task.Run(() => func(param));
@@ -454,7 +492,7 @@ namespace ISQExplorer.Web
             IEnumerable<Exception> Errors
             )>> ScrapeAll()
         {
-            var tasks = new ConcurrentDictionary<(DepartmentModel, Term), Task<Optional<IOException>>>();
+            var tasks = new ConcurrentDictionary<(DepartmentModel, Term), Task<Optional<Exception>>>();
             var taskLock = new object();
             var deptsFailed = new ConcurrentSet<DepartmentScrapeException>();
             var coursesFailed = new ConcurrentSet<CourseScrapeException>();
@@ -472,23 +510,23 @@ namespace ISQExplorer.Web
             var courseCodeToCourse =
                 new ConcurrentDictionary<string, CourseModel>();
 
-            async Task<Optional<IOException>> ScrapeAllRec(DepartmentModel dept, Term when)
+            async Task<Optional<Exception>> ScrapeAllRec(DepartmentModel dept, Term when)
             {
                 var deptRes = await ScrapeDepartment(dept, when);
 
                 if (!deptRes)
                 {
-                    return new IOException("Failed to scrape the department.", deptRes.Exception);
+                    return new DepartmentScrapeException(dept, "Failed to scrape the department.", deptRes.Exception);
                 }
 
                 deptRes.Value.Courses.ForEach(course => courseCodeToCourse[course.CourseCode] = course);
                 deptRes.Value.Exceptions.ForEach(ex => errors.Add(ex));
 
-                deptRes.Value.Professors.AsParallel().ForEach(async prof =>
+                var res = await deptRes.Value.Professors.TryAllParallel(async prof =>
                 {
                     if (professors.Contains(prof))
                     {
-                        return;
+                        return null;
                     }
 
                     professors.Add(prof);
@@ -509,6 +547,10 @@ namespace ISQExplorer.Web
 
                             if (courseRes)
                             {
+                                if (courseRes.Value is IOException ioex)
+                                {
+                                    return ioex;
+                                }
                                 errors.Add(courseRes.Value);
                                 return courseRes.Value;
                             }
@@ -527,15 +569,24 @@ namespace ISQExplorer.Web
 
                     if (!profEntries)
                     {
+                        if (profEntries.Exception is IOException ioex)
+                        {
+                            return ioex;
+                        }
                         errors.Add(profEntries.Exception);
                     }
                     else
                     {
-                        profEntries.Value.ForEach(entry => entries.Add(entry));
+                        profEntries.Value.ForEach(entry => entry.Match(
+                            val => entries.Add(entry.Value),
+                            ex => errors.Add(ex))
+                        );
                     }
+                    
+                    return null;
                 });
 
-                return null;
+                return res.Match(val => val, () => null);
             }
 
             var currentTerm = new Term() - 1;
@@ -544,14 +595,22 @@ namespace ISQExplorer.Web
             try
             {
                 var tmp = await resultTask;
-                tmp.Where(x => x).ForEach(x => errors.Add(x.Value));
+                foreach (var res in tmp)
+                {
+                    if (res && res.Value is IOException ioex)
+                    {
+                        return ioex;
+                    }
+
+                    res.Match(ex => errors.Add(ex));
+                }
 
                 return (
-                        (depts.Value, deptsFailed),
-                        (courseCodeToCourse.Values, coursesFailed),
-                        (professors, professorsFailed),
-                        entries,
-                        errors
+                    (depts.Value, deptsFailed),
+                    (courseCodeToCourse.Values, coursesFailed),
+                    (professors, professorsFailed),
+                    entries,
+                    errors
                 );
             }
             catch (Exception e)

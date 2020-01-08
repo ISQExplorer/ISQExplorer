@@ -150,8 +150,13 @@ namespace ISQExplorerTests
 
             var entries = res3.Value.ToList();
             Assert.Greater(entries.Count, 0);
-            entries.ForEach(x =>
+            entries.ForEach(val =>
             {
+                if (!val)
+                {
+                    return;
+                }
+                var x = val.Value;
                 Assert.AreNotEqual(0, x.Crn);
                 Assert.Greater(x.Pct1 + x.Pct2 + x.Pct3 + x.Pct4 + x.Pct5 + x.PctNa, 0.95);
                 Assert.Greater(
@@ -162,8 +167,8 @@ namespace ISQExplorerTests
                 Assert.AreNotEqual(0, x.NEnrolled);
                 Assert.AreNotEqual(0.0, x.MeanGpa);
             });
-            Assert.True(entries.Any(x => x.NResponded > 0));
-            Assert.True(entries.Any(x => x.Course != null));
+            Assert.True(entries.Any(x => x && x.Value.NResponded > 0));
+            Assert.True(entries.Any(x => x && x.Value.Course != null));
         }
 
         [Test]

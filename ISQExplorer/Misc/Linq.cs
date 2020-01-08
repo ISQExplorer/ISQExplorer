@@ -86,7 +86,7 @@ namespace ISQExplorer.Misc
         {
             try
             {
-                var res = await Task.WhenAll(enumerable.Select(action));
+                var res = await Task.WhenAll(enumerable.AsParallel().Select(action));
                 return res.Any(x => x.HasValue) ? res.First(x => x.HasValue) : new Optional<Exception>();
             }
             catch (Exception e)
@@ -108,7 +108,7 @@ namespace ISQExplorer.Misc
         {
             try
             {
-                await Task.WhenAll(enumerable.Select(action));
+                await Task.WhenAll(enumerable.AsParallel().Select(action));
                 return new Optional<Exception>();
             }
             catch (Exception e)
