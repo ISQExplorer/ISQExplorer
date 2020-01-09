@@ -20,6 +20,8 @@ namespace ISQExplorer.Web
 {
     public static class DataScraper
     {
+        private static RateLimiter _limiter = new RateLimiter(2, 2000);
+
         public static async Task<IDocument> ToDocument(string html)
         {
             var config = Configuration.Default;
@@ -41,7 +43,7 @@ namespace ISQExplorer.Web
         public static async Task<Try<IEnumerable<DepartmentModel>>> ScrapeDepartmentIds()
         {
             const string url = "https://banner.unf.edu/pls/nfpo/wksfwbs.p_dept_schd";
-            var html = await Requests.Get(url);
+            var html = await _limiter.Run(() => Requests.Get(url));
             if (!html)
             {
                 return new IOException("Error while retrieving departments.", html.Exception);
@@ -110,8 +112,9 @@ namespace ISQExplorer.Web
                 _ => 0
             };
 
-            var document = await ToDocument(await Requests.Post("https://banner.unf.edu/pls/nfpo/wksfwbs.p_dept_schd",
-                $"pv_term={no}&pv_dept={dept.Id}&pv_ptrm=&pv_campus=&pv_sub=Submit"));
+            var document = await ToDocument(await _limiter.Run(() =>
+                Requests.Post("https://banner.unf.edu/pls/nfpo/wksfwbs.p_dept_schd",
+                    $"pv_term={no}&pv_dept={dept.Id}&pv_ptrm=&pv_campus=&pv_sub=Submit")));
             if (!document.HasValue)
             {
                 return new IOException($"Error while retrieving department page {dept}.", document.Exception);
@@ -193,7 +196,7 @@ namespace ISQExplorer.Web
         {
             var url =
                 $"https://banner.unf.edu/pls/nfpo/wksfwbs.p_course_isq_grade?pv_course_id={course.CourseCode}";
-            var document = await ToDocument(await Requests.Get(url));
+            var document = await ToDocument(await _limiter.Run(() => Requests.Get(url)));
             if (!document.HasValue)
             {
                 return new IOException($"Error while scraping course code '{course.CourseCode}'.", document.Exception);
@@ -264,7 +267,7 @@ namespace ISQExplorer.Web
 
             var nNumber = nNumberOpt.Value;
 
-            var document = await ToDocument(await Requests.Get(url));
+            var document = await ToDocument(await _limiter.Run(() => Requests.Get(url)));
             if (!document.HasValue)
             {
                 return new IOException($"Error while scraping NNumber '{nNumber}'.", document.Exception);
@@ -363,7 +366,7 @@ namespace ISQExplorer.Web
             var url =
                 $"https://banner.unf.edu/pls/nfpo/wksfwbs.p_instructor_isq_grade?pv_instructor={professor.NNumber}";
 
-            var document = await ToDocument(await Requests.Get(url));
+            var document = await ToDocument(await _limiter.Run(() => Requests.Get(url)));
             if (!document)
             {
                 return new IOException($"Error while scraping NNumber '{professor.NNumber}'.", document.Exception);
@@ -492,8 +495,6 @@ namespace ISQExplorer.Web
             IEnumerable<Exception> Errors
             )>> ScrapeAll()
         {
-            var tasks = new ConcurrentDictionary<(DepartmentModel, Term), Task<Optional<Exception>>>();
-            var taskLock = new object();
             var deptsFailed = new ConcurrentSet<DepartmentScrapeException>();
             var coursesFailed = new ConcurrentSet<CourseScrapeException>();
             var professors = new ConcurrentSet<ProfessorModel>();
@@ -531,41 +532,8 @@ namespace ISQExplorer.Web
 
                     professors.Add(prof);
 
-                    var profEntries = await ScrapeDepartmentProfessorEntries(prof, async (code, term) =>
-                    {
-                        if (!courseCodeToCourse.ContainsKey(code))
-                        {
-                            lock (taskLock)
-                            {
-                                if (!tasks.ContainsKey((dept, term)))
-                                {
-                                    tasks[(dept, term)] = ScrapeAllRec(dept, term);
-                                }
-                            }
-
-                            var courseRes = await tasks[(dept, term)];
-
-                            if (courseRes)
-                            {
-                                if (courseRes.Value is IOException ioex)
-                                {
-                                    return ioex;
-                                }
-                                errors.Add(courseRes.Value);
-                                return courseRes.Value;
-                            }
-
-                            if (!courseCodeToCourse.ContainsKey(code))
-                            {
-                                var ex = new CourseScrapeException(code,
-                                    $"Failed to scrape course code from expected term {term}.");
-                                coursesFailed.Add(ex);
-                                return ex;
-                            }
-                        }
-
-                        return courseCodeToCourse[code];
-                    });
+                    var profEntries =
+                        await ScrapeDepartmentProfessorEntries(prof, code => new CourseModel {CourseCode = code});
 
                     if (!profEntries)
                     {
@@ -573,6 +541,7 @@ namespace ISQExplorer.Web
                         {
                             return ioex;
                         }
+
                         errors.Add(profEntries.Exception);
                     }
                     else
@@ -582,7 +551,7 @@ namespace ISQExplorer.Web
                             ex => errors.Add(ex))
                         );
                     }
-                    
+
                     return null;
                 });
 
@@ -590,8 +559,8 @@ namespace ISQExplorer.Web
             }
 
             var currentTerm = new Term() - 1;
-            depts.Value.AsParallel().ForEach(dept => tasks[(dept, currentTerm)] = ScrapeAllRec(dept, currentTerm));
-            var resultTask = Task.WhenAll(tasks.Select(time => time.Value));
+            var tasks = depts.Value.Select(dept => ScrapeAllRec(dept, currentTerm));
+            var resultTask = Task.WhenAll(tasks);
             try
             {
                 var tmp = await resultTask;
@@ -603,6 +572,20 @@ namespace ISQExplorer.Web
                     }
 
                     res.Match(ex => errors.Add(ex));
+                }
+
+                foreach (var entry in entries)
+                {
+                    if (courseCodeToCourse.ContainsKey(entry.Course.CourseCode))
+                    {
+                        entry.Course = courseCodeToCourse[entry.Course.CourseCode];
+                    }
+                    else
+                    {
+                        errors.Add(
+                            new CourseScrapeException(entry.Course.CourseCode, "This course code was not found."));
+                        entry.Course = null;
+                    }
                 }
 
                 return (

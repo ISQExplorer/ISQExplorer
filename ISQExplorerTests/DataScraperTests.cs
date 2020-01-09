@@ -156,6 +156,7 @@ namespace ISQExplorerTests
                 {
                     return;
                 }
+
                 var x = val.Value;
                 Assert.AreNotEqual(0, x.Crn);
                 Assert.Greater(x.Pct1 + x.Pct2 + x.Pct3 + x.Pct4 + x.Pct5 + x.PctNa, 0.95);
@@ -248,6 +249,34 @@ namespace ISQExplorerTests
             Assert.Greater(courses.Count, 0);
             Assert.Greater(professors.Count, 0);
             Assert.Greater(entries.Count, 0);
+            
+            courses.ForEach(x =>
+            {
+                Assert.NotNull(x.Department);
+                Assert.NotNull(x.CourseCode);
+                Assert.NotNull(x.Name);
+            });
+
+            entries.ForEach(x =>
+            {
+                Assert.AreNotEqual(0, x.Crn);
+                Assert.Greater(x.Pct1 + x.Pct2 + x.Pct3 + x.Pct4 + x.Pct5 + x.PctNa, 0.95);
+                Assert.Greater(
+                    x.PctA + x.PctAMinus + x.PctBPlus + x.PctB + x.PctBMinus + x.PctCPlus + x.PctC + x.PctD + x.PctF +
+                    x.PctWithdraw, 0.90);
+                Assert.NotNull(x.Course);
+                Assert.AreNotEqual(0, x.Year);
+                Assert.AreNotEqual(0, x.NEnrolled);
+                Assert.AreNotEqual(0.0, x.MeanGpa);
+            });
+            
+            professors.ForEach(x =>
+            {
+                Assert.NotNull(x.Department);
+                Assert.NotNull(x.FirstName);
+                Assert.NotNull(x.LastName);
+                Assert.NotNull(x.NNumber);
+            });
         }
     }
 }

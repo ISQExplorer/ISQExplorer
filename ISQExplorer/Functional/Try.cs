@@ -172,16 +172,16 @@ namespace ISQExplorer.Functional
         /// <param name="func">A function converting this type to the desired type. If this function throws, the new Try will be constructed out of the thrown exception.</param>
         /// <typeparam name="TRes">The new type of the try.</typeparam>
         /// <returns>A new Try of the given type containing a value if this Try contains a value and the conversion function didn't throw, or the applicable exception if not.</returns>
-        public Try<TRes, Exception> Select<TRes>(Func<T, TRes> func) => Match(
+        public Try<TRes> Select<TRes>(Func<T, TRes> func) => Match(
             val =>
             {
                 try
                 {
-                    return new Try<TRes, Exception>(func(Value));
+                    return new Try<TRes>(func(Value));
                 }
                 catch (Exception ex)
                 {
-                    return new Try<TRes, Exception>(ex);
+                    return new Try<TRes>(ex);
                 }
             },
             ex => ex
