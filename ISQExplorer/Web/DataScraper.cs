@@ -20,7 +20,7 @@ namespace ISQExplorer.Web
 {
     public static class DataScraper
     {
-        private static RateLimiter _limiter = new RateLimiter(2, 2000);
+        private static readonly RateLimiter Limiter = new RateLimiter(2, 1000);
 
         public static async Task<IDocument> ToDocument(string html)
         {
@@ -43,7 +43,7 @@ namespace ISQExplorer.Web
         public static async Task<Try<IEnumerable<DepartmentModel>>> ScrapeDepartmentIds()
         {
             const string url = "https://banner.unf.edu/pls/nfpo/wksfwbs.p_dept_schd";
-            var html = await _limiter.Run(() => Requests.Get(url));
+            var html = await Limiter.Run(() => Requests.Get(url));
             if (!html)
             {
                 return new IOException("Error while retrieving departments.", html.Exception);
@@ -112,7 +112,7 @@ namespace ISQExplorer.Web
                 _ => 0
             };
 
-            var document = await ToDocument(await _limiter.Run(() =>
+            var document = await ToDocument(await Limiter.Run(() =>
                 Requests.Post("https://banner.unf.edu/pls/nfpo/wksfwbs.p_dept_schd",
                     $"pv_term={no}&pv_dept={dept.Id}&pv_ptrm=&pv_campus=&pv_sub=Submit")));
             if (!document.HasValue)
@@ -196,7 +196,7 @@ namespace ISQExplorer.Web
         {
             var url =
                 $"https://banner.unf.edu/pls/nfpo/wksfwbs.p_course_isq_grade?pv_course_id={course.CourseCode}";
-            var document = await ToDocument(await _limiter.Run(() => Requests.Get(url)));
+            var document = await ToDocument(await Limiter.Run(() => Requests.Get(url)));
             if (!document.HasValue)
             {
                 return new IOException($"Error while scraping course code '{course.CourseCode}'.", document.Exception);
@@ -267,7 +267,7 @@ namespace ISQExplorer.Web
 
             var nNumber = nNumberOpt.Value;
 
-            var document = await ToDocument(await _limiter.Run(() => Requests.Get(url)));
+            var document = await ToDocument(await Limiter.Run(() => Requests.Get(url)));
             if (!document.HasValue)
             {
                 return new IOException($"Error while scraping NNumber '{nNumber}'.", document.Exception);
@@ -366,7 +366,7 @@ namespace ISQExplorer.Web
             var url =
                 $"https://banner.unf.edu/pls/nfpo/wksfwbs.p_instructor_isq_grade?pv_instructor={professor.NNumber}";
 
-            var document = await ToDocument(await _limiter.Run(() => Requests.Get(url)));
+            var document = await ToDocument(await Limiter.Run(() => Requests.Get(url)));
             if (!document)
             {
                 return new IOException($"Error while scraping NNumber '{professor.NNumber}'.", document.Exception);

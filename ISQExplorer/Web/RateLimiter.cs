@@ -34,7 +34,7 @@ namespace ISQExplorer.Web
         public RateLimiter(int maxConcurrentTasks = 10, int cycleTimeMillis = 1000)
         {
             (MaxConcurrentTasks, CycleTimeMillis) = (maxConcurrentTasks, cycleTimeMillis);
-            _semaphore = new SemaphoreSlim(0, maxConcurrentTasks);
+            _semaphore = new SemaphoreSlim(maxConcurrentTasks);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace ISQExplorer.Web
 
             if (watch.ElapsedMilliseconds < CycleTimeMillis)
             {
-                await Task.Delay((int) (CycleTimeMillis - watch.ElapsedMilliseconds));
+                await Task.Delay((int) (CycleTimeMillis - watch.ElapsedMilliseconds + 6));
             }
 
             _semaphore.Release();

@@ -249,33 +249,35 @@ namespace ISQExplorerTests
             Assert.Greater(courses.Count, 0);
             Assert.Greater(professors.Count, 0);
             Assert.Greater(entries.Count, 0);
-            
+
             courses.ForEach(x =>
             {
-                Assert.NotNull(x.Department);
-                Assert.NotNull(x.CourseCode);
-                Assert.NotNull(x.Name);
+                Assert.NotNull(x.Department, x.ToString());
+                Assert.NotNull(x.CourseCode, x.ToString());
+                Assert.NotNull(x.Name, x.ToString());
             });
 
             entries.ForEach(x =>
             {
-                Assert.AreNotEqual(0, x.Crn);
-                Assert.Greater(x.Pct1 + x.Pct2 + x.Pct3 + x.Pct4 + x.Pct5 + x.PctNa, 0.95);
-                Assert.Greater(
-                    x.PctA + x.PctAMinus + x.PctBPlus + x.PctB + x.PctBMinus + x.PctCPlus + x.PctC + x.PctD + x.PctF +
-                    x.PctWithdraw, 0.90);
-                Assert.NotNull(x.Course);
-                Assert.AreNotEqual(0, x.Year);
-                Assert.AreNotEqual(0, x.NEnrolled);
-                Assert.AreNotEqual(0.0, x.MeanGpa);
+                Assert.AreNotEqual(0, x.Crn, x.ToString());
+                Assert.AreNotEqual(0, x.Year, x.ToString());
             });
-            
+
+            Assert.True(entries.AtLeastPercent(0.85, x => x.NEnrolled > 0));
+            Assert.True(entries.AtLeastPercent(0.85, x => x.Pct1 + x.Pct2 + x.Pct3 + x.Pct4 + x.Pct5 + x.PctNa > 0.95),
+                ">15% of entries have rating scales that do not add up to at least 95%.");
+            Assert.True(entries.AtLeastPercent(0.85, x =>
+                x.PctA + x.PctAMinus + x.PctBPlus + x.PctB + x.PctBMinus + x.PctCPlus + x.PctC + x.PctD + x.PctF +
+                x.PctWithdraw > 0.95), ">15% of entries have grade scales that do not add up to at least 95%.");
+            Assert.True(entries.AtLeastPercent(0.85, x => x.Course != null), ">15% of entry courses are null.");
+            Assert.True(entries.AtLeastPercent(0.85, x => x.MeanGpa > 0.05), ">15% of GPAs are 0.0.");
+
             professors.ForEach(x =>
             {
-                Assert.NotNull(x.Department);
-                Assert.NotNull(x.FirstName);
-                Assert.NotNull(x.LastName);
-                Assert.NotNull(x.NNumber);
+                Assert.NotNull(x.Department, x.ToString());
+                Assert.NotNull(x.FirstName, x.ToString());
+                Assert.NotNull(x.LastName, x.ToString());
+                Assert.NotNull(x.NNumber, x.ToString());
             });
         }
     }
