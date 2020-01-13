@@ -30,7 +30,7 @@ namespace ISQExplorer.Models
             var since = s.Split(" ");
             if (since.Length != 2)
             {
-                throw new ArgumentException($"Invalid since field '{s}'");
+                throw new ArgumentException($"Invalid term '{s}'");
             }
 
             var term = since[0] switch
@@ -38,7 +38,7 @@ namespace ISQExplorer.Models
                 "Spring" => Season.Spring,
                 "Summer" => Season.Summer,
                 "Fall" => Season.Fall,
-                _ => throw new ArgumentException($"Invalid term '{since[0]}'")
+                _ => throw new ArgumentException($"Invalid season '{since[0]}'")
             };
 
             if (!int.TryParse(since[1], out var year))

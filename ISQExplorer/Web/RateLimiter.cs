@@ -1,10 +1,7 @@
 using System;
 using System.Diagnostics;
-using System.IO;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using ISQExplorer.Functional;
 
 namespace ISQExplorer.Web
 {
@@ -29,7 +26,7 @@ namespace ISQExplorer.Web
         /// <summary>
         /// Constructs a RateLimiter.
         /// </summary>
-        /// <param name="maxConcurrentTasks">The maximum number of Tasks that can run simultaneously. By default this is 2.</param>
+        /// <param name="maxConcurrentTasks">The maximum number of Tasks that can run simultaneously. By default this is 10.</param>
         /// <param name="cycleTimeMillis">The minimum amount of time a Task spends running in milliseconds. By default this is 1000ms.</param>
         public RateLimiter(int maxConcurrentTasks = 10, int cycleTimeMillis = 1000)
         {

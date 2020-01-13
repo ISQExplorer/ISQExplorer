@@ -11,14 +11,7 @@ namespace ISQExplorer.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public DepartmentModel Department { get; set; }
-
-        private string _courseCode;
-        public string CourseCode
-        {
-            get => _courseCode;
-            set => _courseCode = value.ToUpper();
-        }
-
+        public string CourseCode { get; set; }
         public string Name { get; set; }
 
         public bool Equals(CourseModel other)

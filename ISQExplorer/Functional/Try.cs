@@ -36,16 +36,6 @@ namespace ISQExplorer.Functional
             condition ? val() : new Try<T, TException>(ex());
 
         /// <summary>
-        /// Executes the given function, constructing the Try out of the return value, or the exception the function might throw.
-        /// </summary>
-        /// <param name="func">The function to execute.</param>
-        /// <typeparam name="T">The type of the Try.</typeparam>
-        /// <typeparam name="TException">The type of the Try's exception.</typeparam>
-        /// <returns>A Try of the same type as the return value of the function.</returns>
-        public static Try<T, TException> Of<T, TException>(Func<T> func) where TException : Exception =>
-            new Try<T, TException>(func);
-
-        /// <summary>
         /// Converts the exception to a different type if necessary.
         /// </summary>
         /// <param name="e">An exception.</param>
@@ -123,7 +113,7 @@ namespace ISQExplorer.Functional
                     return _value;
                 }
 
-                throw new InvalidOperationException($"This Try has an exception, not a value. Exception: '{_ex}'.");
+                throw _ex;
             }
         }
 

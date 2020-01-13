@@ -7,14 +7,12 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AngleSharp;
-using AngleSharp.Common;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using ISQExplorer.Exceptions;
 using ISQExplorer.Functional;
 using ISQExplorer.Misc;
 using ISQExplorer.Models;
-using Microsoft.Extensions.Logging;
 
 namespace ISQExplorer.Web
 {
@@ -33,6 +31,22 @@ namespace ISQExplorer.Web
         public static async Task<Try<IDocument, IOException>> ToDocument(Try<string, IOException> html)
         {
             return html ? new Try<IDocument, IOException>(await ToDocument(html.Value)) : html.Exception;
+        }
+
+        public static IEnumerable<IHtmlTableCellElement> RowChildren(this IHtmlTableRowElement row)
+        {
+            foreach (var child in row.Children)
+            {
+                if (!(child is IHtmlTableCellElement cell))
+                {
+                    throw new ArgumentException($"Non cell child '{child.InnerHtml}' of row '{row.InnerHtml}'");
+                }
+
+                for (var i = 0; i < cell.ColumnSpan; ++i)
+                {
+                    yield return cell;
+                }
+            }
         }
 
         /// <summary>
@@ -127,18 +141,26 @@ namespace ISQExplorer.Web
                 .Skip(3)
                 .TryAllParallel(async x =>
                 {
-                    var children = x.Children.ToList();
-
-                    if (children.Count != 20)
+                    if (!(x is IHtmlTableRowElement row))
                     {
-                        exceptions.Add(new MalformedPageException(
-                            $"Malformed row. Incorrect number of columns in table. Expected 20, got {children.Count}"));
-                        return;
+                        return new ArgumentException($"Expected row, got element '{x.OuterHtml}'");
                     }
 
-                    if (WebUtility.HtmlDecode(children.First().InnerHtml)?.Trim() != "")
+                    var children = row.RowChildren().ToList();
+
+                    if (children.Count < 18)
                     {
-                        return;
+                        exceptions.Add(new MalformedPageException(
+                            $"Malformed row. Incorrect number of columns in table. Expected at least 18, got {children.Count}\nRow: '{x.InnerHtml}'"));
+                        return null;
+                    }
+
+                    if (children[2].Children.Length == 0 || children[2].Children.First().InnerHtml.Trim() == "")
+                    {
+                        exceptions.Add(new MalformedPageException(
+                            $"Blank course code in cell '{children[2].InnerHtml}' with row '{row.InnerHtml}'"
+                        ));
+                        return null;
                     }
 
                     courses.Add(new CourseModel
@@ -148,12 +170,17 @@ namespace ISQExplorer.Web
                         Name = children[3].InnerHtml
                     });
 
+                    if (WebUtility.HtmlDecode(children.First().InnerHtml)?.Trim() != "")
+                    {
+                        return null;
+                    }
+
                     if (children[17].Children.None() ||
                         !(children[17].Children.First() is IHtmlAnchorElement professorCell))
                     {
                         exceptions.Add(
                             new MalformedPageException($"Expected anchor element in 17th column, did not get one."));
-                        return;
+                        return null;
                     }
 
                     var url = $"https://banner.unf.edu/pls/nfpo{professorCell.PathName}{professorCell.Search}";
@@ -166,13 +193,14 @@ namespace ISQExplorer.Web
                         {
                             exceptions.Add(new MalformedPageException("Failed to scrape professor data",
                                 profTry.Exception));
-                            return;
+                            return null;
                         }
 
                         urlToProf[url] = profTry.Value;
                     }
 
                     professors.Add(urlToProf[url]);
+                    return null;
                 });
 
             return res
@@ -432,32 +460,34 @@ namespace ISQExplorer.Web
                         Season = term.Season,
                         Year = term.Year,
                         Course = course,
-                        Crn = int.Parse(childText[1]),
+                        Crn = Parse.Int(childText[1]).Value,
                         Professor = professor,
-                        NEnrolled = int.Parse(gpaText[3]),
-                        NResponded = int.Parse(childText[4]),
-                        Pct5 = double.Parse(childText[6]),
-                        Pct4 = double.Parse(childText[7]),
-                        Pct3 = double.Parse(childText[8]),
-                        Pct2 = double.Parse(childText[9]),
-                        Pct1 = double.Parse(childText[10]),
-                        PctNa = double.Parse(childText[11]),
-                        PctA = double.Parse(gpaText[4]),
-                        PctAMinus = double.Parse(gpaText[5]),
-                        PctBPlus = double.Parse(gpaText[6]),
-                        PctB = double.Parse(gpaText[7]),
-                        PctBMinus = double.Parse(gpaText[8]),
-                        PctCPlus = double.Parse(gpaText[9]),
-                        PctC = double.Parse(gpaText[10]),
-                        PctD = double.Parse(gpaText[11]),
-                        PctF = double.Parse(gpaText[12]),
-                        PctWithdraw = double.Parse(gpaText[13]),
-                        MeanGpa = double.Parse(gpaText[14])
+                        NEnrolled = Parse.Int(gpaText[3]).Value,
+                        NResponded = Parse.Int(childText[4]).Value,
+                        Pct5 = Parse.Double(childText[6]).Value,
+                        Pct4 = Parse.Double(childText[7]).Value,
+                        Pct3 = Parse.Double(childText[8]).Value,
+                        Pct2 = Parse.Double(childText[9]).Value,
+                        Pct1 = Parse.Double(childText[10]).Value,
+                        PctNa = Parse.Double(childText[11]).Value,
+                        PctA = Parse.Double(gpaText[4]).Value,
+                        PctAMinus = Parse.Double(gpaText[5]).Value,
+                        PctBPlus = Parse.Double(gpaText[6]).Value,
+                        PctB = Parse.Double(gpaText[7]).Value,
+                        PctBMinus = Parse.Double(gpaText[8]).Value,
+                        PctCPlus = Parse.Double(gpaText[9]).Value,
+                        PctC = Parse.Double(gpaText[10]).Value,
+                        PctD = Parse.Double(gpaText[11]).Value,
+                        PctF = Parse.Double(gpaText[12]).Value,
+                        PctWithdraw = Parse.Double(gpaText[13]).Value,
+                        MeanGpa = gpaText[14].Trim() == "" ? 0.0 : Parse.Double(gpaText[14]).Value
                     });
 
                     if (!entry)
                     {
-                        return entry.Exception;
+                        return new MalformedPageException(
+                            $"Failed to parse row, Child: '{childText.Join("\t")}', GPA:'{gpaText.Join("\t")}'",
+                            entry.Exception);
                     }
 
                     return Try.Of(entry.Value);
@@ -582,9 +612,8 @@ namespace ISQExplorer.Web
                     }
                     else
                     {
-                        errors.Add(
+                        coursesFailed.Add(
                             new CourseScrapeException(entry.Course.CourseCode, "This course code was not found."));
-                        entry.Course = null;
                     }
                 }
 

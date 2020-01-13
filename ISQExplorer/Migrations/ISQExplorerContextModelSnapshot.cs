@@ -3,6 +3,7 @@ using System;
 using ISQExplorer.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace ISQExplorer.Migrations
@@ -18,7 +19,7 @@ namespace ISQExplorer.Migrations
                 .HasAnnotation("ProductVersion", "3.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            modelBuilder.Entity("ISQExplorer.Models.CourseCodeModel", b =>
+            modelBuilder.Entity("ISQExplorer.Models.CourseModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -27,69 +28,43 @@ namespace ISQExplorer.Migrations
 
                     b.Property<string>("CourseCode")
                         .IsRequired()
-                        .HasColumnType("character varying(12)")
-                        .HasMaxLength(12);
+                        .HasColumnType("text");
 
-                    b.Property<int>("CourseId")
+                    b.Property<int>("DepartmentId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("Season")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("Year")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.ToTable("CourseCodes");
-                });
-
-            modelBuilder.Entity("ISQExplorer.Models.CourseModel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<string>("Description")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Description");
+                    b.HasIndex("CourseCode");
+
+                    b.HasIndex("DepartmentId");
 
                     b.ToTable("Courses");
                 });
 
-            modelBuilder.Entity("ISQExplorer.Models.CourseNameModel", b =>
+            modelBuilder.Entity("ISQExplorer.Models.DepartmentModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<int>("CourseId")
-                        .HasColumnType("integer");
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("character varying(255)")
-                        .HasMaxLength(255);
-
-                    b.Property<int?>("Season")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("Year")
-                        .HasColumnType("integer");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CourseId");
+                    b.HasIndex("Name");
 
-                    b.ToTable("CourseNames");
+                    b.ToTable("DepartmentModel");
                 });
 
             modelBuilder.Entity("ISQExplorer.Models.ISQEntryModel", b =>
@@ -112,9 +87,6 @@ namespace ISQExplorer.Migrations
                         .HasColumnType("integer");
 
                     b.Property<int>("NResponded")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("NTotal")
                         .HasColumnType("integer");
 
                     b.Property<double>("Pct1")
@@ -192,72 +164,35 @@ namespace ISQExplorer.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("FirstName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("LastName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("NNumber")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DepartmentId");
 
                     b.HasIndex("NNumber");
 
                     b.ToTable("Professors");
                 });
 
-            modelBuilder.Entity("ISQExplorer.Models.QueryModel", b =>
+            modelBuilder.Entity("ISQExplorer.Models.CourseModel", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<string>("CourseCode")
-                        .HasColumnType("text");
-
-                    b.Property<string>("CourseName")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("LastUpdated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("ProfessorName")
-                        .HasColumnType("text");
-
-                    b.Property<int?>("SeasonSince")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("SeasonUntil")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("YearSince")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("YearUntil")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Queries");
-                });
-
-            modelBuilder.Entity("ISQExplorer.Models.CourseCodeModel", b =>
-                {
-                    b.HasOne("ISQExplorer.Models.CourseModel", "Course")
+                    b.HasOne("ISQExplorer.Models.DepartmentModel", "Department")
                         .WithMany()
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ISQExplorer.Models.CourseNameModel", b =>
-                {
-                    b.HasOne("ISQExplorer.Models.CourseModel", "Course")
-                        .WithMany()
-                        .HasForeignKey("CourseId")
+                        .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -271,6 +206,15 @@ namespace ISQExplorer.Migrations
                     b.HasOne("ISQExplorer.Models.ProfessorModel", "Professor")
                         .WithMany()
                         .HasForeignKey("ProfessorId");
+                });
+
+            modelBuilder.Entity("ISQExplorer.Models.ProfessorModel", b =>
+                {
+                    b.HasOne("ISQExplorer.Models.DepartmentModel", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

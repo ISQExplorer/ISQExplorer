@@ -19,7 +19,7 @@ namespace ISQExplorer.Models
             modelBuilder.Entity<DepartmentModel>()
                 .HasIndex(c => c.Name);
             modelBuilder.Entity<ISQEntryModel>()
-                .HasIndex(c => new {c.Course, c.Crn, c.Season, c.Year});
+                .HasIndex(c => new {c.Crn, c.Season, c.Year});
             modelBuilder.Entity<ProfessorModel>()
                 .HasIndex(c => c.NNumber);
         }

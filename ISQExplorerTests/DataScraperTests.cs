@@ -242,8 +242,12 @@ namespace ISQExplorerTests
             }
 
             var result = res.Value;
+            var depts = result.Departments.Succeeded.ToList();
+            var deptsFailed = result.Departments.Failed.ToList();
             var courses = result.Courses.Succeeded.ToList();
+            var courseErrors = result.Courses.Failed.ToList();
             var professors = result.Professors.Succeeded.ToList();
+            var profErrors = result.Professors.Failed.ToList();
             var entries = result.Entries.ToList();
 
             Assert.Greater(courses.Count, 0);
@@ -269,7 +273,7 @@ namespace ISQExplorerTests
             Assert.True(entries.AtLeastPercent(0.85, x =>
                 x.PctA + x.PctAMinus + x.PctBPlus + x.PctB + x.PctBMinus + x.PctCPlus + x.PctC + x.PctD + x.PctF +
                 x.PctWithdraw > 0.95), ">15% of entries have grade scales that do not add up to at least 95%.");
-            Assert.True(entries.AtLeastPercent(0.85, x => x.Course != null), ">15% of entry courses are null.");
+            Assert.True(entries.AtLeastPercent(0.75, x => x.Course?.Department != null), ">25% of entry course departments are null.");
             Assert.True(entries.AtLeastPercent(0.85, x => x.MeanGpa > 0.05), ">15% of GPAs are 0.0.");
 
             professors.ForEach(x =>

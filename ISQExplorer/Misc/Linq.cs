@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -46,7 +45,7 @@ namespace ISQExplorer.Misc
         /// Returns true if at least a certain percentage of the elements of an enumerable satisfy a predicate, false if not.
         /// </summary>
         /// <param name="enumerable">The enumerable.</param>
-        /// <param name="percent">The proportion of elements that must satisfy the predicate. This is a value from 0.0 to 1.0.</param>
+        /// <param name="proportion">The proportion of elements that must satisfy the predicate. This is a value from 0.0 to 1.0.</param>
         /// <param name="predicate">A function taking an element and returning true or false.</param>
         /// <typeparam name="T">The type of the elements in the enumerable.</typeparam>
         /// <returns>True if the predicate returned true for at least the given number of elements, false if not.</returns>
@@ -154,7 +153,7 @@ namespace ISQExplorer.Misc
         /// The number to stop the range at.
         /// This number is not yielded, but all before it are.
         /// If this number is 0 or less, no integers are yielded.
-        /// <returns></returns>
+        /// <returns>An enumerable of integers from 0 to stop.</returns>
         public static IEnumerable<int> Range(int stop)
         {
             for (var i = 0; i < stop; ++i)
@@ -191,8 +190,7 @@ namespace ISQExplorer.Misc
         /// This value can be negative, which will yield descending numbers if start is greater than stop, otherwise it will yield no numbers.
         /// If this value is set to 0, the default step is used.
         /// </param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
+        /// <returns>An enumerable of integers from start to stop, going up/down by step.</returns>
         public static IEnumerable<int> Range(int start, int stop, int step = 0)
         {
             if (step == 0)
@@ -217,7 +215,7 @@ namespace ISQExplorer.Misc
         public static IList<T> ToShuffledList<T>(this IEnumerable<T> enumerable, int? seed = null)
         {
             var list = enumerable.ToList();
-            var rng = new Random((int)DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds);
+            var rng = new Random(seed ?? (int)DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds);
 
             for (var i = list.Count - 1; i > 0; --i)
             {
