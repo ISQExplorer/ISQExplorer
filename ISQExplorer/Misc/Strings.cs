@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using ISQExplorer.Functional;
 
@@ -56,5 +57,7 @@ namespace ISQExplorer.Misc
             }
             return Regex.IsMatch(input, pattern);
         }
+
+        public static byte[] ToBytes(this string s) => Encoding.UTF8.GetBytes(s);
     }
 }
