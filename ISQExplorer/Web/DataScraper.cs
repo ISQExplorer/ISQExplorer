@@ -56,7 +56,7 @@ namespace ISQExplorer.Web
         /// <exception cref="IOException">Details the type of error.</exception>
         public static async Task<Try<IEnumerable<DepartmentModel>>> ScrapeDepartmentIds()
         {
-            const string url = "https://banner.unf.edu/pls/nfpo/wksfwbs.p_dept_schd";
+            const string url = "https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_dept_schd";
             var html = await Limiter.Run(() => Requests.Get(url));
             if (!html)
             {
@@ -127,7 +127,7 @@ namespace ISQExplorer.Web
             };
 
             var document = await ToDocument(await Limiter.Run(() =>
-                Requests.Post("https://banner.unf.edu/pls/nfpo/wksfwbs.p_dept_schd",
+                Requests.Post("https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_dept_schd",
                     $"pv_term={no}&pv_dept={dept.Id}&pv_ptrm=&pv_campus=&pv_sub=Submit")));
             if (!document.HasValue)
             {
@@ -223,7 +223,7 @@ namespace ISQExplorer.Web
         )
         {
             var url =
-                $"https://banner.unf.edu/pls/nfpo/wksfwbs.p_course_isq_grade?pv_course_id={course.CourseCode}";
+                $"https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id={course.CourseCode}";
             var document = await ToDocument(await Limiter.Run(() => Requests.Get(url)));
             if (!document.HasValue)
             {
@@ -392,7 +392,7 @@ namespace ISQExplorer.Web
             )
         {
             var url =
-                $"https://banner.unf.edu/pls/nfpo/wksfwbs.p_instructor_isq_grade?pv_instructor={professor.NNumber}";
+                $"https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor={professor.NNumber}";
 
             var document = await ToDocument(await Limiter.Run(() => Requests.Get(url)));
             if (!document)

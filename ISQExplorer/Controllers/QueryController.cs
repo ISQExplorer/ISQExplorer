@@ -18,9 +18,11 @@ namespace ISQExplorer.Controllers
             string? professorName = null, Season? sinceSeason = null, int? sinceYear = null,
             Season? untilSeason = null, int? untilYear = null)
         {
-            var query = new QueryParams(courseCode, courseName, professorName);
-            query.Since = new Term(sinceSeason ?? Season.Spring, sinceYear ?? 0);
-            query.Until = new Term(untilSeason ?? Season.Fall, untilYear ?? int.MaxValue);
+            var query = new QueryParams(courseCode, courseName, professorName)
+            {
+                Since = new Term(sinceSeason ?? Season.Spring, sinceYear ?? 0),
+                Until = new Term(untilSeason ?? Season.Fall, untilYear ?? int.MaxValue)
+            };
             return View(await _repo.QueryClass(query));
         }
     }

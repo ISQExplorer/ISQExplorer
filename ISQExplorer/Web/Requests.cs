@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -17,6 +18,7 @@ namespace ISQExplorer.Web
         {
             try
             {
+                client.Timeout = TimeSpan.FromMinutes(30);
                 return await client.GetStringAsync(url);
             }
             catch (HttpRequestException e)
@@ -29,6 +31,7 @@ namespace ISQExplorer.Web
         {
             try
             {
+                client.Timeout = TimeSpan.FromMinutes(30);
                 var resp = await client.PostAsync(url, new ByteArrayContent(data.ToBytes()));
                 return await resp.Content.ReadAsStringAsync();
             }
