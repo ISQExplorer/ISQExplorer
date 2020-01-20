@@ -126,9 +126,11 @@ namespace ISQExplorer.Web
                 _ => 0
             };
 
+            const string url = "https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_dept_schd";
+            var postData = $"pv_term={no}&pv_dept={dept.Id}&pv_ptrm=&pv_campus=&pv_sub=Submit";
+
             var document = await ToDocument(await Limiter.Run(() =>
-                Requests.Post("https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_dept_schd",
-                    $"pv_term={no}&pv_dept={dept.Id}&pv_ptrm=&pv_campus=&pv_sub=Submit")));
+                Requests.Post(url, postData)));
             if (!document.HasValue)
             {
                 return new IOException($"Error while retrieving department page {dept}.", document.Exception);

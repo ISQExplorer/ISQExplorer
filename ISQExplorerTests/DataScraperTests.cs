@@ -42,13 +42,12 @@ namespace ISQExplorerTests
             }
 
             var res = await DataScraper.ScrapeDepartmentProfessor(
-                "https://banner.unf.edu/pls/nfpo/wksfwbs.p_instructor_isq_grade?pv_instructor=N00959246",
+                "https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00959246",
                 dept.Value
             );
 
             Assert.True(res.HasValue);
             Assert.NotNull(res.Value.Department);
-            Assert.AreNotEqual(0, res.Value.Id);
             Assert.NotNull(res.Value.FirstName);
             Assert.NotNull(res.Value.LastName);
             Assert.NotNull(res.Value.NNumber);

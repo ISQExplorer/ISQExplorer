@@ -14,6 +14,7 @@ namespace ISQExplorer.Web
             var request = (HttpWebRequest) WebRequest.Create(url);
 
             request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            request.UserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:72.0) Gecko/20100101 Firefox/72.0";
 
             try
             {
@@ -43,13 +44,14 @@ namespace ISQExplorer.Web
             var request = (HttpWebRequest) WebRequest.Create(url);
 
             request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+            request.UserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:72.0) Gecko/20100101 Firefox/72.0";
             
             var payload = Encoding.UTF8.GetBytes(data);
 
             request.Method = "POST";
             request.ContentLength = payload.Length;
             request.Credentials = CredentialCache.DefaultCredentials;
-            request.ContentType = "text/html; charset=UTF-8";
+            request.ContentType = "application/x-www-form-urlencoded";
 
             var dataStream = request.GetRequestStream();
             dataStream.Write(payload, 0, payload.Length);
