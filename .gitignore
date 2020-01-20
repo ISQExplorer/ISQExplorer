@@ -4,5 +4,5 @@ obj/*
 .idea/*
 ISQExplorer/bin
 ISQExplorer/obj
-ISQExplorer/professors.json
-ISQExplorer/classe.json
+ISQExplorerTests/bin
+ISQExplorerTests/obj
