@@ -56,8 +56,7 @@ namespace ISQExplorer.Web
         /// <exception cref="IOException">Details the type of error.</exception>
         public static async Task<Try<IEnumerable<DepartmentModel>>> ScrapeDepartmentIds()
         {
-            const string url = "https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_dept_schd";
-            var html = await Limiter.Run(() => Requests.Get(url));
+            var html = await Limiter.Run(() => Requests.Get(Urls.DeptSchedule));
             if (!html)
             {
                 return new IOException("Error while retrieving departments.", html.Exception);
@@ -126,11 +125,8 @@ namespace ISQExplorer.Web
                 _ => 0
             };
 
-            const string url = "https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_dept_schd";
-            var postData = $"pv_term={no}&pv_dept={dept.Id}&pv_ptrm=&pv_campus=&pv_sub=Submit";
-
             var document = await ToDocument(await Limiter.Run(() =>
-                Requests.Post(url, postData)));
+                Requests.Post(Urls.DeptSchedule, Urls.DeptSchedulePostData(no, dept.Id))));
             if (!document.HasValue)
             {
                 return new IOException($"Error while retrieving department page {dept}.", document.Exception);
@@ -185,7 +181,7 @@ namespace ISQExplorer.Web
                         return null;
                     }
 
-                    var url = $"https://banner.unf.edu/pls/nfpo{professorCell.PathName}{professorCell.Search}";
+                    var url = Urls.DeptToProf(professorCell.PathName, professorCell.Search);
 
                     if (!urlToProf.ContainsKey(url))
                     {
@@ -225,7 +221,7 @@ namespace ISQExplorer.Web
         )
         {
             var url =
-                $"https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id={course.CourseCode}";
+                Urls.CoursePage(course.CourseCode);
             var document = await ToDocument(await Limiter.Run(() => Requests.Get(url)));
             if (!document.HasValue)
             {
@@ -282,6 +278,46 @@ namespace ISQExplorer.Web
                     MeanGpa = double.Parse(gpaText[14])
                 };
             })));
+        }
+
+        public static async Task<Try<CourseModel, IOException>> ScrapeDepartmentCourse(
+            string courseCode,
+            DepartmentModel dept
+        )
+        {
+            var document = await ToDocument(await Limiter.Run(() => Requests.Get(Urls.CoursePage(courseCode))));
+            if (!document.HasValue)
+            {
+                return new IOException($"Error while scraping course code '{courseCode}'.", document.Exception);
+            }
+
+            var tables = document.Value.QuerySelectorAll("table.datadisplaytable > tbody").ToList();
+            if (tables.Count < 3)
+            {
+                return new IOException($"Not enough tables in the url '{Urls.CoursePage(courseCode)}'.");
+            }
+
+            if (tables[1].Children.Length == 0)
+            {
+                return new IOException($"The second table in the url '{Urls.CoursePage(courseCode)}' is blank.");
+            }
+
+            var row = tables[1].Children.First();
+            var cells = row.Children.ToList();
+
+            if (cells.Count < 6)
+            {
+                return new IOException(
+                    $"The row does not have the correct number of cells in url '{Urls.CoursePage(courseCode)}'. Row: '{row.InnerHtml}''");
+            }
+
+            if (cells[1].InnerHtml.Trim() != courseCode)
+            {
+                return new IOException(
+                    $"Expected course code '{courseCode}', but found '{cells[1].InnerHtml.Trim()}' in the first cell.");
+            }
+
+            return new CourseModel {Department = dept, Name = cells[3].InnerHtml.Trim(), CourseCode = courseCode};
         }
 
         public static async Task<Try<ProfessorModel, IOException>> ScrapeDepartmentProfessor(
@@ -393,8 +429,7 @@ namespace ISQExplorer.Web
                 Func<string, Term, Task<Try<CourseModel>>> courseCodeToCourse
             )
         {
-            var url =
-                $"https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor={professor.NNumber}";
+            var url = Urls.ProfessorPage(professor.NNumber);
 
             var document = await ToDocument(await Limiter.Run(() => Requests.Get(url)));
             if (!document)
@@ -565,7 +600,8 @@ namespace ISQExplorer.Web
                     professors.Add(prof);
 
                     var profEntries =
-                        await ScrapeDepartmentProfessorEntries(prof, code => new CourseModel {CourseCode = code});
+                        await ScrapeDepartmentProfessorEntries(prof,
+                            code => new CourseModel {Department = dept, CourseCode = code});
 
                     if (!profEntries)
                     {
@@ -608,14 +644,28 @@ namespace ISQExplorer.Web
 
                 foreach (var entry in entries)
                 {
-                    if (courseCodeToCourse.ContainsKey(entry.Course.CourseCode))
+                    if (courseCodeToCourse.ContainsKey(entry.Course.CourseCode) &&
+                        courseCodeToCourse[entry.Course.CourseCode].Name != null)
                     {
                         entry.Course = courseCodeToCourse[entry.Course.CourseCode];
                     }
                     else
                     {
-                        coursesFailed.Add(
-                            new CourseScrapeException(entry.Course.CourseCode, "This course code was not found."));
+                        (await ScrapeDepartmentCourse(entry.Course.CourseCode, entry.Course.Department)).Match(
+                            val =>
+                            {
+                                courseCodeToCourse[entry.Course.CourseCode] = val;
+                                entry.Course = val;
+                            },
+                            ex =>
+                            {
+                                coursesFailed.Add(
+                                    new CourseScrapeException(entry.Course.CourseCode,
+                                        "This course code was not found."));
+                                courseCodeToCourse.Remove(entry.Course.CourseCode, out _);
+                                entry.Course = null;
+                            }
+                        );
                     }
                 }
 

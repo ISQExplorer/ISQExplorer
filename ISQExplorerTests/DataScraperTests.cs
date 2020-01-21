@@ -27,6 +27,29 @@ namespace ISQExplorerTests
         }
 
         [Test]
+        public async Task TestScrapeDepartmentCourse()
+        {
+             var ids = await DataScraper.ScrapeDepartmentIds();
+             if (!ids)
+             {
+                 Assert.Fail(ids.Exception.Message);
+             }
+ 
+             var dept = new Try<DepartmentModel>(() => ids.Value.First(x => x.Name == "Computing"));
+             if (!dept)
+             {
+                 Assert.Fail(dept.Exception.Message);
+             }
+
+             var res = await DataScraper.ScrapeDepartmentCourse("COP3503", dept.Value);
+
+             Assert.True(res.HasValue);
+             Assert.NotNull(res.Value.Department);
+             Assert.NotNull(res.Value.CourseCode);
+             Assert.NotNull(res.Value.Name);
+        }
+
+        [Test]
         public async Task TestScrapeDepartmentProfessor()
         {
             var ids = await DataScraper.ScrapeDepartmentIds();
@@ -42,7 +65,7 @@ namespace ISQExplorerTests
             }
 
             var res = await DataScraper.ScrapeDepartmentProfessor(
-                "https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00959246",
+                Urls.ProfessorPage("N00959246"),
                 dept.Value
             );
 

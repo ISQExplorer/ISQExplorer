@@ -16,7 +16,7 @@ namespace ISQExplorer.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                .HasAnnotation("ProductVersion", "3.0.0")
+                .HasAnnotation("ProductVersion", "3.1.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("ISQExplorer.Models.CourseModel", b =>
@@ -64,7 +64,7 @@ namespace ISQExplorer.Migrations
 
                     b.HasIndex("Name");
 
-                    b.ToTable("DepartmentModel");
+                    b.ToTable("Departments");
                 });
 
             modelBuilder.Entity("ISQExplorer.Models.ISQEntryModel", b =>
@@ -74,7 +74,7 @@ namespace ISQExplorer.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<int?>("CourseId")
+                    b.Property<int>("CourseId")
                         .HasColumnType("integer");
 
                     b.Property<int>("Crn")
@@ -137,7 +137,7 @@ namespace ISQExplorer.Migrations
                     b.Property<double>("PctWithdraw")
                         .HasColumnType("double precision");
 
-                    b.Property<int?>("ProfessorId")
+                    b.Property<int>("ProfessorId")
                         .HasColumnType("integer");
 
                     b.Property<int>("Season")
@@ -201,11 +201,15 @@ namespace ISQExplorer.Migrations
                 {
                     b.HasOne("ISQExplorer.Models.CourseModel", "Course")
                         .WithMany()
-                        .HasForeignKey("CourseId");
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ISQExplorer.Models.ProfessorModel", "Professor")
                         .WithMany()
-                        .HasForeignKey("ProfessorId");
+                        .HasForeignKey("ProfessorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ISQExplorer.Models.ProfessorModel", b =>

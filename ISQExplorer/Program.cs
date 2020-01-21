@@ -44,12 +44,15 @@ namespace ISQExplorer
                         db.IsqEntries.AddRangeAsync(res.Value.Entries),
                         db.Professors.AddRangeAsync(res.Value.Professors.Succeeded)
                     );
+                    await db.SaveChangesAsync();
                 }
                 catch (Exception e)
                 {
                     Print.Line(e.ToString(), ConsoleColor.Yellow);
                     Print.Line("Failed to write scraped data to database.", ConsoleColor.Red);
+                    return;
                 }
+                Print.Line("Finished importing data!", ConsoleColor.Green);
             }
 
             host.Run();

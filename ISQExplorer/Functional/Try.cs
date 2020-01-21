@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Threading.Tasks;
 
 namespace ISQExplorer.Functional
 {
@@ -21,6 +22,25 @@ namespace ISQExplorer.Functional
         /// <typeparam name="T">The type of the value.</typeparam>
         /// <returns>A Try{T} constructed from the given value.</returns>
         public static Try<T> Of<T>(T val) => new Try<T>(val);
+       
+        /// <summary>
+        /// Constructs a Try out of an async function, containing either the value returned by the Task, or the exception it may throw.
+        /// This function itself will not throw any exceptions the function passed to it may throw, but said exceptions will be present in the resulting Try.
+        /// </summary>
+        /// <param name="func">The function returning a Task returning the desired value.</param>
+        /// <typeparam name="T">The type of the desired value.</typeparam>
+        /// <returns>A Task of the given Try.</returns>
+        public static async Task<Try<T>> OfAsync<T>(Func<Task<T>> func)
+        {
+            try
+            {
+                return new Try<T>(await func());
+            }
+            catch (Exception e)
+            {
+                return e;
+            }
+        }
 
         /// <summary>
         /// Constructs a Try out of the given value if the condition is true, otherwise constructs it out of the given exception.
