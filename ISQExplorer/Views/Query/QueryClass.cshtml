@@ -5,6 +5,7 @@
     <tr>
         <th>Term</th>
         <th>CRN</th>
+        <th>Course</th>
         <th>Professor</th>
         <th>Number Responded / Enrolled</th>
         <th>Percent Responded</th>
@@ -14,9 +15,10 @@
     @foreach (var mod in Model)
     {
         <tr>
-            <td>@mod.Season</td>
+            <td>@(new Term(mod.Season, mod.Year))</td>
             <td>@mod.Crn</td>
-            <td>@mod.Professor</td>
+            <td>@mod.Course?.CourseCode</td>
+            <td>@mod.Professor?.LastName</td>
             <td>@mod.NResponded/@mod.NEnrolled</td>
             <td>@((100.0 * mod.NResponded / mod.NEnrolled).ToString("#.##"))</td>
             <td>@(mod.Pct5 * 0.05 + mod.Pct4 * 0.04 + mod.Pct3 * 0.03 + mod.Pct2 * 0.02 + mod.Pct1 * 0.01)</td>

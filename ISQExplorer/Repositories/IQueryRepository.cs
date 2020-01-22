@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ISQExplorer.Models;
 
@@ -15,7 +16,7 @@ namespace ISQExplorer.Repositories
             get => _courseCode;
             set
             {
-                if (CourseName != null)
+                if (value != null && CourseName != null && CourseName.Trim() != "")
                 {
                     throw new ArgumentException(
                         $"Do not specify both a course name and a course code. CourseCode = {CourseCode}, CourseName = {CourseName}.");
@@ -32,7 +33,7 @@ namespace ISQExplorer.Repositories
             get => _courseName;
             set
             {
-                if (CourseCode != null)
+                if (value != null && CourseCode != null && CourseCode.Trim() != "")
                 {
                     throw new ArgumentException(
                         $"Do not specify both a course name and a course code. CourseCode = {CourseCode}, CourseName = {CourseName}.");
@@ -95,7 +96,7 @@ namespace ISQExplorer.Repositories
 
     public interface IQueryRepository
     {
-        Task<IEnumerable<ISQEntryModel>> QueryClass(QueryParams qp);
-        Task<IEnumerable<ProfessorModel>> NameToProfessors(string professorName);
+        Task<IQueryable<ISQEntryModel>> QueryClass(QueryParams qp);
+        Task<IQueryable<ProfessorModel>> NameToProfessors(string professorName);
     }
 }

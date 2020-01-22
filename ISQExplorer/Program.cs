@@ -6,6 +6,7 @@ using ISQExplorer.Models;
 using ISQExplorer.Repositories;
 using ISQExplorer.Web;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -52,6 +53,7 @@ namespace ISQExplorer
                     Print.Line("Failed to write scraped data to database.", ConsoleColor.Red);
                     return;
                 }
+
                 Print.Line("Finished importing data!", ConsoleColor.Green);
             }
 

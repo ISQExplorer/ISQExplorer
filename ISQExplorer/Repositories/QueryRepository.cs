@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ISQExplorer.Misc;
 using ISQExplorer.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace ISQExplorer.Repositories
@@ -20,9 +21,12 @@ namespace ISQExplorer.Repositories
             _logger = logger;
         }
 
-        private async Task<IEnumerable<ISQEntryModel>> QueryClassSqlLookup(QueryParams qp)
+        private async Task<IQueryable<ISQEntryModel>> QueryClassSqlLookup(QueryParams qp)
         {
-            IQueryable<ISQEntryModel> query = _context.IsqEntries;
+            IQueryable<ISQEntryModel> query = _context.IsqEntries
+                .Include(x => x.Course)
+                .Include(x => x.Professor)
+                .Include(x => x.Professor.Department);
 
             ISet<string> courseCodes = null;
             if (qp.CourseName != null)
@@ -73,17 +77,17 @@ namespace ISQExplorer.Repositories
             return query.When(qp.Since, qp.Until);
         }
 
-        private async Task<IEnumerable<ISQEntryModel>> QueryClassWebLookup(QueryParams qp)
+        private async Task<IQueryable<ISQEntryModel>> QueryClassWebLookup(QueryParams qp)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<ISQEntryModel>> QueryClass(QueryParams qp)
+        public async Task<IQueryable<ISQEntryModel>> QueryClass(QueryParams qp)
         {
             return await QueryClassSqlLookup(qp);
         }
 
-        public async Task<IEnumerable<ProfessorModel>> NameToProfessors(string professorName)
+        public async Task<IQueryable<ProfessorModel>> NameToProfessors(string professorName)
         {
             if (!professorName.Contains(" "))
             {

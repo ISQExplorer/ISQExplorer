@@ -54,18 +54,24 @@ namespace ISQExplorer.Web
         {
             await _semaphore.WaitAsync();
 
-            var watch = new Stopwatch();
-            watch.Start();
-            var res = await func();
-            watch.Stop();
-
-            if (watch.ElapsedMilliseconds < CycleTimeMillis)
+            try
             {
-                await Task.Delay((int) (CycleTimeMillis - watch.ElapsedMilliseconds + 6));
-            }
+                var watch = new Stopwatch();
+                watch.Start();
+                var res = await func();
+                watch.Stop();
 
-            _semaphore.Release();
-            return res;
+                if (watch.ElapsedMilliseconds < CycleTimeMillis)
+                {
+                    await Task.Delay((int) (CycleTimeMillis - watch.ElapsedMilliseconds + 6));
+                }
+                
+                return res;
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
     }
 }

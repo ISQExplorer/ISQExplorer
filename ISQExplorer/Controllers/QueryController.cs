@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using ISQExplorer.Models;
 using ISQExplorer.Repositories;
@@ -23,7 +24,13 @@ namespace ISQExplorer.Controllers
                 Since = new Term(sinceSeason ?? Season.Spring, sinceYear ?? 0),
                 Until = new Term(untilSeason ?? Season.Fall, untilYear ?? int.MaxValue)
             };
-            return View(await _repo.QueryClass(query));
+            var res = await _repo.QueryClass(query);
+            return View(res.OrderByDescending(x => x.Year).ThenByDescending(x => x.Season));
+        }
+
+        public IActionResult QueryPage()
+        {
+            return View();
         }
     }
 }
