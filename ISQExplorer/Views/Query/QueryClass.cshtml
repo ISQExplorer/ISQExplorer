@@ -1,5 +1,21 @@
 @model IEnumerable<ISQExplorer.Models.ISQEntryModel>
 
+@{
+
+    string RatingToClass(double rating)
+    {
+        if (rating < 2.00)
+        {
+            return "text-danger";
+        }
+        if (rating < 3.6)
+        {
+            return "text-warning";
+        }
+        return "text-success";
+    }
+}
+
 <table class="table w-100">
     <tbody>
     <tr>
@@ -20,9 +36,9 @@
             <td>@mod.Course?.CourseCode</td>
             <td>@mod.Professor?.LastName</td>
             <td>@mod.NResponded/@mod.NEnrolled</td>
-            <td>@((100.0 * mod.NResponded / mod.NEnrolled).ToString("#.##"))</td>
-            <td>@(mod.Pct5 * 0.05 + mod.Pct4 * 0.04 + mod.Pct3 * 0.03 + mod.Pct2 * 0.02 + mod.Pct1 * 0.01)</td>
-            <td>@mod.MeanGpa</td>
+            <td>@((100.0 * mod.NResponded / mod.NEnrolled).ToString("#.00"))</td>
+            <td class="@RatingToClass(mod.Pct5 * 0.05 + mod.Pct4 * 0.04 + mod.Pct3 * 0.03 + mod.Pct2 * 0.02 + mod.Pct1 * 0.01)">@((mod.Pct5 * 0.05 + mod.Pct4 * 0.04 + mod.Pct3 * 0.03 + mod.Pct2 * 0.02 + mod.Pct1 * 0.01).ToString("#.00"))</td>
+            <td class="@RatingToClass(mod.MeanGpa)">@mod.MeanGpa.ToString("#.00")</td>
         </tr>
     }
     </tbody>
