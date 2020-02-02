@@ -1,0 +1,73 @@
+@using ISQExplorer.Controllers
+@using static ISQExplorer.Misc.Html
+@{
+    ViewData["Title"] = "yeetus";
+}
+
+<div class="w-100 d-flex flex-column">
+    <form asp-controller="Query" asp-action="RenderTableISQEntries" class="w-100 d-flex flex-column align-items-center" onsubmit="return false;">
+        <input id="Search" type="text" class="py-4 w-50 align-content-center form-control" placeholder="enter some shit"/>
+        <div class="position-relative w-50">
+            <div id="SearchAutocomplete" class="position-absolute w-100"></div>
+        </div>
+        <input type="submit" hidden/>
+    </form>
+    
+    <table class="py-4">
+        <thead>
+            
+        </thead>
+        <tbody id="QueryResult">
+        
+        </tbody>
+    </table>
+
+    <script>
+    let order = {
+        "orderBy": @(QueryController.ISQEntriesOrderBy.Time),
+        "descending": true
+    };
+    
+    let params = {};
+    
+    const updateTable = async params => {
+         const url = `@(ToEndpoint(nameof(QueryController.RenderTableISQEntries)))${queryString(params)}`;
+         const res1 = await fetch(url);
+         query("#QueryResult").innerHTML = await res1.text();
+    };
+    
+    const getSuggestions = async parameter => {
+        const url = `@(ToEndpoint(nameof(QueryController.GetSuggestions)))?parameter=${parameter}`;
+        const res = await fetch(url);
+        return await res.json();
+    };
+    
+    const search = query("#Search");
+    search.onkeydown = async e => {
+        const val = query("#Search").value;
+        if (val === "") {
+            query("#SearchAutocomplete").innerHTML = "";
+            return;
+        }
+        
+        if (e.code === "Enter") {
+            query("#SearchAutocomplete").innerHTML = "";
+            
+            const val = query("#Search").value;
+            if (/^[a-zA-Z]{3}[0-9]{4}.?$/.test(val)) {
+                params = {courseCode: val.toUpperCase()}
+            }
+            else {
+            
+            }
+        
+            await updateTable(merge(
+                { "courseCode": query("#Search").value }, order
+            ))
+        }
+        else {
+            const suggestions = await getSuggestions(val);
+        }
+    };
+    </script>
+</div>

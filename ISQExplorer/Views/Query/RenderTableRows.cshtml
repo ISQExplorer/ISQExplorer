@@ -1,0 +1,15 @@
+@model IEnumerable<IEnumerable<ISQExplorer.Controllers.TableCell>>
+
+@{
+    Layout = null;
+}
+
+@foreach (var row in Model)
+{
+    <tr>
+        @foreach (var cell in row)
+        {
+            <td class="@{cell.Class ?? ""}" style="@{cell.Style ?? ""}">@cell.Contents</td>
+        }
+    </tr>
+}

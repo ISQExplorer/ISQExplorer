@@ -21,70 +21,28 @@ namespace ISQExplorer.Repositories
             _logger = logger;
         }
 
-        private async Task<IQueryable<ISQEntryModel>> QueryClassSqlLookup(QueryParams qp)
+        public async Task<IQueryable<ISQEntryModel>> QueryClass(string parameter, QueryType qt, Term? since = null,
+            Term? until = null)
         {
-            IQueryable<ISQEntryModel> query = _context.IsqEntries
-                .Include(x => x.Course)
-                .Include(x => x.Professor)
-                .Include(x => x.Professor.Department);
-
-            ISet<string> courseCodes = null;
-            if (qp.CourseName != null)
+            switch (qt)
             {
-                courseCodes = await Task.Run(() => (from course in _context.Courses
-                    where course.Name.ToUpper().Contains(qp.CourseName.ToUpper())
-                    select course.CourseCode).ToHashSet());
-            }
-            else if (qp.CourseCode != null)
-            {
-                courseCodes = new HashSet<string> {qp.CourseCode};
-            }
-
-            if (courseCodes != null)
-            {
-                query = from entry in query
-                    join course in _context.Courses
-                        on entry.Course equals course
-                    where courseCodes.Contains(course.CourseCode)
-                    select entry;
-            }
-
-            if (qp.ProfessorName != null)
-            {
-                var temp = from entry in query
-                    join professor in _context.Professors
-                        on entry.Professor equals professor
-                    select new {entry, professor};
-
-                if (qp.ProfessorName.Contains(" "))
+                case QueryType.CourseCode:
+                    return _context.IsqEntries.Where(x => x.Course.CourseCode.Contains(parameter.ToUpper())).When(since, until);
+                case QueryType.CourseName:
+                    return _context.IsqEntries.Where(x => x.Course.Name.ToUpper().Contains(parameter.ToUpper()))
+                        .When(since, until);
+                case QueryType.ProfessorName when parameter.Contains(" "):
                 {
-                    var name = qp.ProfessorName.Split(" ");
-                    var fname = string.Join(" ", name.SkipLast(1));
-                    var lname = name.Last();
-
-                    query = from t in temp
-                        where t.professor.FirstName == fname && t.professor.LastName == lname
-                        select t.entry;
+                    var fname = parameter.Split(" ").SkipLast(1).Join(" ");
+                    var lname = parameter.Split(" ").Last();
+                    return _context.IsqEntries.Where(x =>
+                        x.Professor.FirstName.Contains(fname) && x.Professor.LastName.Contains(lname));
                 }
-                else
-                {
-                    query = from t in temp
-                        where t.professor.FirstName == qp.ProfessorName || t.professor.LastName == qp.ProfessorName
-                        select t.entry;
-                }
+                case QueryType.ProfessorName:
+                    return _context.IsqEntries.Where(x => x.Professor.LastName.Contains(parameter)).When(since, until);
+                default:
+                    throw new ArgumentException($"Invalid QueryType '{qt}'");
             }
-
-            return query.When(qp.Since, qp.Until);
-        }
-
-        private async Task<IQueryable<ISQEntryModel>> QueryClassWebLookup(QueryParams qp)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<IQueryable<ISQEntryModel>> QueryClass(QueryParams qp)
-        {
-            return await QueryClassSqlLookup(qp);
         }
 
         public async Task<IQueryable<ProfessorModel>> NameToProfessors(string professorName)
@@ -92,7 +50,7 @@ namespace ISQExplorer.Repositories
             if (!professorName.Contains(" "))
             {
                 var lname = professorName.ToUpper();
-                
+
                 return from prof in _context.Professors
                     where prof.LastName.ToUpper().Equals(lname)
                     select prof;

@@ -14,15 +14,14 @@ namespace ISQExplorer.Models
         public readonly Season Season;
         public readonly int Year;
 
-        public static (Season?, int?) FromNullableString(string? s)
+        public static Term? FromNullable(Season? season, int? year)
         {
-            if (s == null)
+            if (season == null || year == null)
             {
-                return (null, null);
+                return null;
             }
-
-            var (season, year) = new Term(s);
-            return (season, year);
+            
+            return new Term(season.Value, year.Value);
         }
 
         public Term(string s)
