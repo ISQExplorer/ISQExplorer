@@ -8,6 +8,7 @@ using ISQExplorer.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.Logging;
 
 namespace ISQExplorer.Controllers
 {
@@ -59,10 +60,12 @@ namespace ISQExplorer.Controllers
     public class QueryController : Controller
     {
         private readonly IQueryRepository _repo;
+        private readonly ILogger<QueryController> _logger;
 
-        public QueryController(IQueryRepository repo)
+        public QueryController(IQueryRepository repo, ILogger<QueryController> logger)
         {
             _repo = repo;
+            _logger = logger;
         }
 
         private string GpaToStyle(double gpa)

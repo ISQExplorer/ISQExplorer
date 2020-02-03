@@ -1,7 +1,11 @@
+using System;
+using ISQExplorer.Models;
+using ISQExplorer.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -21,6 +25,20 @@ namespace ISQExplorer
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            
+            if (Environment.GetEnvironmentVariable("ISQEXPLORER_SERVER") == null ||
+                Environment.GetEnvironmentVariable("ISQEXPLORER_DB") == null ||
+                Environment.GetEnvironmentVariable("ISQEXPLORER_USER") == null ||
+                Environment.GetEnvironmentVariable("ISQEXPLORER_PASSWORD") == null)
+            {
+                throw new ArgumentException("Environment variables ISQEXPLORER_SERVER, ISQEXPLORER_DB, ISQEXPLORER_USER, and ISQEXPLORER_PASSWORD must be set.");
+            }
+
+            string connString =
+                $"Server={Environment.GetEnvironmentVariable("ISQEXPLORER_SERVER")};Port={Environment.GetEnvironmentVariable("ISQEXPLORER_PORT") ?? "5432"};Database={Environment.GetEnvironmentVariable("ISQEXPLORER_DB")};User Id={Environment.GetEnvironmentVariable("ISQEXPLORER_USER")};Password={Environment.GetEnvironmentVariable("ISQEXPLORER_PASSWORD")};";
+            
+            services.AddDbContext<ISQExplorerContext>(options => options.UseNpgsql(connString));
+            services.AddScoped<IQueryRepository, QueryRepository>();
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/build"; });
@@ -55,7 +73,7 @@ namespace ISQExplorer
 
             app.UseSpa(spa =>
             {
-                spa.Options.SourcePath = "ClientApp";
+                spa.Options.SourcePath = "clientapp";
 
                 if (env.IsDevelopment())
                 {
