@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,6 +54,8 @@ namespace ISQExplorer.Controllers
         }
     }
 
+    [ApiController]
+    [Route("[controller]")]
     public class QueryController : Controller
     {
         private readonly IQueryRepository _repo;
@@ -74,11 +77,13 @@ namespace ISQExplorer.Controllers
             return $"color: hsl({hue}, 100%, 35%)";
         }
 
+        /*
         [HttpPost]
         public IActionResult RenderTableRows([FromBody] IEnumerable<IEnumerable<TableCell>> data)
         {
             return View(data);
         }
+        */
 
         public enum ISQEntriesOrderBy
         {
@@ -108,6 +113,7 @@ namespace ISQExplorer.Controllers
         }
         
 
+        /*
         public async Task<IActionResult> RenderTableISQEntries(string parameter, QueryType qt,
             Season? sinceSeason = null, int? sinceYear = null,
             Season? untilSeason = null, int? untilYear = null, ISQEntriesOrderBy orderBy = ISQEntriesOrderBy.Time,
@@ -156,5 +162,6 @@ namespace ISQExplorer.Controllers
         {
             return View();
         }
+        */
     }
 }
