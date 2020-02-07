@@ -4,6 +4,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using ISQExplorer.Functional;
+using ISQExplorer.Misc;
 
 namespace ISQExplorer.Web
 {
@@ -46,7 +47,7 @@ namespace ISQExplorer.Web
             request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
             request.UserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:72.0) Gecko/20100101 Firefox/72.0";
             
-            var payload = Encoding.UTF8.GetBytes(data);
+            var payload = data.ToBytes();
 
             request.Method = "POST";
             request.ContentLength = payload.Length;

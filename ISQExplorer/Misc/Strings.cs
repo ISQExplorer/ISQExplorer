@@ -58,6 +58,11 @@ namespace ISQExplorer.Misc
             return Regex.IsMatch(input, pattern);
         }
 
+        /// <summary>
+        /// Converts a UTF-8 string into a byte array.
+        /// </summary>
+        /// <param name="s">The string to convert.</param>
+        /// <returns>A byte array corresponding to the input string.</returns>
         public static byte[] ToBytes(this string s) => Encoding.UTF8.GetBytes(s);
     }
 }

@@ -1,5 +1,3 @@
-import {ISQQueryCourseResultOrderBy} from "./ISQQueryResult";
-
 export interface Department {
     Name: string;
 }
@@ -38,6 +36,7 @@ export interface ISQEntry {
     Season: Season;
     Year: number;
     Professor: Professor;
+    Course: Course;
     Crn: number;
     NResponded: number;
     NEnrolled: number;
@@ -74,7 +73,8 @@ export enum QueryOrderBy {
     Time,
     LastName,
     Gpa,
-    Rating
+    Rating,
+    Course
 }
 
 export const suggestions = async (parameter: string): Promise<ISQEntry[]> => {
@@ -85,7 +85,7 @@ export const suggestions = async (parameter: string): Promise<ISQEntry[]> => {
 const queryString = (params: { [key: string]: any }): string =>
     Object.keys(params).map(param => `${param}=${params[param]}`).join("&");
 
-export const entries = async (parameter: string, queryType: ISQQueryType, since: Term | null = null, until: Term | null = null): Promise<ISQEntry[]> => {
+export const entries = async (parameter: string, queryType: ISQQueryType, since?: Term, until?: Term): Promise<ISQEntry[]> => {
     const params: { [key: string]: any } = {"parameter": parameter, "QueryType": queryType};
     if (since != null) {
         params["SinceSeason"] = since.Season;
@@ -124,6 +124,10 @@ export const sortedEntries = (entries: ISQEntry[], orderBy: QueryOrderBy, descen
         case QueryOrderBy.Time:
             comp = termCompare({Season: a.Season, Year: a.Year}, {Season: a.Season, Year: a.Year});
             break;
+        case QueryOrderBy.Course:
+            comp = a.Course.CourseCode.localeCompare(b.Course.CourseCode);
+            break;
+                
         }
         return comp * (descending ? -1 : 1);
     });

@@ -22,7 +22,7 @@ namespace ISQExplorer.Functional
         /// <typeparam name="T">The type of the value.</typeparam>
         /// <returns>A Try{T} constructed from the given value.</returns>
         public static Try<T> Of<T>(T val) => new Try<T>(val);
-       
+
         /// <summary>
         /// Constructs a Try out of an async function, containing either the value returned by the Task, or the exception it may throw.
         /// This function itself will not throw any exceptions the function passed to it may throw, but said exceptions will be present in the resulting Try.
@@ -197,6 +197,27 @@ namespace ISQExplorer.Functional
             ex => ex
         );
 
+        /// <summary>
+        /// Maps this Try to another type using the supplied async function.
+        /// </summary>
+        /// <param name="func">A function converting this type to a task of the desired type. If this function throws, the new Try will be constructed out of the thrown exception.</param>
+        /// <typeparam name="TRes">The new type of the try.</typeparam>
+        /// <returns>A new Try of the given type containing a value if this Try contains a value and the conversion function didn't throw, or the applicable exception if not.</returns>
+        public Task<Try<TRes>> SelectAsync<TRes>(Func<T, Task<TRes>> func) => Match(
+            async val =>
+            {
+                try
+                {
+                    return new Try<TRes>(await func(Value));
+                }
+                catch (Exception ex)
+                {
+                    return new Try<TRes>(ex);
+                }
+            },
+            ex => new Task<Try<TRes>>(() => throw ex)
+        );
+
         public static implicit operator Try<T>(T val) => new Try<T>(val);
 
         public static implicit operator Try<T>(Exception ex) => new Try<T>(ex);
@@ -279,7 +300,7 @@ namespace ISQExplorer.Functional
         {
             return !(left == right);
         }
-        
+
         public override string ToString() => Match(val => val.ToString(), ex => ex.ToString());
     }
 
@@ -409,6 +430,27 @@ namespace ISQExplorer.Functional
                 }
             },
             ex => ex
+        );
+
+        /// <summary>
+        /// Maps this Try to another type using the supplied async function.
+        /// </summary>
+        /// <param name="func">A function converting this type to a task of the desired type. If this function throws, the new Try will be constructed out of the thrown exception.</param>
+        /// <typeparam name="TRes">The new type of the try.</typeparam>
+        /// <returns>A new Try of the given type containing a value if this Try contains a value and the conversion function didn't throw, or the applicable exception if not.</returns>
+        public Task<Try<TRes, TException>> SelectAsync<TRes>(Func<T, Task<TRes>> func) => Match(
+            async val =>
+            {
+                try
+                {
+                    return new Try<TRes, TException>(await func(Value));
+                }
+                catch (TException ex)
+                {
+                    return new Try<TRes, TException>(ex);
+                }
+            },
+            ex => new Task<Try<TRes, TException>>(() => throw ex)
         );
 
         public static implicit operator Try<T, TException>(T val) => new Try<T, TException>(val);

@@ -20,6 +20,11 @@ namespace ISQExplorer.Web
     {
         private static readonly RateLimiter Limiter = new RateLimiter(2, 1000);
 
+        /// <summary>
+        /// Converts an html string into an AngleSharp Document.
+        /// </summary>
+        /// <param name="html">The raw html. This is not the url of the website. Use <see cref="Requests.Get"/> to download the html from a url.</param>
+        /// <returns>A Task[Document] that will contain the parsed document when finished.</returns>
         public static async Task<IDocument> ToDocument(string html)
         {
             var config = Configuration.Default;
@@ -28,11 +33,21 @@ namespace ISQExplorer.Web
             return doc;
         }
 
-        public static async Task<Try<IDocument, IOException>> ToDocument(Try<string, IOException> html)
-        {
-            return html ? new Try<IDocument, IOException>(await ToDocument(html.Value)) : html.Exception;
-        }
+        /// <summary>
+        /// Converts a Try[string, IOException] gotten from <see cref="Requests.Get"/> into an AngleSharp document or propagates the exception if there is one.
+        /// </summary>
+        /// <param name="html">The raw html.</param>
+        /// <returns>A Try[Document] that will contain the parsed document or the input exception if there is one.</returns>
+        public static async Task<Try<IDocument, IOException>> ToDocument(Try<string, IOException> html) => await html.SelectAsync(ToDocument);
+        
 
+        /// <summary>
+        /// Returns the cells in an AngleSharp row element.
+        /// Cells with a column span of n will be returned n times.
+        /// </summary>
+        /// <param name="row">The row element.</param>
+        /// <returns>An enumerator that yields the cells in the row.</returns>
+        /// <exception cref="ArgumentException">The row has one or more non-td children.</exception>
         public static IEnumerable<IHtmlTableCellElement> RowChildren(this IHtmlTableRowElement row)
         {
             foreach (var child in row.Children)
@@ -56,6 +71,7 @@ namespace ISQExplorer.Web
         /// <exception cref="IOException">Details the type of error.</exception>
         public static async Task<Try<IEnumerable<DepartmentModel>>> ScrapeDepartmentIds()
         {
+            // get the page as an AngleSharp document
             var html = await Limiter.Run(() => Requests.Get(Urls.DeptSchedule));
             if (!html)
             {
@@ -63,6 +79,8 @@ namespace ISQExplorer.Web
             }
 
             var document = await ToDocument(html.Value);
+            
+            // get the element with id "dept_id". this is a dropdown with a list of all departments/ids
             var selectors = document.QuerySelectorAll("#dept_id").ToList();
             if (selectors.Count != 1)
             {
@@ -70,9 +88,12 @@ namespace ISQExplorer.Web
                     $"Encountered malformed page while retrieving departments. Expected one #dept_id, found {selectors.Count}.");
             }
 
+            // for each child of #dept_id, get the id of the option and its value, return as a DepartmentModel
+            // skip 1 to ignore the "Select Department" entry
             return new Try<IEnumerable<DepartmentModel>, IOException>(() => selectors.First().Children.Skip(1).Select(
                 x =>
                 {
+                    // it should be an <option> element
                     if (!(x is IHtmlOptionElement opt))
                     {
                         throw new MalformedPageException(
@@ -111,10 +132,16 @@ namespace ISQExplorer.Web
             Term? when = null
         )
         {
+            // concurrent data structures allow us to access them safely from multiple threads
             var courses = new ConcurrentSet<CourseModel>();
             var professors = new ConcurrentSet<ProfessorModel>();
             var exceptions = new ConcurrentBag<MalformedPageException>();
 
+            // calculate the semester id
+            // spring = 10, summer = 50, fall = 80
+            // for Summer 2019 this is 201950
+            
+            // if "when" is not given, get the previous semester
             var (season, year) = when ?? new Term(DateTime.UtcNow) - 1;
             var no = year * 100;
             no += season switch
@@ -132,8 +159,10 @@ namespace ISQExplorer.Web
                 return new IOException($"Error while retrieving department page {dept}.", document.Exception);
             }
 
+            // cache the professor models for each url so we don't scrape the same professor twice
             var urlToProf = new ConcurrentDictionary<string, ProfessorModel>();
 
+            // start scraping the main results table
             var res = await document.Value
                 .QuerySelectorAll("table.datadisplaytable > tbody > tr")
                 .Skip(3)
@@ -280,6 +309,12 @@ namespace ISQExplorer.Web
             })));
         }
 
+        /// <summary>
+        /// Gets a CourseModel given a department and course code.
+        /// </summary>
+        /// <param name="courseCode">The coursecode.</param>
+        /// <param name="dept">The department.</param>
+        /// <returns>A Try containing the CourseModel or the IOException detailing why it couldn't be retrieved.</returns>
         public static async Task<Try<CourseModel, IOException>> ScrapeDepartmentCourse(
             string courseCode,
             DepartmentModel dept

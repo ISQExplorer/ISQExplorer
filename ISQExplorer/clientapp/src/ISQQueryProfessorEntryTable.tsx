@@ -1,18 +1,23 @@
+import {avgRating, entries, ISQEntry, ISQQueryType, QueryOrderBy, seasonToString, sortedEntries} from "./Query";
 import React from "react";
-import {avgRating, entries, ISQEntry, ISQQueryType, QueryOrderBy, seasonToString, sortedEntries,} from "./Query";
 
-export interface ISQQueryCourseResultProps {
-    parameter: string
+export interface ISQQueryProfessorEntryTableProps {
+    className: string;
+    parameter: string;
 }
 
-export interface ISQQueryCourseResultState {
+export interface ISQQueryProfessorEntryTableState {
     entries: ISQEntry[];
     orderBy: QueryOrderBy;
     orderByDescending: boolean;
 }
 
-export class ISQQueryCourseResult extends React.Component<ISQQueryCourseResultProps, ISQQueryCourseResultState> {
-    public constructor(props: ISQQueryCourseResultProps) {
+export class ISQQueryProfessorEntryTable extends React.Component<ISQQueryProfessorEntryTableProps, ISQQueryProfessorEntryTableState> {
+    public static defaultProps: Partial<ISQQueryProfessorEntryTableProps> = {
+        className: ""
+    };
+
+    public constructor(props: ISQQueryProfessorEntryTableProps) {
         super(props);
 
         this.state = {
@@ -46,7 +51,7 @@ export class ISQQueryCourseResult extends React.Component<ISQQueryCourseResultPr
             });
         }
     }
-    
+
     private makeHeading(orderBy: QueryOrderBy) {
         let innerString = "";
         switch (orderBy) {
@@ -56,18 +61,27 @@ export class ISQQueryCourseResult extends React.Component<ISQQueryCourseResultPr
         case QueryOrderBy.Time:
             innerString = "Semester";
             break;
-        case QueryOrderBy.LastName:
-            innerString = "Professor";
+        case QueryOrderBy.Course:
+            innerString = "Course";
             break;
         case QueryOrderBy.Rating:
             innerString = "Average Rating";
+            break;
         }
-        
+
         return (
             <th onClick={() => this.updateOrder(orderBy)}>
                 {innerString}{this.state.orderBy === orderBy && this.state.orderByDescending ? " ▼" : " ▲"}
             </th>
         );
+    }
+
+    // noinspection JSMethodCanBeStatic
+    private makeColoredCell(val: number, min: number, max: number, minHue: number = 0, maxHue: number = 100, saturation: number = 90, luminance: number = 35) {
+        const pct = (maxHue - minHue) * ((val - min) / (max - min)) + minHue;
+        return <td style={{color: `hsl(${Math.round(pct)}, ${Math.round(saturation)}%, ${Math.round(saturation)}, ${Math.round(luminance)})`}}>
+            {val}
+        </td>;
     }
 
     public render() {
@@ -76,12 +90,12 @@ export class ISQQueryCourseResult extends React.Component<ISQQueryCourseResultPr
         }
 
         return (
-            <table className="table">
+            <table className={this.props.className}>
                 <thead>
                     <tr>
                         {this.makeHeading(QueryOrderBy.Time)}
                         <th>CRN</th>
-                        {this.makeHeading(QueryOrderBy.LastName)}
+                        {this.makeHeading(QueryOrderBy.Course)}
                         <th>Percent Responded</th>
                         {this.makeHeading(QueryOrderBy.Rating)}
                         {this.makeHeading(QueryOrderBy.Gpa)}
@@ -92,10 +106,10 @@ export class ISQQueryCourseResult extends React.Component<ISQQueryCourseResultPr
                         <tr key={entry.Crn}>
                             <td>{`${seasonToString(entry.Season)} ${entry.Year}`}</td>
                             <td>{entry.Crn}</td>
-                            <td>{entry.Professor.LastName}</td>
-                            <td>{100.0 * entry.NResponded / entry.NEnrolled}</td>
-                            <td>{avgRating(entry)}</td>
-                            <td>{entry.MeanGpa}</td>
+                            <td>{entry.Course.CourseCode}</td>
+                            {this.makeColoredCell(100.0 * entry.NResponded / entry.NEnrolled, 0, 100)}
+                            {this.makeColoredCell(avgRating(entry), 1, 5)}
+                            {this.makeColoredCell(entry.MeanGpa, 0, 4)}
                         </tr>
                     ))}
                 </tbody>
@@ -103,4 +117,3 @@ export class ISQQueryCourseResult extends React.Component<ISQQueryCourseResultPr
         );
     }
 }
-
