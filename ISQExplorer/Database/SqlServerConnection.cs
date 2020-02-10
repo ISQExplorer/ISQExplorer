@@ -1,3 +1,4 @@
+#nullable enable
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 
@@ -13,7 +14,7 @@ namespace ISQExplorer.Database
         public bool UseSSL { get; set; }
         public bool AllowSelfSigned { get; set; }
         public bool UseIntegratedSecurity { get; set; }
-        private readonly string _connectionString;
+        private readonly string? _connectionString;
 
 
         public SqlServerConnection()

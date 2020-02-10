@@ -27,6 +27,8 @@ export class ISQQueryProfessorEntryTable extends React.Component<ISQQueryProfess
         };
 
         this.updateOrder = this.updateOrder.bind(this);
+        this.makeColoredCell = this.makeColoredCell.bind(this);
+        this.makeHeading = this.makeHeading.bind(this);
 
         const res = entries(this.props.parameter,
             /[A-Za-z]{3}[0-9]{4,}/.test(this.props.parameter) ?
