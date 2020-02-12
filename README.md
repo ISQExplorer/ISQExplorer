@@ -20,7 +20,7 @@ Once you have cloned the project, you will need to start up your database server
 * `ISQEXPLORER_DB_HOST` - The IP address of the database server to use (`localhost` by default).
 * `ISQEXPLORER_DB_PORT` - The port of the database server to use (`5432` for PostgreSQL and `1433` for SQL Server by default).
 * `ISQEXPLORER_DB_DATABASE` - The name of the database to use within the database server (`ISQExplorer` by default). This database should be empty or filled only with ISQExplorer's tables.
-* `ISQEXPLORER_DB_USER` - The username to login to the SQL server with (`root` by default). When creating the initial database, this user needs permissions to create tables within the `ISQEXPLORER_DB_DATABASE`. When running the app, this user needs permissions to insert into and read from tables within the `ISQEXPLORER_DB_DATABASE`. 
+* `ISQEXPLORER_DB_USER` - The username to login to the SQL server with (`root` by default). When creating the initial database, this user needs permissions to create tables within the `ISQEXPLORER_DB_DATABASE`. When running the app, this user needs permissions to insert into and read from tables within the `ISQEXPLORER_DB_DATABASE`.
 * `ISQEXPLORER_PASSWORD` - The password of the above user. This is an empty string by default.
 * `ISQEXPLORER_DB_SSL` - `1` to enable SSL, or `0` to disable it (unset by default).
 * `ISQEXPLORER_DB_SSL_ALLOW_SELF_SIGNED` - `1` to allow self-signed certificates with SSL, `0` to disable them (unset by default).
@@ -42,3 +42,6 @@ $ dotnet ef database drop
 Once the above has been done, you can simply open the solution in your IDE of choice and run the project.
 
 For best results, use Visual Studio on Windows and Rider on OSX/Linux.
+
+## Contributing guidelines
+See [CONTRIBUTING.md](CONTRIBUTING.md).

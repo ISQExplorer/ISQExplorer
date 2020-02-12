@@ -9,6 +9,14 @@
         * [git push](#git-push)
         * [git branch](#git-branch)
         * [git merge](#git-merge)
+    * [Git Guidelines](#git-guidelines)
+* [Code Style](#code-style)
+    * [Universal](#universal)
+    * [C#](#c#)
+    * [CSS](#css)
+    * [HTML](#html)
+    * [React/TSX](#react/tsx)
+    * [Typescript](#typescript)
 
 ## Git
 The project uses `git` for its version control, as it is by far the most popular version control system both in the industry and for open-source projects because it is well-featured, relatively easy to use, and fast.
@@ -184,4 +192,41 @@ int z = 10;
 ```
 **If you do not understand the above example, you should not perform a `git merge`.**
 
-`git merge` will "merge" both changes into the same file, and it is up to you to resolve these conflicts so that the code works. Most IDE's will automatically highlight these "merge conflict" markers so merge conflicts are easily seen.
+`git merge` will "merge" both changes into the same file, and it is up to you to resolve these conflicts so that the code works. Most IDE's will automatically highlight these "merge conflict" markers so merge conflicts are easily seen. You shouldn't push your changes until all merge conflicts are resolved.
+
+### Git Guidelines
+The guidelines given are specific for this project. If you do not understand any of the termiology used, consult the [tutorial](#tutorial).
+
+* **Do not push with `--force` unless absolutely necessary.**
+    * If you do not understand what the above means, read the [tutorial](#tutorial).
+    * If you have to ask, don't do it.
+
+* **Do not push *directly* to `master` unless absolutely necessary.**
+    * If you do not understand what the above means, read the [tutorial](#tutorial).
+    * `master` should always be a clean, working version of the code.
+    * Every branch directly or indirectly depends on `master`, so it is of the utmost importance that code pushed to `master` is of the highest quality.
+
+* Do leave a good commit message. Don't leave some garbage like `aids` or `minor fixes` or `it works`. Something like `fixed bug where text overflows from the table`, or `added a component that displays professor information` is good enough. 
+
+* Follow the other style guides given in this project.
+
+## Code Style
+Follow the below style guides to ensure that the project's style remains consistent.
+
+### Universal
+* Tabs are 4 spaces unless otherwise specified.
+* Do not leave trailing whitespace on lines.
+* When in doubt, prefer readability over conciseness.
+
+### C#
+* Tabs are 4 spaces.
+* Do not leave unused imports.
+* Async functions should
+
+### CSS
+
+### HTML
+
+### React/TSX
+
+### Typescript
