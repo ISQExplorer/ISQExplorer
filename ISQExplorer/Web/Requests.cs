@@ -1,7 +1,6 @@
 #nullable enable
 using System.IO;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using ISQExplorer.Functional;
 using ISQExplorer.Misc;

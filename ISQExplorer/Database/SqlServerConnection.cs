@@ -41,10 +41,10 @@ namespace ISQExplorer.Database
                 builder.UserID = Username;
                 builder.Password = Password;
             }
-
+            
             builder.Encrypt = UseSSL;
             builder.TrustServerCertificate = AllowSelfSigned;
-            builder.DataSource = $"Host,{Port}";
+            builder.DataSource = $"{Host},{Port}";
             builder.InitialCatalog = Database;
             builder.IntegratedSecurity = UseIntegratedSecurity;
 

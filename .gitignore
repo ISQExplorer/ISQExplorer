@@ -2,6 +2,7 @@ bin/*
 obj/*
 /packages/
 .idea/*
+ISQExplorer/Migrations
 ISQExplorer/bin
 ISQExplorer/obj
 ISQExplorerTests/bin

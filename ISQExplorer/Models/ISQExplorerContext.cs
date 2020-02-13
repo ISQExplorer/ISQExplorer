@@ -1,4 +1,3 @@
-using AngleSharp;
 using Microsoft.EntityFrameworkCore;
 
 namespace ISQExplorer.Models

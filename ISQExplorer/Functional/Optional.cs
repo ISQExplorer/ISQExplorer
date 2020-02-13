@@ -6,19 +6,35 @@ namespace ISQExplorer.Functional
 {
     /// <summary>
     /// Represents a value that can or can not be present.
+    /// This is a replacement for nullable types since they don't quite work at the moment.
     /// </summary>
+    /// <remarks>
+    /// Optional is a struct because structs cannot be null, preventing a problem where the Optional itself is null.
+    /// Because structs cannot have blank constructors, this Optional's HasValue field will be false by default, since the default value for booleans is false.
+    /// </remarks>
     /// <typeparam name="T">The type of the underlying optional value.</typeparam>
     public struct Optional<T> : IEquatable<Optional<T>>
     {
         private readonly T _value;
 
+        /// <summary>
+        /// True if the Optional contains a value, false if not.
+        /// </summary>
         public bool HasValue { get; }
 
+        /// <summary>
+        /// Constructs an Optional out 
+        /// </summary>
+        /// <param name="value"></param>
         public Optional(T value)
         {
             (_value, HasValue) = (value, value != null);
         }
 
+        /// <summary>
+        /// Gets the value if there is one, throws if not.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">The Optional does not have a value.</exception>
         public T Value
         {
             get

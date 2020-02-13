@@ -32,14 +32,16 @@ namespace ISQExplorer.Database
                 return input.UseNpgsql(_connectionString);
             }
 
-            var builder = new NpgsqlConnectionStringBuilder();
-            builder.Host = Host;
-            builder.Port = Port;
-            builder.Database = Database;
-            builder.Username = Username;
-            builder.Password = Password;
-            builder.SslMode = SslMode.Prefer;
-            
+            var builder = new NpgsqlConnectionStringBuilder
+            {
+                Host = Host,
+                Port = Port,
+                Database = Database,
+                Username = Username,
+                Password = Password,
+                SslMode = SSLType
+            };
+
             return input.UseNpgsql(builder.ConnectionString);
         }
     }
