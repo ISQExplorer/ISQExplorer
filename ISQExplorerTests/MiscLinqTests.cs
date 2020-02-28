@@ -3,7 +3,7 @@ using NUnit.Framework;
 
 namespace ISQExplorerTests
 {
-    public class MisqLinqTests
+    public class MiscLinqTests
     {
         [Test]
         public void TestAtLeastPercent()

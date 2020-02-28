@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using ISQExplorer.Exceptions;
@@ -21,50 +20,6 @@ namespace ISQExplorer.Web
         private static readonly RateLimiter Limiter = new RateLimiter(2, 1000);
 
         /// <summary>
-        /// Converts an html string into an AngleSharp Document.
-        /// </summary>
-        /// <param name="html">The raw html. This is not the url of the website. Use <see cref="Requests.Get"/> to download the html from a url.</param>
-        /// <returns>A Task[Document] that will contain the parsed document when finished.</returns>
-        public static async Task<IDocument> ToDocument(string html)
-        {
-            var config = Configuration.Default;
-            var context = BrowsingContext.New(config);
-            var doc = await context.OpenAsync(req => req.Content(html));
-            return doc;
-        }
-
-        /// <summary>
-        /// Converts a Try[string, IOException] gotten from <see cref="Requests.Get"/> into an AngleSharp document or propagates the exception if there is one.
-        /// </summary>
-        /// <param name="html">The raw html.</param>
-        /// <returns>A Try[Document] that will contain the parsed document or the input exception if there is one.</returns>
-        public static async Task<Try<IDocument, IOException>> ToDocument(Try<string, IOException> html) => await html.SelectAsync(ToDocument);
-        
-
-        /// <summary>
-        /// Returns the cells in an AngleSharp row element.
-        /// Cells with a column span of n will be returned n times.
-        /// </summary>
-        /// <param name="row">The row element.</param>
-        /// <returns>An enumerator that yields the cells in the row.</returns>
-        /// <exception cref="ArgumentException">The row has one or more non-td children.</exception>
-        public static IEnumerable<IHtmlTableCellElement> RowChildren(this IHtmlTableRowElement row)
-        {
-            foreach (var child in row.Children)
-            {
-                if (!(child is IHtmlTableCellElement cell))
-                {
-                    throw new ArgumentException($"Non cell child '{child.InnerHtml}' of row '{row.InnerHtml}'");
-                }
-
-                for (var i = 0; i < cell.ColumnSpan; ++i)
-                {
-                    yield return cell;
-                }
-            }
-        }
-
-        /// <summary>
         /// Retrieves a list of departments from the web.
         /// </summary>
         /// <returns>A Try containing a list of departments, or an IOException detailing why it could not be returned.</returns>
@@ -72,7 +27,7 @@ namespace ISQExplorer.Web
         public static async Task<Try<IEnumerable<DepartmentModel>>> ScrapeDepartmentIds()
         {
             // get the page as an AngleSharp document
-            var html = await Limiter.Run(() => Requests.Get(Urls.DeptSchedule));
+            var html = await Limiter.Run(() => Requests.GetAsync(Urls.DeptSchedule));
             if (!html)
             {
                 return new IOException("Error while retrieving departments.", html.Exception);
@@ -153,7 +108,7 @@ namespace ISQExplorer.Web
             };
 
             var document = await ToDocument(await Limiter.Run(() =>
-                Requests.Post(Urls.DeptSchedule, Urls.DeptSchedulePostData(no, dept.Id))));
+                Requests.PostAsync(Urls.DeptSchedule, Urls.DeptSchedulePostData(no, dept.Id))));
             if (!document.HasValue)
             {
                 return new IOException($"Error while retrieving department page {dept}.", document.Exception);
@@ -251,7 +206,7 @@ namespace ISQExplorer.Web
         {
             var url =
                 Urls.CoursePage(course.CourseCode);
-            var document = await ToDocument(await Limiter.Run(() => Requests.Get(url)));
+            var document = await ToDocument(await Limiter.Run(() => Requests.GetAsync(url)));
             if (!document.HasValue)
             {
                 return new IOException($"Error while scraping course code '{course.CourseCode}'.", document.Exception);
@@ -320,7 +275,7 @@ namespace ISQExplorer.Web
             DepartmentModel dept
         )
         {
-            var document = await ToDocument(await Limiter.Run(() => Requests.Get(Urls.CoursePage(courseCode))));
+            var document = await ToDocument(await Limiter.Run(() => Requests.GetAsync(Urls.CoursePage(courseCode))));
             if (!document.HasValue)
             {
                 return new IOException($"Error while scraping course code '{courseCode}'.", document.Exception);
@@ -368,7 +323,7 @@ namespace ISQExplorer.Web
 
             var nNumber = nNumberOpt.Value;
 
-            var document = await ToDocument(await Limiter.Run(() => Requests.Get(url)));
+            var document = await ToDocument(await Limiter.Run(() => Requests.GetAsync(url)));
             if (!document.HasValue)
             {
                 return new IOException($"Error while scraping NNumber '{nNumber}'.", document.Exception);
@@ -466,7 +421,7 @@ namespace ISQExplorer.Web
         {
             var url = Urls.ProfessorPage(professor.NNumber);
 
-            var document = await ToDocument(await Limiter.Run(() => Requests.Get(url)));
+            var document = await ToDocument(await Limiter.Run(() => Requests.GetAsync(url)));
             if (!document)
             {
                 return new IOException($"Error while scraping NNumber '{professor.NNumber}'.", document.Exception);

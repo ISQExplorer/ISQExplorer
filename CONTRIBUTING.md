@@ -125,7 +125,7 @@ $ git push origin [branch] --force
 ```
 to overwrite the history of the project. **Do not do this unless you really know what you're doing, as you can mess up your project permanently.**
 
-#### git branch 
+#### git branch
 When you first clone a project, you will most likely be dropped into a "branch" called master. Branches, like on an actual tree, represent points where the development of the tree splits. The trunk (`master`) goes one way, and the branch goes another way. This way, you and your teammates can work on the same code at the same time without stepping on each others' toes, since each of you have a separate copy of the code.
 
 It's generally good practice to make branches for the development of features while keeping `master` as a good, clean, working version of the code. This means you should only push urgent security fixes or minor changes directly to `master`.
@@ -201,12 +201,12 @@ The guidelines given are specific for this project. If you do not understand any
     * If you do not understand what the above means, read the [tutorial](#tutorial).
     * If you have to ask, don't do it.
 
-* **Do not push *directly* to `master` unless absolutely necessary.**
+* **Do not push *directly* to `master` unless absolutely necessary or your change can be done in a single commit.**
     * If you do not understand what the above means, read the [tutorial](#tutorial).
     * `master` should always be a clean, working version of the code.
     * Every branch directly or indirectly depends on `master`, so it is of the utmost importance that code pushed to `master` is of the highest quality.
 
-* Do leave a good commit message. Don't leave some garbage like `aids` or `minor fixes` or `it works`. Something like `fixed bug where text overflows from the table`, or `added a component that displays professor information` is good enough. 
+* Do leave a good commit message. Don't leave some garbage like `aids` or `minor fixes` or `it works`. Something like `fixed bug where text overflows from the table`, or `added a component that displays professor information` is good enough.
 
 * Follow the other style guides given in this project.
 

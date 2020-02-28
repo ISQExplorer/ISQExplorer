@@ -9,7 +9,7 @@ namespace ISQExplorer.Web
 {
     public static class Requests
     {
-        public static async Task<Try<string, IOException>> Get(string url)
+        public static async Task<Try<string, IOException>> GetAsync(string url)
         {
             var request = (HttpWebRequest) WebRequest.Create(url);
 
@@ -39,7 +39,7 @@ namespace ISQExplorer.Web
             }
         }
 
-        public static async Task<Try<string, IOException>> Post(string url, string data)
+        public static async Task<Try<string, IOException>> PostAsync(string url, string data)
         {
             var request = (HttpWebRequest) WebRequest.Create(url);
 

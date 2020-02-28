@@ -10,8 +10,7 @@ namespace ISQExplorer.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public CourseModel Course { get; set; }
-        public Season Season { get; set; }
-        public int Year { get; set; }
+        public int Term { get; set; }
         public ProfessorModel Professor { get; set; }
         public int Crn { get; set; }
         public int NResponded { get; set; }
