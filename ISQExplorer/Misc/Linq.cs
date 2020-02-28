@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using ISQExplorer.Controllers;
 using ISQExplorer.Functional;
 
 namespace ISQExplorer.Misc
@@ -78,12 +79,12 @@ namespace ISQExplorer.Misc
         /// <param name="enumerable">The enumerable.</param>
         /// <typeparam name="T">The type of the enumerable's elements.</typeparam>
         /// <returns>An enumerable containing tuples of (element, index).</returns>
-        public static IEnumerable<(T elem, int index)> Enumerate<T>(this IEnumerable<T> enumerable)
+        public static IEnumerable<(int Index, T Elem)> Enumerate<T>(this IEnumerable<T> enumerable)
         {
             var i = 0;
             foreach (var y in enumerable)
             {
-                yield return (elem: y, index: i);
+                yield return (Index: i, Elem: y);
                 i++;
             }
         }
@@ -100,6 +101,26 @@ namespace ISQExplorer.Misc
             {
                 action(y);
             }
+        }
+
+        /// <summary>
+        /// Returns the index of a given element in an enumerable, or -1 if it was not found.
+        /// </summary>
+        /// <param name="enumerable">The input enumerable.</param>
+        /// <param name="elem">The element to find.</param>
+        /// <typeparam name="T">The type of the elements in the enumerable.</typeparam>
+        /// <returns>The index of the given element, or -1 if it's not found.</returns>
+        public static int Index<T>(this IEnumerable<T> enumerable, T elem)
+        {
+            var comp = EqualityComparer<T>.Default;
+            foreach (var (i, e) in enumerable.Enumerate())
+            {
+                if (comp.Equals(e, elem))
+                {
+                    return i;
+                }
+            }
+            return -1;
         }
 
         /// <summary>

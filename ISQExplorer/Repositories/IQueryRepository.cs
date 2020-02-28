@@ -14,7 +14,7 @@ namespace ISQExplorer.Repositories
 
     public interface IQueryRepository
     {
-        Task<IQueryable<ISQEntryModel>> QueryClass(string parameter, QueryType qt, Term? since = null, Term? until = null);
+        Task<IQueryable<ISQEntryModel>> QueryClass(string parameter, QueryType qt, TermModel? since = null, TermModel? until = null);
         Task<IQueryable<ProfessorModel>> NameToProfessors(string professorName);
     }
 }

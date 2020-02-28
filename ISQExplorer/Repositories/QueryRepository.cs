@@ -19,8 +19,8 @@ namespace ISQExplorer.Repositories
             _logger = logger;
         }
 
-        public async Task<IQueryable<ISQEntryModel>> QueryClass(string parameter, QueryType qt, Term? since = null,
-            Term? until = null)
+        public async Task<IQueryable<ISQEntryModel>> QueryClass(string parameter, QueryType qt, TermModel? since = null,
+            TermModel? until = null)
         {
             switch (qt)
             {

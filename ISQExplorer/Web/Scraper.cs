@@ -3,34 +3,53 @@ using System.Linq;
 using System.Threading.Tasks;
 using AngleSharp.Html.Dom;
 using ISQExplorer.Misc;
+using ISQExplorer.Models;
+using ISQExplorer.Repositories;
 
 namespace ISQExplorer.Web
 {
     public class Scraper
     {
         private readonly RateLimiter _limiter;
-        public IDictionary<int, string> Departments { get; set; }
-        public IDictionary<string, int> Terms { get; set; }
-        public IDictionary<int, HtmlPage> CachedPages { get; set; }
-        public IDictionary<(int, string), HtmlPage> CachedDepartmentIndexes { get; set; }
+        public ICollection<DepartmentModel> Departments { get; set; }
+        public ITermRepository Terms { get; set; }
 
-        public Scraper(int maxConcurrentTasks = 2, int cycleTimeMillis = 1000)
+        public HtmlPage? IndexPageCache { get; set; }
+        public IDictionary<(int, TermModel), HtmlPage> DepartmentListCache { get; set; }
+        public IDictionary<ProfessorModel, HtmlPage> ProfessorListCache { get; set; }
+
+
+        public Scraper(ITermRepository termRepo, int maxConcurrentTasks = 2, int cycleTimeMillis = 1000)
         {
             _limiter = new RateLimiter(maxConcurrentTasks, cycleTimeMillis);
-            Departments = new Dictionary<int, string>();
+            Departments = new HashSet<DepartmentModel>();
+            
+            DepartmentListCache = new Dictionary<(int, TermModel), HtmlPage>();
+            ProfessorListCache = new Dictionary<ProfessorModel, HtmlPage>();
         }
 
-        private Task<Result> ScrapeDepartmentsAndTerms() => Result.OfAsync(async () =>
+        private Task<Result> ScrapeDepartmentsAsync() => Result.OfAsync(async () =>
         {
-            var page = (await _limiter.Run(() => HtmlPage.FromUrlAsync(Urls.DeptSchedule))).Value;
+            if (IndexPageCache == null)
+            {
+                IndexPageCache = (await _limiter.Run(() => HtmlPage.FromUrlAsync(Urls.DeptSchedule))).Value;
+            }
 
-            page.Query<IHtmlSelectElement>("#dept_id").Value
+            IndexPageCache.Query<IHtmlSelectElement>("#dept_id").Value
                 .Children<IHtmlOptionElement>().Value.Skip(1)
-                .ForEach(e => Departments[Parse.Int(e.Id).Value] = e.Label);
+                .ForEach(e => Departments.Add(new DepartmentModel {Id = Parse.Int(e.Id).Value, Name = e.Label}));
+        });
 
-            page.Query<IHtmlSelectElement>("#term_id").Value
+        private Task<Result> ScrapeTermsAsync() => Result.OfAsync(async () =>
+        {
+            if (IndexPageCache == null)
+            {
+                IndexPageCache = (await _limiter.Run(() => HtmlPage.FromUrlAsync(Urls.DeptSchedule))).Value;
+            }
+
+            IndexPageCache.Query<IHtmlSelectElement>("#term_id").Value
                 .Children<IHtmlOptionElement>().Value.Skip(1)
-                .ForEach(e => Terms[e.Label] = Parse.Int(e.Value).Value);
+                .ForEach(e => Terms.Add(new TermModel {Name = e.Label, Id = Parse.Int(e.Value).Value}));
         });
     }
 }

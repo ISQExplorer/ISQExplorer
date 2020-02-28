@@ -10,7 +10,7 @@ namespace ISQExplorer.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public CourseModel Course { get; set; }
-        public int Term { get; set; }
+        public TermModel Term { get; set; }
         public ProfessorModel Professor { get; set; }
         public int Crn { get; set; }
         public int NResponded { get; set; }
@@ -37,7 +37,7 @@ namespace ISQExplorer.Models
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Equals(Course, other.Course) && Season == other.Season && Year == other.Year && Crn == other.Crn;
+            return Equals(Course, other.Course) && Term == other.Term && Crn == other.Crn;
         }
 
         public override bool Equals(object obj)
@@ -58,13 +58,12 @@ namespace ISQExplorer.Models
             unchecked
             {
                 var hashCode = (Course != null ? Course.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (int) Season;
-                hashCode = (hashCode * 397) ^ Year;
+                hashCode = (hashCode * 397) ^ (Term != null ? Term.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ Crn;
                 return hashCode;
             }
         }
 
-        public override string ToString() => $"{new Term(Season, Year)} {Crn} - {Course} {Professor}";
+        public override string ToString() => $"{Term} {Crn} - {Course} {Professor}";
     }
 }
