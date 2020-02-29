@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using ISQExplorer.Functional;
 using ISQExplorer.Models;
 
@@ -10,5 +11,6 @@ namespace ISQExplorer.Repositories
         Optional<TermModel> Previous(TermModel t, int howMany = 0);
         Optional<TermModel> Next(TermModel t, int howMany = 0);
         void Add(TermModel term);
+        void AddRange(IEnumerable<TermModel> term);
     }
 }

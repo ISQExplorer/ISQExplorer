@@ -6,6 +6,7 @@ using AngleSharp;
 using AngleSharp.Dom;
 using ISQExplorer.Exceptions;
 using ISQExplorer.Functional;
+using ISQExplorer.Misc;
 
 namespace ISQExplorer.Web
 {
@@ -68,10 +69,10 @@ namespace ISQExplorer.Web
             return typedRes;
         }
 
-        public Try<IEnumerable<T>, HtmlElementException> QueryAll<T>(string cssSelector) where T : IElement
+        public IEnumerable<T> QueryAll<T>(string cssSelector) where T : IElement
         {
             var res = _doc.QuerySelectorAll(cssSelector);
-            return new Try<IEnumerable<T>, HtmlElementException>(() => res.Select(elem =>
+            return res.Select(elem => Try.Of(() =>
             {
                 if (!(elem is T typedElem))
                 {
@@ -79,7 +80,8 @@ namespace ISQExplorer.Web
                 }
 
                 return typedElem;
-            }));
+            })).Where(x => x.HasValue)
+                .Select(x => x.Value);
         }
 
         public override string ToString()

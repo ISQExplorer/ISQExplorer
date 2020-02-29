@@ -14,88 +14,41 @@ namespace ISQExplorer.Repositories
         private readonly IDictionary<string, TermModel> _stringToTerm;
         private readonly SortedSet<int> _ids;
 
-        private readonly Mutex writeMutex;
-        private readonly Mutex readMutex;
-        private int counter;
+        private readonly ReadWriteLock _lock;
 
         public TermRepository()
         {
             _idToTerm = new Dictionary<int, TermModel>();
             _stringToTerm = new Dictionary<string, TermModel>();
             _ids = new SortedSet<int>();
-            
-            writeMutex = new Mutex();
-            readMutex = new Mutex();
-            counter = 0;
+
+            _lock = new ReadWriteLock();
         }
 
-        private T ReadOp<T>(Func<T> func)
+        public void Add(TermModel term) => _lock.Write(() =>
         {
-            readMutex.WaitOne();
-            try
-            {
-                Interlocked.Increment(ref counter);
-                if (counter == 1)
-                {
-                    writeMutex.WaitOne();
-                }
-            }
-            finally
-            {
-                readMutex.ReleaseMutex();
-            }
+            _idToTerm[term.Id] = term;
+            _stringToTerm[term.Name] = term;
+            _ids.Add(term.Id);
+        });
 
-            Exception? ex = null;
-            try
-            {
-                func();
-            }
-            catch (Exception e)
-            {
-                ex = e;
-            }
-
-            readMutex.WaitOne();
-            try
-            {
-                Interlocked.Decrement(ref counter);
-                if (counter == 0)
-                {
-                    writeMutex.ReleaseMutex();
-                }
-            }
-            finally
-            {
-                readMutex.ReleaseMutex();
-                if (ex != null)
-                {
-                    throw ex;
-                }
-            }
-        }
-
-        public void Add(TermModel term)
+        public void AddRange(IEnumerable<TermModel> terms) => _lock.Write(() =>
         {
-            writeMutex.WaitOne();
-            try
+            foreach (var term in terms)
             {
                 _idToTerm[term.Id] = term;
                 _stringToTerm[term.Name] = term;
                 _ids.Add(term.Id);
             }
-            finally
-            {
-                writeMutex.ReleaseMutex();
-            }
-        }
+        });
 
         public Optional<TermModel> FromId(int id) =>
-            ReadOp(() => _idToTerm.ContainsKey(id) ? _idToTerm[id] : new Optional<TermModel>());
+            _lock.Read(() => _idToTerm.ContainsKey(id) ? _idToTerm[id] : new Optional<TermModel>());
 
         public Optional<TermModel> FromString(string str) =>
-            ReadOp(() => _stringToTerm.ContainsKey(str) ? _stringToTerm[str] : new Optional<TermModel>());
+            _lock.Read(() => _stringToTerm.ContainsKey(str) ? _stringToTerm[str] : new Optional<TermModel>());
 
-        public Optional<TermModel> Previous(TermModel t, int howMany = 1) => ReadOp(() =>
+        public Optional<TermModel> Previous(TermModel t, int howMany = 1) => _lock.Read(() =>
         {
             if (howMany < 0)
             {
@@ -108,7 +61,7 @@ namespace ISQExplorer.Repositories
                 : _idToTerm[_ids.ElementAt(index - howMany)];
         });
 
-        public Optional<TermModel> Next(TermModel t, int howMany = 1) => ReadOp(() =>
+        public Optional<TermModel> Next(TermModel t, int howMany = 1) => _lock.Read(() =>
         {
             if (howMany < 0)
             {

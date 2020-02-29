@@ -23,6 +23,8 @@ namespace ISQExplorer.Models
                 .HasIndex(c => new {c.Crn, c.Term});
             modelBuilder.Entity<ProfessorModel>()
                 .HasIndex(c => c.NNumber);
+            modelBuilder.Entity<TermModel>()
+                .HasIndex(c => c.Name);
         }
     }
 }

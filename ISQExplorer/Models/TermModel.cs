@@ -49,5 +49,7 @@ namespace ISQExplorer.Models
             ReferenceEquals(t1, t2) || (!ReferenceEquals(t1, null) && t1.Equals(t2));
 
         public static bool operator !=(TermModel t1, TermModel t2) => !(t1 == t2);
+
+        public override string ToString() => Name;
     }
 }
