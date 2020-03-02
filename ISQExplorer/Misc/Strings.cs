@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
+using System.Web;
 using ISQExplorer.Functional;
 
 namespace ISQExplorer.Misc
@@ -22,8 +24,30 @@ namespace ISQExplorer.Misc
             {
                 return matches[0].Value != "" ? matches[0].Value : null;
             }
+
             return matches.Count <= number ? null : matches[number].Value;
         }
+
+        /// <summary>
+        /// Unescapes any HTML glyphs in the string.
+        /// </summary>
+        /// <param name="s">The input string.</param>
+        /// <returns>The unescaped string.</returns>
+        public static string HtmlDecode(this string s) => HttpUtility.HtmlDecode(s);
+
+        /// <summary>
+        /// Escapes any special HTML characters in the string.
+        /// </summary>
+        /// <param name="s">The input string.</param>
+        /// <returns>The escaped string.</returns>
+        public static string HtmlEncode(this string s) => HttpUtility.HtmlEncode(s);
+
+        /// <summary>
+        /// Returns true if a string is null, empty, or contains only whitespace.
+        /// </summary>
+        /// <param name="s">The input string.</param>
+        /// <returns>True if the string is null or blank, false if not.</returns>
+        public static bool IsBlank(this string s) => s == null || s.Trim() == "";
 
         /// <summary>
         /// Joins an enumerable of strings into one string, linking them with the given <paramref name="delimiter"/>.
@@ -55,6 +79,7 @@ namespace ISQExplorer.Misc
                     pattern = $"{pattern}$";
                 }
             }
+
             return Regex.IsMatch(input, pattern);
         }
 

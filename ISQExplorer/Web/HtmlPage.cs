@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -47,26 +48,20 @@ namespace ISQExplorer.Web
             return new HtmlPage(doc);
         }
 
-        public static async Task<Try<HtmlPage, IOException>> FromUrlAsync(string url, string? postData = null)
-        {
-            var res = postData != null ? await Requests.PostAsync(url, postData) : await Requests.GetAsync(url);
-            return await res.SelectAsync(FromHtmlAsync);
-        }
-
         public HtmlPage(IDocument doc)
         {
             _doc = doc;
         }
 
-        public Try<T, HtmlElementException> Query<T>(string cssSelector) where T : IElement
+        public Try<T, ArgumentException> Query<T>(string cssSelector) where T : IElement
         {
-            var res = _doc.QuerySelector(cssSelector);
-            if (!(res is T typedRes))
+            var res = Try.Of(() => (T) _doc.QuerySelectorAll(cssSelector).First(x => x is T));
+            if (!res)
             {
-                return new HtmlElementException(res, typeof(T));
+                return new ArgumentException($"No elements found of type {typeof(T).Name} matching the selector '{cssSelector}'.");
             }
-
-            return typedRes;
+            
+            return res.Value;
         }
 
         public IEnumerable<T> QueryAll<T>(string cssSelector) where T : IElement
@@ -85,6 +80,11 @@ namespace ISQExplorer.Web
         }
 
         public override string ToString()
+        {
+            return _doc.Minify();
+        }
+
+        public string Prettify()
         {
             return _doc.Prettify();
         }

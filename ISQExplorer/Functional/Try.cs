@@ -221,6 +221,8 @@ namespace ISQExplorer.Functional
         public static implicit operator Try<T>(T val) => new Try<T>(val);
 
         public static implicit operator Try<T>(Exception ex) => new Try<T>(ex);
+        
+        public static implicit operator Optional<T>(Try<T> t) => t.HasValue ? new Optional<T>(t.Value) : new Optional<T>();
 
         public static explicit operator T(Try<T> t) => t.Value;
 
@@ -456,6 +458,8 @@ namespace ISQExplorer.Functional
         public static implicit operator Try<T, TException>(T val) => new Try<T, TException>(val);
 
         public static implicit operator Try<T, TException>(TException ex) => new Try<T, TException>(ex);
+        
+        public static implicit operator Optional<T>(Try<T, TException> t) => t.HasValue ? new Optional<T>(t.Value) : new Optional<T>();
 
         public static explicit operator T(Try<T, TException> t) => t.Value;
 

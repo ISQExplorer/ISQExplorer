@@ -1,8 +1,10 @@
 using System;
 using ISQExplorer.Database;
+using ISQExplorer.Functional;
 using ISQExplorer.Misc;
 using ISQExplorer.Models;
 using ISQExplorer.Repositories;
+using ISQExplorer.Web;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
@@ -40,6 +42,7 @@ namespace ISQExplorer
                 {
                     return new PostgresConnection(connString);
                 }
+
                 return new SqlServerConnection(connString);
             }
 
@@ -64,7 +67,7 @@ namespace ISQExplorer
                         var x when
                         x == "preferred" ||
                         x == null => SslMode.Prefer,
-                        
+
                         var x when
                         x == "disabled" ||
                         x == "0" => SslMode.Disable,
@@ -202,6 +205,10 @@ namespace ISQExplorer
             services.AddDbContext<ISQExplorerContext>(options => GetConnection().Make(options));
             // also add an instance of our repository to dependency injection
             services.AddScoped<IQueryRepository, QueryRepository>();
+
+            services.AddSingleton<IHtmlClient, HtmlClient>(s =>
+                new HtmlClient(() => new RateLimiter(3, 1000), 
+                    usePostCache: true));
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/build"; });
