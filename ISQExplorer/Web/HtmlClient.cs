@@ -186,7 +186,7 @@ namespace ISQExplorer.Web
         }
 
         public Task<Try<string, IOException>> PostAsync(Either<Uri, string> url,
-            IDictionary<string, string?> postParams) =>
+            IReadOnlyDictionary<string, string?> postParams) =>
             PostAsync(url,
                 postParams.ToImmutableSortedDictionary()
                     .Select(x => $"{x.Key.HtmlEncode()}={x.Value.HtmlEncode()}")

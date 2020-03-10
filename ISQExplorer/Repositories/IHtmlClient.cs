@@ -10,6 +10,6 @@ namespace ISQExplorer.Repositories
     {
         Task<Try<string, IOException>> GetAsync(Either<Uri, string> url);
         Task<Try<string, IOException>> PostAsync(Either<Uri, string> url, string postData);
-        Task<Try<string, IOException>> PostAsync(Either<Uri, string> url, IDictionary<string, string?> postParams);
+        Task<Try<string, IOException>> PostAsync(Either<Uri, string> url, IReadOnlyDictionary<string, string?> postParams);
     }
 }

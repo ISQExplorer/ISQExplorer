@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using ISQExplorer.Functional;
 using ISQExplorer.Misc;
 using ISQExplorer.Models;
@@ -13,65 +15,85 @@ namespace ISQExplorer.Repositories
         private readonly IDictionary<int, TermModel> _idToTerm;
         private readonly IDictionary<string, TermModel> _stringToTerm;
         private readonly SortedSet<int> _ids;
+        private readonly ISQExplorerContext _context;
 
         private readonly ReadWriteLock _lock;
 
-        public TermRepository()
+        public TermRepository(ISQExplorerContext context)
         {
             _idToTerm = new Dictionary<int, TermModel>();
             _stringToTerm = new Dictionary<string, TermModel>();
             _ids = new SortedSet<int>();
+            _context = context;
 
             _lock = new ReadWriteLock();
+
+            _lock.Read(() => _context.Terms.ForEach(term =>
+            {
+                _idToTerm[term.Id] = term;
+                _stringToTerm[term.Name] = term;
+                _ids.Add(term.Id);
+            }));
         }
 
-        public void Add(TermModel term) => _lock.Write(() =>
+        public Task AddAsync(TermModel term) => _lock.Write(async () =>
         {
             _idToTerm[term.Id] = term;
             _stringToTerm[term.Name] = term;
             _ids.Add(term.Id);
+            await _context.Terms.AddAsync(term);
         });
 
-        public void AddRange(IEnumerable<TermModel> terms) => _lock.Write(() =>
+        public Task AddRangeAsync(IEnumerable<TermModel> terms) => _lock.Write(async () =>
         {
-            foreach (var term in terms)
+            var t = terms.ToList();
+
+            foreach (var term in t)
             {
                 _idToTerm[term.Id] = term;
                 _stringToTerm[term.Name] = term;
                 _ids.Add(term.Id);
             }
+
+            await _context.Terms.AddRangeAsync(t);
         });
 
-        public Optional<TermModel> FromId(int id) =>
-            _lock.Read(() => _idToTerm.ContainsKey(id) ? _idToTerm[id] : new Optional<TermModel>());
+        public async Task<Optional<TermModel>> FromIdAsync(int id) =>
+            await Task.FromResult(_lock.Read(() => _idToTerm.ContainsKey(id) ? _idToTerm[id] : new Optional<TermModel>()));
 
-        public Optional<TermModel> FromString(string str) =>
-            _lock.Read(() => _stringToTerm.ContainsKey(str) ? _stringToTerm[str] : new Optional<TermModel>());
+        public async Task<Optional<TermModel>> FromStringAsync(string str) =>
+            await Task.FromResult(_lock.Read(() => _stringToTerm.ContainsKey(str) ? _stringToTerm[str] : new Optional<TermModel>()));
 
-        public Optional<TermModel> Previous(TermModel t, int howMany = 1) => _lock.Read(() =>
+        public Task<Optional<TermModel>> PreviousAsync(TermModel t, int howMany = 1) => _lock.Read(() =>
         {
             if (howMany < 0)
             {
-                return Next(t, -howMany);
+                return NextAsync(t, -howMany);
             }
 
             var index = _ids.Index(t.Id);
-            return index - howMany < 0
+            return Task.FromResult(index - howMany < 0
                 ? new Optional<TermModel>()
-                : _idToTerm[_ids.ElementAt(index - howMany)];
+                : _idToTerm[_ids.ElementAt(index - howMany)]);
         });
 
-        public Optional<TermModel> Next(TermModel t, int howMany = 1) => _lock.Read(() =>
+        public Task<Optional<TermModel>> NextAsync(TermModel t, int howMany = 1) => _lock.Read(() =>
         {
             if (howMany < 0)
             {
-                return Next(t, -howMany);
+                return PreviousAsync(t, -howMany);
             }
 
             var index = _ids.Index(t.Id);
-            return index + howMany >= _ids.Count
+            return Task.FromResult(index + howMany >= _ids.Count
                 ? new Optional<TermModel>()
-                : _idToTerm[_ids.ElementAt(index + howMany)];
+                : _idToTerm[_ids.ElementAt(index + howMany)]);
         });
+
+        public IEnumerable<TermModel> Terms => _ids.Select(id => _idToTerm[id]);
+
+        public IEnumerator GetEnumerator() => Terms.GetEnumerator();
+
+        IEnumerator<TermModel> IEnumerable<TermModel>.GetEnumerator() => Terms.GetEnumerator();
     }
 }

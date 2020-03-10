@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using AngleSharp.Common;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using ISQExplorer.Exceptions;
@@ -69,6 +70,9 @@ namespace ISQExplorer.Web
                     .Select(res => res.Value);
             }
         }
+
+        public IEnumerable<IDictionary<string, IHtmlTableCellElement>> Rows =>
+            _rows.Select(RowChildren).Select(x => x.Zip(ColumnTitles).ToDictionary(y => y.Second, y => y.First));
 
         public IEnumerable<IHtmlTableCellElement> this[string columnName] => this[_columnTitleToIndex[columnName]];
     }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Transactions;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using ISQExplorer.Exceptions;
@@ -24,24 +25,23 @@ namespace ISQExplorer.Web
 
         public ConcurrentSet<ISQEntryModel> Entries { get; set; }
 
-        public ConcurrentDictionary<(DepartmentModel Department, string LastName), ProfessorModel> Professors
+        public ConcurrentDictionary<DepartmentModel, ConcurrentDictionary<string, ProfessorModel>> Professors
         {
             get;
             set;
         }
 
-        public ConcurrentBag<ProfessorScrapeException> ProfessorScrapeErrors;
-
         public ConcurrentDictionary<string, CourseModel> Courses { get; set; }
-        public ConcurrentBag<(DepartmentModel, TermModel, CourseScrapeException)> CourseScrapeErrors;
 
-        private readonly ConcurrentDictionary<(Either<string, Uri>, string?), HtmlPage> PageCache;
+        public ConcurrentBag<Exception> Errors { get; set; }
+
+        private readonly ConcurrentDictionary<(Either<string, Uri>, string?), HtmlPage> _pageCache;
 
         private async Task<Try<HtmlPage, IOException>> PageFromUrl(Either<string, Uri> url, string? postData = null)
         {
-            if (PageCache.ContainsKey((url, postData)))
+            if (_pageCache.ContainsKey((url, postData)))
             {
-                return PageCache[(url, postData)];
+                return _pageCache[(url, postData)];
             }
 
             var res =
@@ -50,7 +50,7 @@ namespace ISQExplorer.Web
 
             if (res.HasValue)
             {
-                PageCache[(url, postData)] = res.Value;
+                _pageCache[(url, postData)] = res.Value;
             }
 
             return res;
@@ -62,6 +62,10 @@ namespace ISQExplorer.Web
             _htmlClient = htmlClient;
             Departments = new ConcurrentSet<DepartmentModel>();
             Terms = termRepo;
+            Courses = new ConcurrentDictionary<string, CourseModel>();
+            _pageCache = new ConcurrentDictionary<(Either<string, Uri>, string), HtmlPage>();
+            Errors = new ConcurrentBag<Exception>();
+            Professors = new ConcurrentDictionary<DepartmentModel, ConcurrentDictionary<string, ProfessorModel>>();
         }
 
         public Task<Result> ScrapeDepartmentsAsync() => Result.OfAsync(async () =>
@@ -104,9 +108,8 @@ namespace ISQExplorer.Web
 
             links.Where(x => !x.HasValue && x.Exception.Element.TextContent.HtmlDecode().IsBlank()).ForEach(val =>
             {
-                CourseScrapeErrors.Add((dept, term,
-                    new CourseScrapeException(val.Exception.Element.TextContent,
-                        "The given cell was not an <a> element.")));
+                Errors.Add(new CourseScrapeException(
+                    "The given cell was not an <a> element.", val.Exception.Element.TextContent, dept, term));
             });
 
             links
@@ -146,8 +149,9 @@ namespace ISQExplorer.Web
 
             links.Where(x => !x.HasValue && x.Exception.Element.TextContent.HtmlDecode().IsBlank()).ForEach(val =>
             {
-                ProfessorScrapeErrors.Add(new ProfessorScrapeException(
-                    $"The given cell with OuterHTML '{val.Exception.Element.OuterHtml}' was not an <a> element."));
+                Errors.Add(new ProfessorScrapeException(
+                    $"The given cell with OuterHTML '{val.Exception.Element.OuterHtml}' was not an <a> element.", null,
+                    dept, term));
             });
 
             links.Where(x => x.HasValue).Select(x => x.Value).ForEach(async val =>
@@ -156,8 +160,9 @@ namespace ISQExplorer.Web
                 var nNumber = val.Href.Capture(@"[nN]\d{8}").Select(x => x.ToUpper());
                 if (!nNumber)
                 {
-                    ProfessorScrapeErrors.Add(
-                        new ProfessorScrapeException($"The URL {val.Href} does not contain an N-Number."));
+                    Errors.Add(
+                        new ProfessorScrapeException($"The URL {val.Href} does not contain an N-Number.", null, dept,
+                            term));
                     return;
                 }
 
@@ -172,7 +177,7 @@ namespace ISQExplorer.Web
                     {
                         throw new ProfessorScrapeException(
                             $"Could not find instructor name on '{Urls.ProfessorPage(nNumber.Value)}'.",
-                            professorName.Exception);
+                            professorName.Exception, nNumber.Value, dept, term);
                     }
 
                     Professors[(dept, lname)] = new ProfessorModel
@@ -186,6 +191,66 @@ namespace ISQExplorer.Web
             });
         });
 
-        public Task<Result> ScrapeEntries(ProfessorModel prof) => Result.OfAsync(async () => { });
+        public Task<Result> ScrapeEntries(ProfessorModel prof, bool recursive = true) => Result.OfAsync(async () =>
+        {
+            if (recursive && Departments.None())
+            {
+                var res = await ScrapeDepartmentsAsync();
+                if (!res)
+                {
+                    return res;
+                }
+            }
+
+            Departments.SelectMany(x => Terms.Terms,
+                (model, termModel) => (model, termModel)).AsParallel().ForEach(async x =>
+            {
+                var (dept, term) = x;
+
+                if (recursive && Courses.None())
+                {
+                    var res = await ScrapeCourses(dept, term);
+                    if (!res)
+                    {
+                        Errors.Add(res.Error);
+                        return;
+                    }
+                }
+
+                if (recursive && Professors.None())
+                {
+                    var res = await ScrapeProfessors(dept, term);
+                    if (!res)
+                    {
+                        Errors.Add(res.Error);
+                        return;
+                    }
+                }
+
+                var page = await PageFromUrl(Urls.DeptSchedule, Urls.DeptSchedulePostData(term.Id, dept.Id));
+                if (!page)
+                {
+                    Errors.Add(page.Exception);
+                    return;
+                }
+
+                var tables = page.Value.QueryAll<IHtmlTableElement>("table.datadisplaytable").ToList();
+                if (tables.Count != 3)
+                {
+                    Errors.Add(new HtmlPageException(page.Value,
+                        "This page does not have the required number (3) of table.datadisplaytable."));
+                    return;
+                }
+
+                var tab = HtmlTable.Create(tables.Last()).Value;
+                if (!tab.ColumnTitles.Contains("Professor"))
+                {
+                    Errors.Add(new HtmlElementException(tables.Last(),
+                        "Expected a column in the main table titled 'Professor'."));
+                }
+            });
+
+            return new Result();
+        });
     }
 }

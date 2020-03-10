@@ -12,6 +12,7 @@ namespace ISQExplorer.Models
         public DbSet<ISQEntryModel> IsqEntries { get; set; }
         public DbSet<ProfessorModel> Professors { get; set; }
         public DbSet<CourseModel> Courses { get; set; }
+        public DbSet<TermModel> Terms { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

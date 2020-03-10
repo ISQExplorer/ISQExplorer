@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace ISQExplorer.Misc
+namespace ISQExplorer.Functional
 {
     public struct Result
     {
@@ -21,12 +21,36 @@ namespace ISQExplorer.Misc
             }
         }
 
+        public static Result Of(Func<Result> func)
+        {
+            try
+            {
+                return func();
+            }
+            catch (Exception e)
+            {
+                return new Result(e);
+            }
+        }
+
         public static async Task<Result> OfAsync(Func<Task> func)
         {
             try
             {
                 await func();
                 return new Result();
+            }
+            catch (Exception e)
+            {
+                return new Result(e);
+            }
+        }
+
+        public static async Task<Result> OfAsync(Func<Task<Result>> func)
+        {
+            try
+            {
+                return await func();
             }
             catch (Exception e)
             {

@@ -9,13 +9,13 @@ namespace ISQExplorer.Exceptions
         public readonly string Reason;
 
         public DepartmentScrapeException(DepartmentModel dept, string reason) : base(
-            $"Failed to scrape department '{dept}'. {reason}")
+            $"Failed to scrape department '{dept}'s listings. {reason}")
         {
             (Department, Reason) = (dept, reason);
         }
 
         public DepartmentScrapeException(DepartmentModel dept, string reason, Exception innerException) : base(
-            $"Failed to scrape department '{dept}'. {reason}", innerException)
+            $"Failed to scrape department '{dept}'s listings. {reason}", innerException)
         {
             (Department, Reason) = (dept, reason);
         }
