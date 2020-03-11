@@ -26,9 +26,11 @@ namespace ISQExplorer
             // if the database is empty
             if (db.IsqEntries.None())
             {
+                var scraper = services.GetService<Scraper>();
+                
                 // scrape the data
                 Print.Line("Scraping data...", ConsoleColor.Green);
-                var res = await DataScraper.ScrapeAll();
+                var res = await scraper.ScrapeEntriesAsync();
                 
                 // if scraping failed
                 if (!res)
@@ -40,27 +42,6 @@ namespace ISQExplorer
                 }
 
                 Print.Line("Done scraping data!", ConsoleColor.Green);
-
-                // write the data to the db
-                Print.Line("Importing scraped data into database...", ConsoleColor.Green);
-                try
-                {
-                    await Task.WhenAll(
-                        db.Courses.AddRangeAsync(res.Value.Courses.Succeeded),
-                        db.IsqEntries.AddRangeAsync(res.Value.Entries),
-                        db.Professors.AddRangeAsync(res.Value.Professors.Succeeded)
-                    );
-                    // actually commit the changes. don't be a dumbass and spend 2 hours debugging this next time
-                    await db.SaveChangesAsync();
-                }
-                catch (Exception e)
-                {
-                    Print.Line(e.ToString(), ConsoleColor.Yellow);
-                    Print.Line("Failed to write scraped data to database.", ConsoleColor.Red);
-                    return;
-                }
-
-                Print.Line("Finished importing data!", ConsoleColor.Green);
             }
 
             // start hosting the app

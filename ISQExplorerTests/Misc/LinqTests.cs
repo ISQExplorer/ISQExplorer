@@ -1,9 +1,9 @@
 using ISQExplorer.Misc;
 using NUnit.Framework;
 
-namespace ISQExplorerTests
+namespace ISQExplorerTests.Misc
 {
-    public class MiscLinqTests
+    public class LinqTests
     {
         [Test]
         public void TestAtLeastPercent()

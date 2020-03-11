@@ -16,30 +16,22 @@ namespace ISQExplorer.Web
     {
         private readonly ConcurrentDictionary<string, RateLimiter> _domainToLimiter;
         private readonly Func<string, RateLimiter>? _limiterFactory;
-        public ConcurrentDictionary<Uri, string> GetCache { get; }
-        public ConcurrentDictionary<(Uri, string), string> PostCache { get; }
-        public bool UseGetCache { get; }
-        public bool UsePostCache { get; }
+        public Cache<Uri, HtmlPage> GetCache { get; }
+        public Cache<(Uri, string), HtmlPage> PostCache { get; }
 
-        public HtmlClient(Func<string, RateLimiter>? limiterFactory = null,
-            bool useGetCache = true,
-            bool usePostCache = false)
+        public HtmlClient(Func<string, RateLimiter>? limiterFactory = null)
         {
             _domainToLimiter = new ConcurrentDictionary<string, RateLimiter>();
             _limiterFactory = limiterFactory;
-            GetCache = new ConcurrentDictionary<Uri, string>();
-            PostCache = new ConcurrentDictionary<(Uri, string), string>();
-            UseGetCache = useGetCache;
-            UsePostCache = usePostCache;
+            GetCache = new Cache<Uri, HtmlPage>();
+            PostCache = new Cache<(Uri, string), HtmlPage>();
         }
 
-        public HtmlClient(Func<RateLimiter> limiterFactory,
-            bool useGetCache = true,
-            bool usePostCache = false) : this(s => limiterFactory(), useGetCache, usePostCache)
+        public HtmlClient(Func<RateLimiter> limiterFactory) : this(s => limiterFactory())
         {
         }
 
-        public async Task<Try<string, IOException>> GetAsync(Either<Uri, string> url)
+        public async Task<Try<HtmlPage, IOException>> GetAsync(Either<Uri, string> url)
         {
             var u = url.Unite(str => new Uri(str));
 
@@ -73,39 +65,27 @@ namespace ISQExplorer.Web
                 }
             }
 
-            if (UseGetCache && GetCache.ContainsKey(u))
+            return await Try.OfAsync<HtmlPage, IOException>(async () => await GetCache.GetOrMakeAsync(u, async () =>
             {
-                return GetCache[u];
-            }
-
-            if (_limiterFactory != null)
-            {
-                if (!_domainToLimiter.ContainsKey(u.Host))
+                if (_limiterFactory != null)
                 {
-                    _domainToLimiter[u.Host] = _limiterFactory(u.Host);
-                }
+                    if (!_domainToLimiter.ContainsKey(u.Host))
+                    {
+                        _domainToLimiter[u.Host] = _limiterFactory(u.Host);
+                    }
 
-                var res = await _domainToLimiter[u.Host].Run(Get);
-                if (UseGetCache && res.HasValue)
+                    var res = await _domainToLimiter[u.Host].Run(Get);
+                    return (await res.SelectAsync(HtmlPage.FromHtmlAsync)).ValueOrThrow;
+                }
+                else
                 {
-                    GetCache[u] = res.Value;
+                    var res = await Get();
+                    return (await res.SelectAsync(HtmlPage.FromHtmlAsync)).ValueOrThrow;
                 }
-
-                return res;
-            }
-            else
-            {
-                var res = await Get();
-                if (UseGetCache && res.HasValue)
-                {
-                    GetCache[u] = res.Value;
-                }
-
-                return res;
-            }
+            }));
         }
 
-        public async Task<Try<string, IOException>> PostAsync(Either<Uri, string> url, string postData)
+        public async Task<Try<HtmlPage, IOException>> PostAsync(Either<Uri, string> url, string postData)
         {
             var u = url.Unite(str => new Uri(str));
 
@@ -153,39 +133,27 @@ namespace ISQExplorer.Web
                 }
             }
 
-            if (UsePostCache && PostCache.ContainsKey((u, postData)))
+            return await Try.OfAsync<HtmlPage, IOException>(async () => await PostCache.GetOrMakeAsync((u, postData), async () =>
             {
-                return PostCache[(u, postData)];
-            }
-
-            if (_limiterFactory != null)
-            {
-                if (!_domainToLimiter.ContainsKey(u.Host))
+                if (_limiterFactory != null)
                 {
-                    _domainToLimiter[u.Host] = _limiterFactory(u.Host);
-                }
+                    if (!_domainToLimiter.ContainsKey(u.Host))
+                    {
+                        _domainToLimiter[u.Host] = _limiterFactory(u.Host);
+                    }
 
-                var res = await _domainToLimiter[u.Host].Run(Post);
-                if (UsePostCache && res.HasValue)
+                    var res = await _domainToLimiter[u.Host].Run(Post);
+                    return (await res.SelectAsync(HtmlPage.FromHtmlAsync)).ValueOrThrow;
+                }
+                else
                 {
-                    PostCache[(u, postData)] = res.Value;
+                    var res = await Post();
+                    return (await res.SelectAsync(HtmlPage.FromHtmlAsync)).ValueOrThrow;
                 }
-
-                return res;
-            }
-            else
-            {
-                var res = await Post();
-                if (UsePostCache && res.HasValue)
-                {
-                    PostCache[(u, postData)] = res.Value;
-                }
-
-                return res;
-            }
+            }));
         }
 
-        public Task<Try<string, IOException>> PostAsync(Either<Uri, string> url,
+        public Task<Try<HtmlPage, IOException>> PostAsync(Either<Uri, string> url,
             IReadOnlyDictionary<string, string?> postParams) =>
             PostAsync(url,
                 postParams.ToImmutableSortedDictionary()

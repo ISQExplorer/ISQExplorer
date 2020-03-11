@@ -1,6 +1,5 @@
 using System;
 using ISQExplorer.Database;
-using ISQExplorer.Functional;
 using ISQExplorer.Misc;
 using ISQExplorer.Models;
 using ISQExplorer.Repositories;
@@ -8,6 +7,7 @@ using ISQExplorer.Web;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -201,14 +201,32 @@ namespace ISQExplorer
         {
             services.AddControllersWithViews();
 
+            var options = new DbContextOptionsBuilder<ISQExplorerContext>();
+            var newOptions = GetConnection().Make(options);
+            var context = new ISQExplorerContext(newOptions.Options);
+
+
+            services.AddSingleton<ISQExplorerContext>(provider =>
+            {
+                var options = new DbContextOptionsBuilder<ISQExplorerContext>();
+                var newOptions = GetConnection().Make(options);
+                return new ISQExplorerContext(newOptions.Options);
+            });
+
             // use dependency injection to make our ISQExplorerContext backed by the sql server we choose 
-            services.AddDbContext<ISQExplorerContext>(options => GetConnection().Make(options));
+            // services.AddDbContext<ISQExplorerContext>(options => GetConnection().Make(options));
             // also add an instance of our repository to dependency injection
             services.AddScoped<IQueryRepository, QueryRepository>();
 
             services.AddSingleton<IHtmlClient, HtmlClient>(s =>
-                new HtmlClient(() => new RateLimiter(3, 1000), 
-                    usePostCache: true));
+                new HtmlClient(() => new RateLimiter(3, 1000)));
+
+            services.AddSingleton<ITermRepository, TermRepository>();
+            services.AddSingleton<IProfessorRepository, ProfessorRepository>();
+            services.AddSingleton<ICourseRepository, CourseRepository>();
+            services.AddSingleton<IDepartmentRepository, DepartmentRepository>();
+            services.AddSingleton<IEntryRepository, EntryRepository>();
+            services.AddSingleton<Scraper, Scraper>();
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/build"; });

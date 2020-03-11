@@ -1,20 +1,17 @@
 using System.Collections.Generic;
 using System.Linq;
-using AngleSharp.Common;
-using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using ISQExplorer.Exceptions;
 using ISQExplorer.Functional;
 using ISQExplorer.Misc;
-using Microsoft.EntityFrameworkCore.Internal;
 
 namespace ISQExplorer.Web
 {
     public class HtmlTable
     {
-        private IList<IHtmlTableRowElement> _rows;
-        public IReadOnlyList<string> ColumnTitles;
-        private IDictionary<string, int> _columnTitleToIndex;
+        private readonly IList<IHtmlTableRowElement> _rows;
+        public readonly IReadOnlyList<string> ColumnTitles;
+        private readonly IDictionary<string, int> _columnTitleToIndex;
 
         private static IEnumerable<IHtmlTableCellElement> RowChildren(IHtmlTableRowElement re)
         {
@@ -48,7 +45,7 @@ namespace ISQExplorer.Web
 
                 ColumnTitles = Linq.Range(num)
                     .Select(i => rowChildren.Select(x => x.Children[i]))
-                    .Select(x => x.Select(y => y.TextContent).Join(" "))
+                    .Select(x => x.Select(y => y.TextContent.Trim()).Join(" "))
                     .ToList();
             }
 

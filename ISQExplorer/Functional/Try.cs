@@ -43,6 +43,27 @@ namespace ISQExplorer.Functional
         }
 
         /// <summary>
+        /// Constructs a Try out of an async function, containing either the value returned by the Task, or the exception it may throw.
+        /// This function itself will not throw any exceptions the function passed to it may throw, but said exceptions will be present in the resulting Try.
+        /// </summary>
+        /// <param name="func">The function returning a Task returning the desired value.</param>
+        /// <typeparam name="T">The type of the desired value.</typeparam>
+        /// <typeparam name="TException">The type of the desired exception.</typeparam>
+        /// <returns>A Task of the given Try.</returns>
+        public static async Task<Try<T, TException>> OfAsync<T, TException>(Func<Task<T>> func)
+            where TException : Exception
+        {
+            try
+            {
+                return new Try<T, TException>(await func());
+            }
+            catch (TException e)
+            {
+                return e;
+            }
+        }
+
+        /// <summary>
         /// Constructs a Try out of the given value if the condition is true, otherwise constructs it out of the given exception.
         /// </summary>
         /// <param name="condition">True if the value should be used, false if the exception should be used.</param>
@@ -221,8 +242,9 @@ namespace ISQExplorer.Functional
         public static implicit operator Try<T>(T val) => new Try<T>(val);
 
         public static implicit operator Try<T>(Exception ex) => new Try<T>(ex);
-        
-        public static implicit operator Optional<T>(Try<T> t) => t.HasValue ? new Optional<T>(t.Value) : new Optional<T>();
+
+        public static implicit operator Optional<T>(Try<T> t) =>
+            t.HasValue ? new Optional<T>(t.Value) : new Optional<T>();
 
         public static explicit operator T(Try<T> t) => t.Value;
 
@@ -374,6 +396,19 @@ namespace ISQExplorer.Functional
             }
         }
 
+        public T ValueOrThrow
+        {
+            get
+            {
+                if (HasValue)
+                {
+                    return _value;
+                }
+
+                throw _ex;
+            }
+        }
+
         public TException Exception
         {
             get
@@ -458,8 +493,9 @@ namespace ISQExplorer.Functional
         public static implicit operator Try<T, TException>(T val) => new Try<T, TException>(val);
 
         public static implicit operator Try<T, TException>(TException ex) => new Try<T, TException>(ex);
-        
-        public static implicit operator Optional<T>(Try<T, TException> t) => t.HasValue ? new Optional<T>(t.Value) : new Optional<T>();
+
+        public static implicit operator Optional<T>(Try<T, TException> t) =>
+            t.HasValue ? new Optional<T>(t.Value) : new Optional<T>();
 
         public static explicit operator T(Try<T, TException> t) => t.Value;
 

@@ -26,6 +26,9 @@ namespace ISQExplorer.Models
                 .HasIndex(c => c.NNumber);
             modelBuilder.Entity<TermModel>()
                 .HasIndex(c => c.Name);
+
+            modelBuilder.Entity<ISQEntryModel>()
+                .HasOne<TermModel>();
         }
     }
 }

@@ -1,90 +1,61 @@
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Transactions;
-using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using ISQExplorer.Exceptions;
 using ISQExplorer.Functional;
 using ISQExplorer.Misc;
 using ISQExplorer.Models;
 using ISQExplorer.Repositories;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore.Internal;
 
 namespace ISQExplorer.Web
 {
     public class Scraper
     {
-        private readonly IHtmlClient _htmlClient;
-        public ConcurrentSet<DepartmentModel> Departments { get; set; }
+        public IHtmlClient HtmlClient { get; set; }
+        public IDepartmentRepository Departments { get; set; }
         public ITermRepository Terms { get; set; }
 
-        public ConcurrentSet<ISQEntryModel> Entries { get; set; }
-
-        public ConcurrentDictionary<DepartmentModel, ConcurrentDictionary<string, ProfessorModel>> Professors
-        {
-            get;
-            set;
-        }
-
-        public ConcurrentDictionary<string, CourseModel> Courses { get; set; }
+        public IEntryRepository Entries { get; set; }
+        public IProfessorRepository Professors { get; set; }
+        public ICourseRepository Courses { get; set; }
 
         public ConcurrentBag<Exception> Errors { get; set; }
 
-        private readonly ConcurrentDictionary<(Either<string, Uri>, string?), HtmlPage> _pageCache;
-
-        private async Task<Try<HtmlPage, IOException>> PageFromUrl(Either<string, Uri> url, string? postData = null)
+        public Scraper(ITermRepository termRepo, IProfessorRepository profRepo, IDepartmentRepository departmentRepo,
+            IEntryRepository entryRepo, ICourseRepository courseRepo, IHtmlClient htmlClient)
         {
-            if (_pageCache.ContainsKey((url, postData)))
-            {
-                return _pageCache[(url, postData)];
-            }
-
-            var res =
-                await (await (postData == null ? _htmlClient.GetAsync(url) : _htmlClient.PostAsync(url, postData)))
-                    .SelectAsync(HtmlPage.FromHtmlAsync);
-
-            if (res.HasValue)
-            {
-                _pageCache[(url, postData)] = res.Value;
-            }
-
-            return res;
-        }
-
-
-        public Scraper(ITermRepository termRepo, IHtmlClient htmlClient)
-        {
-            _htmlClient = htmlClient;
-            Departments = new ConcurrentSet<DepartmentModel>();
             Terms = termRepo;
-            Courses = new ConcurrentDictionary<string, CourseModel>();
-            _pageCache = new ConcurrentDictionary<(Either<string, Uri>, string), HtmlPage>();
+            Professors = profRepo;
+            HtmlClient = htmlClient;
+            Departments = departmentRepo;
+            Courses = courseRepo;
+            Entries = entryRepo;
             Errors = new ConcurrentBag<Exception>();
-            Professors = new ConcurrentDictionary<DepartmentModel, ConcurrentDictionary<string, ProfessorModel>>();
         }
 
         public Task<Result> ScrapeDepartmentsAsync() => Result.OfAsync(async () =>
         {
-            (await PageFromUrl(Urls.DeptSchedule)).Value.Query<IHtmlSelectElement>("#dept_id").Value
+            (await HtmlClient.GetAsync(Urls.DeptSchedule)).Value.Query<IHtmlSelectElement>("#dept_id").Value
                 .Children<IHtmlOptionElement>().Value.Skip(1)
-                .ForEach(e => Departments.Add(new DepartmentModel {Id = Parse.Int(e.Id).Value, Name = e.Label}));
+                .ForEach(async e =>
+                    await Departments.AddAsync(new DepartmentModel {Id = Parse.Int(e.Id).Value, Name = e.Label}));
         });
 
         public Task<Result> ScrapeTermsAsync() => Result.OfAsync(async () =>
         {
-            (await PageFromUrl(Urls.DeptSchedule)).Value.Query<IHtmlSelectElement>("#term_id").Value
+            await Terms.AddRangeAsync((await HtmlClient.GetAsync(Urls.DeptSchedule)).Value
+                .Query<IHtmlSelectElement>("#term_id")
+                .Value
                 .Children<IHtmlOptionElement>().Value.Skip(1)
-                .ForEach(e => Terms.Add(new TermModel {Name = e.Label, Id = Parse.Int(e.Value).Value}));
+                .Select(e => new TermModel {Name = e.Label, Id = Parse.Int(e.Value).Value}));
         });
 
-        public Task<Result> ScrapeCourses(DepartmentModel dept, TermModel term) => Result.OfAsync(async () =>
+        public Task<Result> ScrapeCoursesAsync(DepartmentModel dept, TermModel term) => Result.OfAsync(async () =>
         {
-            var page = (await PageFromUrl(Urls.DeptSchedule, Urls.DeptSchedulePostData(term.Id, dept.Id))).Value;
+            var page = (await HtmlClient.PostAsync(Urls.DeptSchedule, Urls.DeptSchedulePostData(term.Id, dept.Id)))
+                .Value;
             var tables = page.QueryAll<IHtmlTableElement>("table.datadisplaytable").ToList();
             if (tables.Count != 3)
             {
@@ -116,21 +87,22 @@ namespace ISQExplorer.Web
                 .Zip(titles)
                 .Where(x => x.First.HasValue)
                 .Select(x => (Course: x.First.Value, Title: x.Second.TextContent))
-                .ForEach(val =>
+                .ForEach(async val =>
                 {
                     var (course, title) = val;
-                    Courses[course.TextContent] = new CourseModel
+                    await Courses.AddAsync(new CourseModel
                     {
                         CourseCode = course.TextContent,
                         Department = dept,
                         Name = title
-                    };
+                    });
                 });
         });
 
-        public Task<Result> ScrapeProfessors(DepartmentModel dept, TermModel term) => Result.OfAsync(async () =>
+        public Task<Result> ScrapeProfessorsAsync(DepartmentModel dept, TermModel term) => Result.OfAsync(async () =>
         {
-            var page = (await PageFromUrl(Urls.DeptSchedule, Urls.DeptSchedulePostData(term.Id, dept.Id))).Value;
+            var page = (await HtmlClient.PostAsync(Urls.DeptSchedule, Urls.DeptSchedulePostData(term.Id, dept.Id)))
+                .Value;
             var tables = page.QueryAll<IHtmlTableElement>("table.datadisplaytable").ToList();
             if (tables.Count != 3)
             {
@@ -166,32 +138,103 @@ namespace ISQExplorer.Web
                     return;
                 }
 
-                if (!Professors.ContainsKey((dept, lname)))
+                if (await Professors.FromNNumberAsync(dept, nNumber.Value)) return;
+
+                var page = (await HtmlClient.GetAsync(Urls.ProfessorPage(nNumber.Value))).Value;
+
+                var professorName = Try.Of(() => page.QueryAll<IHtmlTableCellElement>("td.dddefault").First(
+                    elem => elem.PreviousElementSibling?.TextContent.HtmlDecode().Trim() == "Instructor:"));
+
+                if (!professorName)
                 {
-                    var page = (await PageFromUrl(Urls.ProfessorPage(nNumber.Value))).Value;
-
-                    var professorName = Try.Of(() => page.QueryAll<IHtmlTableCellElement>("td.dddefault").First(
-                        elem => elem.PreviousElementSibling?.TextContent.HtmlDecode().Trim() == "Instructor:"));
-
-                    if (!professorName)
-                    {
-                        throw new ProfessorScrapeException(
-                            $"Could not find instructor name on '{Urls.ProfessorPage(nNumber.Value)}'.",
-                            professorName.Exception, nNumber.Value, dept, term);
-                    }
-
-                    Professors[(dept, lname)] = new ProfessorModel
-                    {
-                        Department = dept,
-                        FirstName = professorName.Value.TextContent.Split(" ").SkipLast(1).Join(" "),
-                        LastName = lname,
-                        NNumber = nNumber.Value
-                    };
+                    throw new ProfessorScrapeException(
+                        $"Could not find instructor name on '{Urls.ProfessorPage(nNumber.Value)}'.",
+                        professorName.Exception, nNumber.Value, dept, term);
                 }
+
+                await Professors.AddAsync(new ProfessorModel
+                {
+                    Department = dept,
+                    FirstName = professorName.Value.TextContent.Split(" ").SkipLast(1).Join(" "),
+                    LastName = lname,
+                    NNumber = nNumber.Value
+                });
             });
         });
 
-        public Task<Result> ScrapeEntries(ProfessorModel prof, bool recursive = true) => Result.OfAsync(async () =>
+        public Task<Result> ScrapeProfessorEntriesAsync(ProfessorModel prof) => Result.OfAsync(async () =>
+        {
+            var page = await HtmlClient.GetAsync(Urls.ProfessorPage(prof.NNumber));
+            if (!page)
+            {
+                Errors.Add(page.Exception);
+                return;
+            }
+
+            var tables = page.Value.QueryAll<IHtmlTableElement>("table.datadisplaytable").ToList();
+            if (tables.Count != 6)
+            {
+                Errors.Add(new HtmlPageException(page.Value, $"Expected 6 tables, got {tables.Count}"));
+                return;
+            }
+
+            var mainTable = HtmlTable.Create(tables[3]);
+            if (!mainTable)
+            {
+                Errors.Add(mainTable.Exception);
+                return;
+            }
+
+            var gpaTable = HtmlTable.Create(tables[5]);
+            if (!gpaTable)
+            {
+                Errors.Add(mainTable.Exception);
+                return;
+            }
+
+            var mainRows = mainTable.Value.Rows.GroupBy(x => (x["Term"], x["CRN"], x["Course"]))
+                .ToDictionary(x => x.Key, x => x.First());
+            var gpaRows = gpaTable.Value.Rows.GroupBy(x => (x["Term"], x["CRN"], x["Course"]))
+                .ToDictionary(x => x.Key, x => x.First());
+
+            var results = (from mrow in mainRows
+                join grow in gpaRows on mrow.Key equals grow.Key
+                select (mrow.Value, grow.Value)).Select(group => Result.Of(async () =>
+            {
+                var (mrow, grow) = group;
+
+                await Entries.AddAsync(new ISQEntryModel
+                {
+                    Course = (await Courses.FromCourseCodeAsync(mrow["Course ID"].TextContent)).Value,
+                    Term = (await Terms.FromStringAsync(mrow["Term"].TextContent)).Value,
+                    Professor = prof,
+                    Crn = Parse.Int(mrow["Crn"].TextContent).Value,
+                    NEnrolled = Parse.Int(mrow["Number Enrolled"].TextContent).Value,
+                    NResponded = Parse.Int(mrow["Number Responded"].TextContent).Value,
+                    Pct5 = Parse.Double(mrow["Excellent (5)"].TextContent).Value,
+                    Pct4 = Parse.Double(mrow["Very Good (4)"].TextContent).Value,
+                    Pct3 = Parse.Double(mrow["Good (3)"].TextContent).Value,
+                    Pct2 = Parse.Double(mrow["Fair (2)"].TextContent).Value,
+                    Pct1 = Parse.Double(mrow["Poor (1)"].TextContent).Value,
+                    PctNa = Parse.Double(mrow["NR/NA"].TextContent).Value,
+                    PctA = Parse.Double(grow["A"].TextContent).Value,
+                    PctAMinus = Parse.Double(grow["A-"].TextContent).Value,
+                    PctBPlus = Parse.Double(grow["B+"].TextContent).Value,
+                    PctB = Parse.Double(grow["B"].TextContent).Value,
+                    PctBMinus = Parse.Double(grow["B-"].TextContent).Value,
+                    PctCPlus = Parse.Double(grow["C+"].TextContent).Value,
+                    PctC = Parse.Double(grow["C"].TextContent).Value,
+                    PctD = Parse.Double(grow["D"].TextContent).Value,
+                    PctF = Parse.Double(grow["F"].TextContent).Value,
+                    PctWithdraw = Parse.Double(grow["Withdraw"].TextContent).Value,
+                    MeanGpa = Parse.Double(grow["Mean GPA"].TextContent).Value
+                });
+            }));
+
+            results.Where(res => res.IsError).Select(res => res.Error).ForEach(Errors.Add);
+        });
+
+        public Task<Result> ScrapeEntriesAsync(bool recursive = true) => Result.OfAsync(async () =>
         {
             if (recursive && Departments.None())
             {
@@ -209,7 +252,7 @@ namespace ISQExplorer.Web
 
                 if (recursive && Courses.None())
                 {
-                    var res = await ScrapeCourses(dept, term);
+                    var res = await ScrapeCoursesAsync(dept, term);
                     if (!res)
                     {
                         Errors.Add(res.Error);
@@ -219,7 +262,7 @@ namespace ISQExplorer.Web
 
                 if (recursive && Professors.None())
                 {
-                    var res = await ScrapeProfessors(dept, term);
+                    var res = await ScrapeProfessorsAsync(dept, term);
                     if (!res)
                     {
                         Errors.Add(res.Error);
@@ -227,29 +270,15 @@ namespace ISQExplorer.Web
                     }
                 }
 
-                var page = await PageFromUrl(Urls.DeptSchedule, Urls.DeptSchedulePostData(term.Id, dept.Id));
-                if (!page)
+                var res2 = await ScrapeCoursesAsync(dept, term) && await ScrapeProfessorsAsync(dept, term);
+                if (!res2)
                 {
-                    Errors.Add(page.Exception);
-                    return;
-                }
-
-                var tables = page.Value.QueryAll<IHtmlTableElement>("table.datadisplaytable").ToList();
-                if (tables.Count != 3)
-                {
-                    Errors.Add(new HtmlPageException(page.Value,
-                        "This page does not have the required number (3) of table.datadisplaytable."));
-                    return;
-                }
-
-                var tab = HtmlTable.Create(tables.Last()).Value;
-                if (!tab.ColumnTitles.Contains("Professor"))
-                {
-                    Errors.Add(new HtmlElementException(tables.Last(),
-                        "Expected a column in the main table titled 'Professor'."));
+                    Errors.Add(res2.Error);
                 }
             });
 
+            Professors.AsParallel().ForEach(async prof => await ScrapeProfessorEntriesAsync(prof));
+            
             return new Result();
         });
     }

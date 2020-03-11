@@ -1,10 +1,13 @@
-using System.Collections.Concurrent;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ISQExplorer.Functional;
 using ISQExplorer.Misc;
 using ISQExplorer.Models;
+
+// below comment is used to suppress resharper warning that the defaultdict entries are never initialized
+// ReSharper disable CollectionNeverUpdated.Local
 
 namespace ISQExplorer.Repositories
 {
@@ -20,10 +23,10 @@ namespace ISQExplorer.Repositories
 
         private void _updateProf(ProfessorModel prof)
         {
-            _lastNameToProfessor[prof.LastName] = prof;
-            _firstNameToProfessor[prof.FirstName] = prof;
-            _nameToProfessor[prof.FirstName + " " + prof.LastName] = prof;
-            _nNumberToProfessor[prof.NNumber] = prof;
+            _lastNameToProfessor[prof.Department][prof.LastName] = prof;
+            _firstNameToProfessor[prof.Department][prof.FirstName] = prof;
+            _nameToProfessor[prof.Department][prof.FirstName + " " + prof.LastName] = prof;
+            _nNumberToProfessor[prof.Department][prof.NNumber] = prof;
         }
 
         public ProfessorRepository(ISQExplorerContext context)
@@ -68,6 +71,22 @@ namespace ISQExplorer.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Optional<ProfessorModel>> FromFirstName(DepartmentModel dept, string firstName) =>
-            await Task.FromResult(_firstNameToProfessor[dept][firstName]);
+        public async Task<Optional<ProfessorModel>> FromFirstNameAsync(DepartmentModel dept, string firstName) =>
+            await Task.FromResult(_locks[dept].Read(() => _firstNameToProfessor[dept][firstName]));
+
+        public async Task<Optional<ProfessorModel>> FromLastNameAsync(DepartmentModel dept, string lastName) =>
+            await Task.FromResult(_locks[dept].Read(() => _lastNameToProfessor[dept][lastName]));
+
+        public async Task<Optional<ProfessorModel>> FromNameAsync(DepartmentModel dept, string name) =>
+            await Task.FromResult(_locks[dept].Read(() => _nameToProfessor[dept][name]));
+
+        public async Task<Optional<ProfessorModel>> FromNNumberAsync(DepartmentModel dept, string nNumber) =>
+            await Task.FromResult(_locks[dept].Read(() => _nNumberToProfessor[dept][nNumber]));
+
+        public IEnumerable<ProfessorModel> Professors => _context.Professors;
+
+        public IEnumerator<ProfessorModel> GetEnumerator() => Professors.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => Professors.GetEnumerator();
     }
+}

@@ -81,9 +81,17 @@ namespace ISQExplorer.Functional
 
         public static implicit operator bool(Result r) => !r.IsError;
 
+        public static bool operator true(Result r) => !r.IsError;
+
+        public static bool operator false(Result r) => r.IsError;
+
         public static implicit operator Result(Exception ex) => new Result(ex);
 
         public static implicit operator Result(bool b) => b ? new Result() : new Result(new Exception());
+
+        public static Result operator &(Result t1, Result t2) => !t1 ? t1 : t2;
+
+        public static Result operator |(Result t1, Result t2) => t1 ? t1 : t2;
     }
 
     public struct Result<TException> where TException : Exception
@@ -139,6 +147,14 @@ namespace ISQExplorer.Functional
             IsError ? _ex : throw new InvalidOperationException("This Result does not contain an error.");
 
         public static implicit operator bool(Result<TException> r) => !r.IsError;
+        
+        public static bool operator true(Result<TException> r) => !r.IsError;
+
+        public static bool operator false(Result<TException> r) => r.IsError;
+
+        public static Result operator &(Result<TException> t1, Result<TException> t2) => !t1 ? t1 : t2;
+
+        public static Result operator |(Result<TException> t1, Result<TException> t2) => t1 ? t1 : t2;
 
         public static implicit operator Result(Result<TException> r) => r ? new Result() : new Result(r.Error);
 

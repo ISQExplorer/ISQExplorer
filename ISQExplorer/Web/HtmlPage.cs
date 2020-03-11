@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AngleSharp;
 using AngleSharp.Dom;
 using ISQExplorer.Exceptions;
 using ISQExplorer.Functional;
-using ISQExplorer.Misc;
 
 namespace ISQExplorer.Web
 {
