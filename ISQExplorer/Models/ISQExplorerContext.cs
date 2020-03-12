@@ -7,12 +7,12 @@ namespace ISQExplorer.Models
         public ISQExplorerContext(DbContextOptions options) : base(options)
         {
         }
-        
-        public DbSet<DepartmentModel> Departments { get; set; }
-        public DbSet<ISQEntryModel> IsqEntries { get; set; }
-        public DbSet<ProfessorModel> Professors { get; set; }
-        public DbSet<CourseModel> Courses { get; set; }
-        public DbSet<TermModel> Terms { get; set; }
+
+        public DbSet<DepartmentModel> Departments { get; set; } = null!;
+        public DbSet<ISQEntryModel> IsqEntries { get; set; } = null!;
+        public DbSet<ProfessorModel> Professors { get; set; } = null!;
+        public DbSet<CourseModel> Courses { get; set; } = null!;
+        public DbSet<TermModel> Terms { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

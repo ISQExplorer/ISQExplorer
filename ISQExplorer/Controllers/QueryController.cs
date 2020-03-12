@@ -22,7 +22,7 @@ namespace ISQExplorer.Controllers
             }
             else
             {
-                (Contents, Class, Style) = (contents.ToString(), @class?.Trim(), style?.Trim());
+                (Contents, Class, Style) = (contents?.ToString() ?? "null", @class?.Trim(), style?.Trim());
             }
         }
 

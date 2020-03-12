@@ -6,19 +6,17 @@ namespace ISQExplorer.Database
 {
     public class PostgresConnection : IConnection
     {
-        public string Host { get; set; }
-        public string Database { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public int Port { get; set; }
-        public SslMode SSLType { get; set; }
+        public string? Host { get; set; }
+        public string? Database { get; set; }
+        public string? Username { get; set; }
+        public string? Password { get; set; }
+        public int? Port { get; set; }
+        public SslMode? SslType { get; set; }
         public bool AllowSelfSigned { get; set; }
         private readonly string? _connectionString;
 
         public PostgresConnection()
         {
-            (Host, Database, Username, Password, Port, SSLType) = ("localhost", nameof(ISQExplorer), "root", "", 5432,
-                SslMode.Prefer);
         }
 
         public PostgresConnection(string connString)
@@ -36,13 +34,16 @@ namespace ISQExplorer.Database
             var builder = new NpgsqlConnectionStringBuilder
             {
                 Host = Host,
-                Port = Port,
                 Database = Database,
                 Username = Username,
                 Password = Password,
-                SslMode = SSLType,
                 TrustServerCertificate = AllowSelfSigned
             };
+            
+            if (Port != null)
+                builder.Port = (int) Port;
+            if (SslType != null)
+                builder.SslMode = (SslMode) SslType;
 
             return input.UseNpgsql(builder.ConnectionString);
         }

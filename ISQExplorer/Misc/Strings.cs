@@ -21,10 +21,10 @@ namespace ISQExplorer.Misc
             var matches = Regex.Match(input, pattern).Groups.Values.ToList();
             if (matches.Count == 1 && number <= 1)
             {
-                return matches[0].Value != "" ? matches[0].Value : null;
+                return matches[0].Value != "" ? matches[0].Value : new Optional<string>();
             }
 
-            return matches.Count <= number ? null : matches[number].Value;
+            return matches.Count <= number ? new Optional<string>() : matches[number].Value;
         }
 
         /// <summary>

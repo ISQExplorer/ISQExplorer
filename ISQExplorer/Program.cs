@@ -24,8 +24,6 @@ namespace ISQExplorer
 
             var db = services.GetService<ISQExplorerContext>();
 
-            var test = db.Terms.ToList();
-
             // if the database is empty
             if (db.IsqEntries.None())
             {

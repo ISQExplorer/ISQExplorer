@@ -9,9 +9,10 @@ namespace ISQExplorer.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public CourseModel Course { get; set; }
-        public TermModel Term { get; set; }
-        public ProfessorModel Professor { get; set; }
+
+        public CourseModel Course { get; set; } = null!;
+        public TermModel Term { get; set; } = null!;
+        public ProfessorModel Professor { get; set; } = null!;
         public int Crn { get; set; }
         public int NResponded { get; set; }
         public int NEnrolled { get; set; }
@@ -33,14 +34,14 @@ namespace ISQExplorer.Models
         public double PctWithdraw { get; set; }
         public double MeanGpa { get; set; }
 
-        public bool Equals(ISQEntryModel other)
+        public bool Equals(ISQEntryModel? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return Equals(Course, other.Course) && Term == other.Term && Crn == other.Crn;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

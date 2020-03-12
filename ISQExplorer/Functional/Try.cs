@@ -83,12 +83,23 @@ namespace ISQExplorer.Functional
         /// <param name="message">A message to use if the exception is casted.</param>
         /// <typeparam name="TException">The type of the exception to cast to.</typeparam>
         /// <returns>A new exception if the input exception is not the desired type, or the input exception if it is.</returns>
-        public static TException Cast<TException>(this Exception e, string message = "") where TException : Exception =>
-            e is TException te
-                ? te
-                : (TException) typeof(TException).GetConstructor(new[] {typeof(string), typeof(Exception)})
-                      ?.Invoke(new object[] {message, e}) ?? throw new InvalidOperationException(
-                      $"Exception '{typeof(TException)}' does not have a (string, Exception) constructor.");
+        public static TException Cast<TException>(this Exception e, string message = "") where TException : Exception
+        {
+            if (e is TException te)
+            {
+                return te;
+            }
+
+            var res = typeof(TException).GetConstructor(new[] {typeof(string), typeof(Exception)})
+                ?.Invoke(new object[] {message, e});
+            
+            if (res == null || !(res is TException te2))
+            {
+                throw new InvalidOperationException($"Exception '{typeof(TException)}' does not have a (string, Exception) constructor.");
+            }
+
+            return te2;
+        }
     }
 
     /// <summary>
@@ -107,7 +118,7 @@ namespace ISQExplorer.Functional
         /// <param name="val">The value.</param>
         public Try(T val)
         {
-            (_value, _ex, HasValue) = (val, default, true);
+            (_value, _ex, HasValue) = (val, default!, true);
         }
 
         /// <summary>
@@ -116,7 +127,7 @@ namespace ISQExplorer.Functional
         /// <param name="ex">The exception.</param>
         public Try(Exception ex)
         {
-            (_value, _ex, HasValue) = (default, ex, false);
+            (_value, _ex, HasValue) = (default!, ex, false);
         }
 
         /// <summary>
@@ -127,11 +138,11 @@ namespace ISQExplorer.Functional
         {
             try
             {
-                (_value, _ex, HasValue) = (func(), default, true);
+                (_value, _ex, HasValue) = (func(), default!, true);
             }
             catch (Exception ex)
             {
-                (_value, _ex, HasValue) = (default, ex, false);
+                (_value, _ex, HasValue) = (default!, ex, false);
             }
         }
 
@@ -141,11 +152,24 @@ namespace ISQExplorer.Functional
         /// <param name="other">The other Try.</param>
         public Try(Try<T> other)
         {
-            (_value, _ex, HasValue) = (other.HasValue ? other.Value : default,
-                !other.HasValue ? other.Exception : default, other.HasValue);
+            (_value, _ex, HasValue) = (other.HasValue ? other.Value : default!,
+                !other.HasValue ? other.Exception : default!, other.HasValue);
         }
 
         public T Value
+        {
+            get
+            {
+                if (HasValue)
+                {
+                    return _value;
+                }
+
+                throw new InvalidOperationException($"This Try has an exception, not a value.", _ex);
+            }
+        }
+
+        public T ValueOrThrow
         {
             get
             {
@@ -270,7 +294,7 @@ namespace ISQExplorer.Functional
 
         public override int GetHashCode()
         {
-            return HasValue ? Value.GetHashCode() : Exception.GetHashCode();
+            return HasValue ? Value!.GetHashCode() : Exception!.GetHashCode();
         }
 
         public static bool operator ==(Try<T>? left, Try<T>? right)
@@ -325,7 +349,7 @@ namespace ISQExplorer.Functional
             return !(left == right);
         }
 
-        public override string ToString() => Match(val => val.ToString(), ex => ex.ToString());
+        public override string ToString() => Match(val => val!.ToString(), ex => ex!.ToString())!;
     }
 
     /// <summary>
@@ -345,7 +369,7 @@ namespace ISQExplorer.Functional
         /// <param name="val">The value.</param>
         public Try(T val)
         {
-            (_value, _ex, HasValue) = (val, default, true);
+            (_value, _ex, HasValue) = (val, default!, true);
         }
 
         /// <summary>
@@ -354,7 +378,7 @@ namespace ISQExplorer.Functional
         /// <param name="ex">The exception.</param>
         public Try(TException ex)
         {
-            (_value, _ex, HasValue) = (default, ex, false);
+            (_value, _ex, HasValue) = (default!, ex, false);
         }
 
         /// <summary>
@@ -365,11 +389,11 @@ namespace ISQExplorer.Functional
         {
             try
             {
-                (_value, _ex, HasValue) = (func(), default, true);
+                (_value, _ex, HasValue) = (func(), default!, true);
             }
             catch (TException ex)
             {
-                (_value, _ex, HasValue) = (default, ex, false);
+                (_value, _ex, HasValue) = (default!, ex, false);
             }
         }
 
@@ -380,7 +404,7 @@ namespace ISQExplorer.Functional
         public Try(Try<T, TException> other)
         {
             (_value, _ex, HasValue) = (other.HasValue ? other.Value : default,
-                !other.HasValue ? other.Exception : default, other.HasValue);
+                !other.HasValue ? other.Exception : default!, other.HasValue);
         }
 
         public T Value
@@ -392,7 +416,7 @@ namespace ISQExplorer.Functional
                     return _value;
                 }
 
-                throw new InvalidOperationException($"This Try has an exception, not a value. Exception: '{_ex}'.");
+                throw new InvalidOperationException($"This Try has an exception, not a value.", _ex);
             }
         }
 
@@ -526,7 +550,7 @@ namespace ISQExplorer.Functional
 
         public override int GetHashCode()
         {
-            return HasValue ? Value.GetHashCode() : Exception.GetHashCode();
+            return HasValue ? Value!.GetHashCode() : Exception!.GetHashCode();
         }
 
         public static bool operator ==(Try<T, TException>? left, Try<T, TException>? right)
@@ -581,6 +605,6 @@ namespace ISQExplorer.Functional
             return !(left == right);
         }
 
-        public override string ToString() => Match(val => val.ToString(), ex => ex.ToString());
+        public override string ToString() => Match(val => val!.ToString(), ex => ex!.ToString())!;
     }
 }

@@ -1,4 +1,6 @@
 #nullable enable
+using System;
+using ISQExplorer.Misc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 
@@ -6,21 +8,18 @@ namespace ISQExplorer.Database
 {
     public class SqlServerConnection : IConnection
     {
-        public string Host { get; set; }
-        public string Database { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public int Port { get; set; }
-        public bool UseSSL { get; set; }
+        public string? Host { get; set; }
+        public string? Database { get; set; }
+        public string? Username { get; set; }
+        public string? Password { get; set; }
+        public int? Port { get; set; }
+        public bool UseSsl { get; set; } 
         public bool AllowSelfSigned { get; set; }
         public bool UseIntegratedSecurity { get; set; }
         private readonly string? _connectionString;
-
-
+        
         public SqlServerConnection()
         {
-            (Host, Database, Username, Password, Port, UseSSL, AllowSelfSigned, UseIntegratedSecurity) = ("localhost",
-                nameof(ISQExplorer), "root", "", 1433, false, false, true);
         }
 
         public SqlServerConnection(string connString)
@@ -42,9 +41,20 @@ namespace ISQExplorer.Database
                 builder.Password = Password;
             }
             
-            builder.Encrypt = UseSSL;
+            builder.Encrypt = UseSsl;
             builder.TrustServerCertificate = AllowSelfSigned;
-            builder.DataSource = $"{Host},{Port}";
+            if (Host != null && Port != null)
+            {
+                builder.DataSource = $"{Host},{Port}";
+            }
+            else if (Host != null)
+            {
+                builder.DataSource = $"{Host}";
+                if (Port != null)
+                {
+                    Print.Error("Warning: Cannot specify port without host in the SQL Server connection string builder.", ConsoleColor.Yellow);
+                }
+            }
             builder.InitialCatalog = Database;
             builder.IntegratedSecurity = UseIntegratedSecurity;
 

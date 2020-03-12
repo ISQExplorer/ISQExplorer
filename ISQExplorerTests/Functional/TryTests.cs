@@ -39,7 +39,9 @@ namespace ISQExplorerTests
             var tmp3 = await Try.OfAsync(() => Task.Run(() =>
             {
                 throw new Exception("yeet");
+#pragma warning disable 162
                 return "abc";
+#pragma warning restore 162
             }));
             Assert.False(tmp3.HasValue);
             Assert.AreEqual(tmp3.Exception.Message, "yeet");
@@ -47,7 +49,9 @@ namespace ISQExplorerTests
             var tmp4 = await tmp1.SelectAsync(async x => await Task.Run(() =>
             {
                 throw new Exception("yeetus");
+#pragma warning disable 162
                 return 3;
+#pragma warning restore 162
             }));
             Assert.False(tmp4.HasValue);
             Assert.AreEqual(tmp4.Exception.Message, "yeetus");

@@ -157,7 +157,8 @@ namespace ISQExplorer.Web
             IReadOnlyDictionary<string, string?> postParams) =>
             PostAsync(url,
                 postParams.ToImmutableSortedDictionary()
-                    .Select(x => $"{x.Key.HtmlEncode()}={x.Value.HtmlEncode()}")
+                    .Where(x => x.Value != null)
+                    .Select(x => $"{x.Key.HtmlEncode()}={x.Value!.HtmlEncode()}")
                     .Join("&"));
     }
 }

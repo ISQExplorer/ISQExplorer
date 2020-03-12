@@ -9,7 +9,7 @@ namespace ISQExplorer.Misc
     /// Contains a thread-safe set of elements.
     /// </summary>
     /// <typeparam name="T">The type of the contained elements.</typeparam>
-    public class ConcurrentSet<T> : ICollection<T>
+    public class ConcurrentSet<T> : ICollection<T> where T : notnull
     {
         private readonly ConcurrentDictionary<T, byte> _dict;
 

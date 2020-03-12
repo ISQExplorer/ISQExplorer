@@ -130,7 +130,7 @@ namespace ISQExplorer.Misc
         /// <returns>An enumerable of lines from that reader.</returns>
         public static IEnumerable<string> Lines(this StreamReader reader)
         {
-            string line;
+            string? line;
             while ((line = reader.ReadLine()) != null)
             {
                 yield return line;

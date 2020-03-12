@@ -9,13 +9,13 @@ namespace ISQExplorer.Misc
         /// </summary>
         /// <param name="s">The object to print. Its toString() representation will be used.</param>
         /// <param name="color">The color to print the line in. By default this uses the default color of the terminal.</param>
-        public static void Line(object s, ConsoleColor? color = null)
+        public static void Line(object? s, ConsoleColor? color = null)
         {
             var colorBefore = Console.ForegroundColor;
 
             var col = color ?? Console.ForegroundColor;
             Console.ForegroundColor = col;
-            Console.WriteLine(s.ToString());
+            Console.WriteLine(s?.ToString());
             Console.ForegroundColor = colorBefore;
         }
 

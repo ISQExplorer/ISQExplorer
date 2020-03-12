@@ -58,9 +58,9 @@ namespace ISQExplorer.Functional
             }
         }
 
-        public Result(Exception e)
+        public Result(Exception? e)
         {
-            (IsError, _ex) = (e != null, e);
+            (IsError, _ex) = (e != null, e!);
         }
 
         public Result(Action func)
@@ -68,7 +68,7 @@ namespace ISQExplorer.Functional
             try
             {
                 func();
-                (IsError, _ex) = (false, default);
+                (IsError, _ex) = (false, default!);
             }
             catch (Exception e)
             {
@@ -135,7 +135,7 @@ namespace ISQExplorer.Functional
             try
             {
                 func();
-                (IsError, _ex) = (false, default);
+                (IsError, _ex) = (false, default!);
             }
             catch (TException e)
             {

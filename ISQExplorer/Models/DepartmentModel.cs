@@ -8,7 +8,8 @@ namespace ISQExplorer.Models
     {
         [Key]
         public int Id { get; set; }
-        public string Name { get; set; }
+
+        public string Name { get; set; } = null!;
         public DateTime LastUpdated { get; set; }
 
         public DepartmentModel()
@@ -16,14 +17,14 @@ namespace ISQExplorer.Models
             LastUpdated = DateTime.UtcNow;
         }
 
-        public bool Equals(DepartmentModel other)
+        public bool Equals(DepartmentModel? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return Id == other.Id && Name == other.Name;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

@@ -8,17 +8,17 @@ namespace ISQExplorerTests
     {
         private static object[] _captureTestCases =
         {
-            new object[] {"abcdef", "bcd", 1, "bcd"},
-            new object[] {"abcdef", "a(bcd)e(fg)", 1, null},
-            new object[] {"abcdef", "a(bcd)e", 1, "bcd"},
-            new object[] {"abcdef", "a(bcd)ef", 1, "bcd"},
-            new object[] {"abcdef", "abcd(.*)$", 1, "ef"},
-            new object[] {"abcdef", "(a)", 1, "a"},
-            new object[] {"abcdef", "(ab).*(ef)", 2, "ef"},
-            new object[] {"abcdef", "a(bcd)efg", 1, null},
-            new object[] {"abcdef", "a", 1, "a"},
-            new object[] {"abcdef", "(g)", 1, null},
-            new object[] {"abcdef", "(a)", 2, null},
+            new object?[] {"abcdef", "bcd", 1, "bcd"},
+            new object?[] {"abcdef", "a(bcd)e(fg)", 1, null},
+            new object?[] {"abcdef", "a(bcd)e", 1, "bcd"},
+            new object?[] {"abcdef", "a(bcd)ef", 1, "bcd"},
+            new object?[] {"abcdef", "abcd(.*)$", 1, "ef"},
+            new object?[] {"abcdef", "(a)", 1, "a"},
+            new object?[] {"abcdef", "(ab).*(ef)", 2, "ef"},
+            new object?[] {"abcdef", "a(bcd)efg", 1, null},
+            new object?[] {"abcdef", "a", 1, "a"},
+            new object?[] {"abcdef", "(g)", 1, null},
+            new object?[] {"abcdef", "(a)", 2, null},
         };
 
         [Test]

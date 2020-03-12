@@ -10,17 +10,17 @@ namespace ISQExplorer.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string NNumber { get; set; }
-        public DepartmentModel Department { get; set; }
+        public string FirstName { get; set; } = null!;
+        public string LastName { get; set; } = null!;
+        public string NNumber { get; set; } = null!;
+        public DepartmentModel Department { get; set; } = null!;
 
-        protected bool Equals(ProfessorModel other)
+        protected bool Equals(ProfessorModel? other)
         {
             return other != null && NNumber == other.NNumber;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ISQExplorer.Misc
 {
-    public class Cache<TKey, TValue>
+    public class Cache<TKey, TValue> where TKey : notnull
     {
         private readonly ConcurrentDictionary<TKey, TValue> _dict;
 
@@ -44,7 +44,7 @@ namespace ISQExplorer.Misc
                     _dict.TryRemove(key, out _);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 _dict.TryRemove(key, out _);
             }

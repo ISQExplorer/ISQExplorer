@@ -46,12 +46,12 @@ namespace ISQExplorer.Repositories
             await _context.SaveChangesAsync();
         });
 
-        public async Task<IEnumerable<ISQEntryModel>> ByCourseAsync(CourseModel course, TermModel since = null,
-            TermModel until = null) => await _lock.Read(() =>
+        public async Task<IEnumerable<ISQEntryModel>> ByCourseAsync(CourseModel course, TermModel? since = null,
+            TermModel? until = null) => await _lock.Read(() =>
             Task.FromResult(_context.IsqEntries.Where(x => x.Course == course).When(since, until)));
 
-        public async Task<IEnumerable<ISQEntryModel>> ByProfessorAsync(ProfessorModel professor, TermModel since = null,
-            TermModel until = null) =>
+        public async Task<IEnumerable<ISQEntryModel>> ByProfessorAsync(ProfessorModel professor, TermModel? since = null,
+            TermModel? until = null) =>
             await _lock.Read(() =>
                 Task.FromResult(_context.IsqEntries.Where(x => x.Professor == professor).When(since, until)));
 

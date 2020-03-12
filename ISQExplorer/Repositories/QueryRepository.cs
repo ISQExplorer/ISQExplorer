@@ -20,12 +20,13 @@ namespace ISQExplorer.Repositories
         }
 
         public async Task<IQueryable<ISQEntryModel>> QueryClass(string parameter, QueryType qt, TermModel? since = null,
-            TermModel? until = null)
+            TermModel? until = null) => await Task.Run(() =>
         {
             switch (qt)
             {
                 case QueryType.CourseCode:
-                    return _context.IsqEntries.Where(x => x.Course.CourseCode.Contains(parameter.ToUpper())).When(since, until);
+                    return _context.IsqEntries.Where(x => x.Course.CourseCode.Contains(parameter.ToUpper()))
+                        .When(since, until);
                 case QueryType.CourseName:
                     return _context.IsqEntries.Where(x => x.Course.Name.ToUpper().Contains(parameter.ToUpper()))
                         .When(since, until);
@@ -41,9 +42,9 @@ namespace ISQExplorer.Repositories
                 default:
                     throw new ArgumentException($"Invalid QueryType '{qt}'");
             }
-        }
+        });
 
-        public async Task<IQueryable<ProfessorModel>> NameToProfessors(string professorName)
+        public async Task<IQueryable<ProfessorModel>> NameToProfessors(string professorName) => await Task.Run(() =>
         {
             if (!professorName.Contains(" "))
             {
@@ -63,6 +64,6 @@ namespace ISQExplorer.Repositories
                           prof.FirstName.ToUpper().Equals(fname)
                     select prof;
             }
-        }
+        });
     }
 }

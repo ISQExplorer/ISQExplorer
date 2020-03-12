@@ -10,18 +10,19 @@ namespace ISQExplorer.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public DepartmentModel Department { get; set; }
-        public string CourseCode { get; set; }
-        public string Name { get; set; }
 
-        public bool Equals(CourseModel other)
+        public DepartmentModel Department { get; set; } = null!;
+        public string CourseCode { get; set; } = null!;
+        public string Name { get; set; } = null!;
+
+        public bool Equals(CourseModel? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return Id == other.Id && CourseCode == other.CourseCode && Name == other.Name;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

@@ -101,7 +101,7 @@ namespace ISQExplorer
                         Host = host,
                         Password = password,
                         Username = user,
-                        SSLType = sslType,
+                        SslType = sslType,
                         AllowSelfSigned = sslSelfSigned
                     };
 
@@ -191,7 +191,7 @@ namespace ISQExplorer
                         Host = host,
                         Password = password,
                         Username = user,
-                        UseSSL = sslType,
+                        UseSsl = sslType,
                         UseIntegratedSecurity = sslTrustedConnection,
                         AllowSelfSigned = sslSelfSigned
                     };
@@ -221,34 +221,28 @@ namespace ISQExplorer
         {
             services.AddControllersWithViews();
 
-            var options = new DbContextOptionsBuilder<ISQExplorerContext>();
-            var newOptions = GetConnection().Make(options);
-            var context = new ISQExplorerContext(newOptions.Options);
-
-
-            /*
             services.AddSingleton<ISQExplorerContext>(provider =>
             {
                 var options = new DbContextOptionsBuilder<ISQExplorerContext>();
                 var newOptions = GetConnection().Make(options);
                 return new ISQExplorerContext(newOptions.Options);
             });
-            */
+            
 
             // use dependency injection to make our ISQExplorerContext backed by the sql server we choose 
-            services.AddDbContext<ISQExplorerContext>(options => GetConnection().Make(options));
+            // services.AddDbContext<ISQExplorerContext>(options => GetConnection().Make(options));
             // also add an instance of our repository to dependency injection
             services.AddScoped<IQueryRepository, QueryRepository>();
 
             services.AddSingleton<IHtmlClient, HtmlClient>(s =>
                 new HtmlClient(() => new RateLimiter(3, 1000)));
 
-            services.AddScoped<ITermRepository, TermRepository>();
-            services.AddScoped<IProfessorRepository, ProfessorRepository>();
-            services.AddScoped<ICourseRepository, CourseRepository>();
-            services.AddScoped<IDepartmentRepository, DepartmentRepository>();
-            services.AddScoped<IEntryRepository, EntryRepository>();
-            services.AddScoped<Scraper, Scraper>();
+            services.AddSingleton<ITermRepository, TermRepository>();
+            services.AddSingleton<IProfessorRepository, ProfessorRepository>();
+            services.AddSingleton<ICourseRepository, CourseRepository>();
+            services.AddSingleton<IDepartmentRepository, DepartmentRepository>();
+            services.AddSingleton<IEntryRepository, EntryRepository>();
+            services.AddSingleton<Scraper, Scraper>();
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/build"; });

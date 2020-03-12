@@ -13,12 +13,12 @@ namespace ISQExplorer.Functional
 
         public Either(TLeft val)
         {
-            (HasLeft, HasRight, _left, _right) = (true, false, val, default);
+            (HasLeft, HasRight, _left, _right) = (true, false, val, default!);
         }
 
         public Either(TRight val)
         {
-            (HasLeft, HasRight, _left, _right) = (false, true, default, val);
+            (HasLeft, HasRight, _left, _right) = (false, true, default!, val);
         }
 
         public TLeft Left =>
@@ -73,7 +73,7 @@ namespace ISQExplorer.Functional
                    EqualityComparer<TRight>.Default.Equals(_right, other._right);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
@@ -93,6 +93,6 @@ namespace ISQExplorer.Functional
             }
         }
 
-        public override string ToString() => HasLeft ? Left.ToString() : Right.ToString();
+        public override string ToString() => HasLeft ? Left!.ToString()! : Right!.ToString()!;
     }
 }

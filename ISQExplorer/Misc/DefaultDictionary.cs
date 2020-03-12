@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ISQExplorer.Misc
 {
-    public class DefaultDictionary<TKey, TValue> : Dictionary<TKey, TValue>
+    public class DefaultDictionary<TKey, TValue> : Dictionary<TKey, TValue> where TKey : notnull
     {
         private readonly Func<TValue> _defaultFactory;
 
