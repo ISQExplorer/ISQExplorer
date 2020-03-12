@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using ISQExplorer.Misc;
 using ISQExplorer.Models;
@@ -22,6 +23,8 @@ namespace ISQExplorer
             var services = scope.ServiceProvider;
 
             var db = services.GetService<ISQExplorerContext>();
+
+            var test = db.Terms.ToList();
 
             // if the database is empty
             if (db.IsqEntries.None())

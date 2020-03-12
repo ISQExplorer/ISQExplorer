@@ -3,10 +3,15 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ISQExplorer.Models
 {
-    public class TermModel : IEquatable<TermModel>, IComparable<TermModel>
+    public class TermModel : IEquatable<TermModel>//, IComparable<TermModel>
     {
-        [Key] public int Id { get; set; }
+        [Key]
+        public int Id { get; set; }
         public string Name { get; set; }
+
+        public TermModel()
+        {
+        }
 
         public bool Equals(TermModel other)
         {
@@ -31,6 +36,7 @@ namespace ISQExplorer.Models
             }
         }
 
+        /*
         public int CompareTo(TermModel other) => this.Id - other.Id;
 
         public static bool operator >(TermModel t1, TermModel t2) =>
@@ -44,6 +50,7 @@ namespace ISQExplorer.Models
 
         public static bool operator <=(TermModel t1, TermModel t2) =>
             t1 == t2 || t1 < t2;
+            */
 
         public static bool operator ==(TermModel t1, TermModel t2) =>
             ReferenceEquals(t1, t2) || (!ReferenceEquals(t1, null) && t1.Equals(t2));

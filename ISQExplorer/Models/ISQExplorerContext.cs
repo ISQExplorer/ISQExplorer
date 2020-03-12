@@ -16,19 +16,29 @@ namespace ISQExplorer.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // you cannot specify any FK's as indices
+            // you will get a very cryptic error if you do
+            
             modelBuilder.Entity<CourseModel>()
-                .HasIndex(c => c.CourseCode);
+                .HasIndex(c => c.CourseCode)
+                .IsUnique();
             modelBuilder.Entity<DepartmentModel>()
-                .HasIndex(c => c.Name);
-            modelBuilder.Entity<ISQEntryModel>()
-                .HasIndex(c => new {c.Crn, c.Term});
+                .HasIndex(c => c.Name)
+                .IsUnique();
             modelBuilder.Entity<ProfessorModel>()
-                .HasIndex(c => c.NNumber);
+                 .HasIndex(c => c.NNumber)
+                 .IsUnique();
             modelBuilder.Entity<TermModel>()
-                .HasIndex(c => c.Name);
-
+                 .HasIndex(c => c.Name)
+                 .IsUnique();
             modelBuilder.Entity<ISQEntryModel>()
                 .HasOne<TermModel>();
+
+
+            /*
+            modelBuilder.Entity<ISQEntryModel>()
+                .HasOne<TermModel>();
+                */
         }
     }
 }

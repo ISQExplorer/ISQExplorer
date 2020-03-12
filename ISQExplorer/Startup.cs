@@ -56,6 +56,8 @@ namespace ISQExplorer
                     var portString = Environment.GetEnvironmentVariable("ISQEXPLORER_DB_PORT");
                     var db = Environment.GetEnvironmentVariable("ISQEXPLORER_DB_DATABASE");
                     var ssl = Environment.GetEnvironmentVariable("ISQEXPLORER_DB_SSL");
+                    var sslSelfSignedString =
+                        Environment.GetEnvironmentVariable("ISQEXPLORER_DB_SSL_ALLOW_SELF_SIGNED");
 
                     var sslType = ssl?.ToLower() switch
                     {
@@ -76,13 +78,31 @@ namespace ISQExplorer
                             $"Environment variable ISQEXPLORER_DB_SSL for PostgreSQL connections must be set to one of 'required', 'preferred', 'disabled'. Was set to '${x}'")
                     };
 
+                    var sslSelfSigned = sslSelfSignedString?.ToLower() switch
+                    {
+                        var x when
+                        x == "yes" ||
+                        x == "true" ||
+                        x == "1" => true,
+
+                        var x when
+                        x == "0" ||
+                        x == "false" ||
+                        x == "no" ||
+                        x == null => false,
+
+                        var x => throw new ArgumentException(
+                            $"Environment variable ISQEXPLORER_DB_SSL_ALLOW_SELF_SIGNED for SQL Server connections must be set to one of '1', '0'. Was set to '${x}'")
+                    };
+
                     var ret = new PostgresConnection
                     {
                         Database = db,
                         Host = host,
                         Password = password,
                         Username = user,
-                        SSLType = sslType
+                        SSLType = sslType,
+                        AllowSelfSigned = sslSelfSigned
                     };
 
                     if (portString != null)
@@ -206,27 +226,29 @@ namespace ISQExplorer
             var context = new ISQExplorerContext(newOptions.Options);
 
 
+            /*
             services.AddSingleton<ISQExplorerContext>(provider =>
             {
                 var options = new DbContextOptionsBuilder<ISQExplorerContext>();
                 var newOptions = GetConnection().Make(options);
                 return new ISQExplorerContext(newOptions.Options);
             });
+            */
 
             // use dependency injection to make our ISQExplorerContext backed by the sql server we choose 
-            // services.AddDbContext<ISQExplorerContext>(options => GetConnection().Make(options));
+            services.AddDbContext<ISQExplorerContext>(options => GetConnection().Make(options));
             // also add an instance of our repository to dependency injection
             services.AddScoped<IQueryRepository, QueryRepository>();
 
             services.AddSingleton<IHtmlClient, HtmlClient>(s =>
                 new HtmlClient(() => new RateLimiter(3, 1000)));
 
-            services.AddSingleton<ITermRepository, TermRepository>();
-            services.AddSingleton<IProfessorRepository, ProfessorRepository>();
-            services.AddSingleton<ICourseRepository, CourseRepository>();
-            services.AddSingleton<IDepartmentRepository, DepartmentRepository>();
-            services.AddSingleton<IEntryRepository, EntryRepository>();
-            services.AddSingleton<Scraper, Scraper>();
+            services.AddScoped<ITermRepository, TermRepository>();
+            services.AddScoped<IProfessorRepository, ProfessorRepository>();
+            services.AddScoped<ICourseRepository, CourseRepository>();
+            services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+            services.AddScoped<IEntryRepository, EntryRepository>();
+            services.AddScoped<Scraper, Scraper>();
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/build"; });

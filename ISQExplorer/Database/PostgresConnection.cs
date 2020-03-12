@@ -12,6 +12,7 @@ namespace ISQExplorer.Database
         public string Password { get; set; }
         public int Port { get; set; }
         public SslMode SSLType { get; set; }
+        public bool AllowSelfSigned { get; set; }
         private readonly string? _connectionString;
 
         public PostgresConnection()
@@ -39,7 +40,8 @@ namespace ISQExplorer.Database
                 Database = Database,
                 Username = Username,
                 Password = Password,
-                SslMode = SSLType
+                SslMode = SSLType,
+                TrustServerCertificate = AllowSelfSigned
             };
 
             return input.UseNpgsql(builder.ConnectionString);
