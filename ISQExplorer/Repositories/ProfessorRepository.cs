@@ -13,10 +13,10 @@ namespace ISQExplorer.Repositories
 {
     public class ProfessorRepository : IProfessorRepository
     {
-        private readonly DefaultDictionary<DepartmentModel, IDictionary<string, ProfessorModel>> _lastNameToProfessor;
-        private readonly DefaultDictionary<DepartmentModel, IDictionary<string, ProfessorModel>> _firstNameToProfessor;
-        private readonly DefaultDictionary<DepartmentModel, IDictionary<string, ProfessorModel>> _nameToProfessor;
-        private readonly DefaultDictionary<DepartmentModel, IDictionary<string, ProfessorModel>> _nNumberToProfessor;
+        private readonly DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>> _lastNameToProfessor;
+        private readonly DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>> _firstNameToProfessor;
+        private readonly DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>> _nameToProfessor;
+        private readonly DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>> _nNumberToProfessor;
         private readonly ISQExplorerContext _context;
 
         private readonly DefaultDictionary<DepartmentModel, ReadWriteLock> _locks;
@@ -32,17 +32,17 @@ namespace ISQExplorer.Repositories
         public ProfessorRepository(ISQExplorerContext context)
         {
             _lastNameToProfessor =
-                new DefaultDictionary<DepartmentModel, IDictionary<string, ProfessorModel>>(() =>
-                    new Dictionary<string, ProfessorModel>());
+                new DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>(() =>
+                    new OptionalDictionary<string, ProfessorModel>());
             _firstNameToProfessor =
-                new DefaultDictionary<DepartmentModel, IDictionary<string, ProfessorModel>>(() =>
-                    new Dictionary<string, ProfessorModel>());
+                new DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>(() =>
+                    new OptionalDictionary<string, ProfessorModel>());
             _nameToProfessor =
-                new DefaultDictionary<DepartmentModel, IDictionary<string, ProfessorModel>>(() =>
-                    new Dictionary<string, ProfessorModel>());
+                new DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>(() =>
+                    new OptionalDictionary<string, ProfessorModel>());
             _nNumberToProfessor =
-                new DefaultDictionary<DepartmentModel, IDictionary<string, ProfessorModel>>(() =>
-                    new Dictionary<string, ProfessorModel>());
+                new DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>(() =>
+                    new OptionalDictionary<string, ProfessorModel>());
             _locks = new DefaultDictionary<DepartmentModel, ReadWriteLock>(() => new ReadWriteLock());
             _context = context;
 

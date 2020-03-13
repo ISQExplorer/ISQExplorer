@@ -102,6 +102,9 @@ namespace ISQExplorer.Misc
             }
         }
 
+        public static Task ForEachAsync<T>(this IEnumerable<T> enumerable, Func<T, Task> action) =>
+            Task.WhenAll(enumerable.Select(action));
+
         /// <summary>
         /// Returns the index of a given element in an enumerable, or -1 if it was not found.
         /// </summary>
@@ -119,6 +122,7 @@ namespace ISQExplorer.Misc
                     return i;
                 }
             }
+
             return -1;
         }
 
@@ -179,7 +183,7 @@ namespace ISQExplorer.Misc
             for (var i = 0; i < stop; ++i)
             {
                 yield return i;
-            }            
+            }
         }
 
         /// <summary>
@@ -235,7 +239,7 @@ namespace ISQExplorer.Misc
         public static IList<T> ToShuffledList<T>(this IEnumerable<T> enumerable, int? seed = null)
         {
             var list = enumerable.ToList();
-            var rng = new Random(seed ?? (int)DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds);
+            var rng = new Random(seed ?? (int) DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds);
 
             for (var i = list.Count - 1; i > 0; --i)
             {
@@ -244,65 +248,8 @@ namespace ISQExplorer.Misc
                 list[i] = list[randIndex];
                 list[randIndex] = temp;
             }
+
             return list;
-        }
-
-        /// <summary>
-        /// Executes a function for each element of the input enumerable, indicating if any of them threw an exception.
-        /// This fails fast if any of the instances throw.
-        /// </summary>
-        /// <param name="enumerable">The enumerable.</param>
-        /// <param name="action">The function.</param>
-        /// <typeparam name="T">The type of the enumerable.</typeparam>
-        /// <returns>An Optional[Exception] containing the first exception thrown.</returns>
-        public static async Task<Optional<Exception>> TryAllParallel<T>(this IEnumerable<T> enumerable,
-            Func<T, Task<Optional<Exception>>> action)
-        {
-            try
-            {
-                var res = await Task.WhenAll(enumerable.AsParallel().Select(action));
-                return res.Any(x => x.HasValue) ? res.First(x => x.HasValue) : new Optional<Exception>();
-            }
-            catch (Exception e)
-            {
-                return e;
-            }
-        }
-
-        /// <summary>
-        /// Executes a function for each element of the input enumerable, indicating if any of them threw an exception.
-        /// This fails fast if any of the instances throw.
-        /// </summary>
-        /// <param name="enumerable">The enumerable.</param>
-        /// <param name="action">The function.</param>
-        /// <typeparam name="T">The type of the enumerable.</typeparam>
-        /// <returns>An Optional[Exception] containing the first exception thrown.</returns>
-        public static async Task<Optional<Exception>> TryAllParallel<T>(this IEnumerable<T> enumerable,
-            Func<T, Task> action)
-        {
-            try
-            {
-                await Task.WhenAll(enumerable.AsParallel().Select(action));
-                return new Optional<Exception>();
-            }
-            catch (Exception e)
-            {
-                return e;
-            }
-        }
-
-        /// <summary>
-        /// Executes a function for each element of the input enumerable, indicating if any of them threw an exception.
-        /// This fails fast if any of the instances throw.
-        /// </summary>
-        /// <param name="enumerable">The enumerable.</param>
-        /// <param name="action">The function.</param>
-        /// <typeparam name="T">The type of the enumerable.</typeparam>
-        /// <returns>An Optional[Exception] containing the first exception thrown.</returns>
-        public static async Task<Optional<Exception>> TryAllParallel<T>(this IEnumerable<T> enumerable,
-            Action<T> action)
-        {
-            return await enumerable.TryAllParallel(y => Task.Run(() => action(y)));
         }
     }
 }

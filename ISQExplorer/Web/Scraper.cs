@@ -40,7 +40,7 @@ namespace ISQExplorer.Web
             (await HtmlClient.GetAsync(Urls.DeptSchedule)).Value.Query<IHtmlSelectElement>("#dept_id").Value
                 .Children<IHtmlOptionElement>().Value.Skip(1)
                 .ForEach(async e =>
-                    await Departments.AddAsync(new DepartmentModel {Id = Parse.Int(e.Id).Value, Name = e.Label}));
+                    await Departments.AddAsync(new DepartmentModel {Id = Parse.Int(e.Value).Value, Name = e.Label}));
         });
 
         public Task<Result> ScrapeTermsAsync() => Result.OfAsync(async () =>
@@ -69,7 +69,11 @@ namespace ISQExplorer.Web
                 throw new HtmlElementException(tables.Last(), "Expected a column in the main table titled 'Course'.");
             }
 
-            var links = tab["Course"].Select(x => x.Cast<IHtmlAnchorElement>()).ToList();
+            var links = tab["Course"]
+                .Where(x => x.Children.Length == 1)
+                .Select(x => x.Children.First().Cast<IHtmlAnchorElement>())
+                .ToList();
+
             var titles = tab["Title"].ToList();
 
             if (links.Count != titles.Count)
@@ -77,7 +81,7 @@ namespace ISQExplorer.Web
                 throw new WtfException("Different lengths of Course and Title column in the same table.");
             }
 
-            links.Where(x => !x.HasValue && x.Exception.Element.TextContent.HtmlDecode().IsBlank()).ForEach(val =>
+            links.Where(x => !x.HasValue && !x.Exception.Element.TextContent.HtmlDecode().IsBlank()).ForEach(val =>
             {
                 Errors.Add(new CourseScrapeException(
                     "The given cell was not an <a> element.", val.Exception.Element.TextContent, dept, term));
@@ -111,53 +115,66 @@ namespace ISQExplorer.Web
             }
 
             var tab = HtmlTable.Create(tables.Last()).Value;
-            if (!tab.ColumnTitles.Contains("Professor"))
+            if (!tab.ColumnTitles.Contains("Instructor"))
             {
                 throw new HtmlElementException(tables.Last(),
-                    "Expected a column in the main table titled 'Professor'.");
+                    "Expected a column in the main table titled 'Instructor'.");
             }
 
-            var links = tab["Professor"].Select(x => x.Cast<IHtmlAnchorElement>()).ToList();
+            var links = tab["Instructor"]
+                .Where(x => x.Children.Length == 1)
+                .Select(x => x.Children.First().Cast<IHtmlAnchorElement>()).ToList();
 
-            links.Where(x => !x.HasValue && x.Exception.Element.TextContent.HtmlDecode().IsBlank()).ForEach(val =>
+            links.Where(x => !x.HasValue && !x.Exception.Element.TextContent.HtmlDecode().IsBlank()).ForEach(val =>
             {
                 Errors.Add(new ProfessorScrapeException(
                     $"The given cell with OuterHTML '{val.Exception.Element.OuterHtml}' was not an <a> element.", null,
                     dept, term));
             });
 
-            links.Where(x => x.HasValue).Select(x => x.Value).ForEach(async val =>
-            {
-                var lname = val.TextContent;
-                var nNumber = val.Href.Capture(@"[nN]\d{8}").Select(x => x.ToUpper());
-                if (!nNumber)
+            var nNumbers = links.Values()
+                .Where(x => !x.TextContent.HtmlDecode().IsBlank())
+                .Select(x => Try.Of(() =>
                 {
-                    Errors.Add(
-                        new ProfessorScrapeException($"The URL {val.Href} does not contain an N-Number.", null, dept,
-                            term));
-                    return;
-                }
+                    var lname = x.TextContent;
+                    var nNumber = x.Href.Capture(@"[nN]\d{8}").Select(y => y.ToUpper());
+                    if (!nNumber)
+                    {
+                        throw new ProfessorScrapeException($"The URL '{x.Href}' does not contain an N-Number.",
+                            null,
+                            dept,
+                            term);
+                    }
 
-                if (await Professors.FromNNumberAsync(dept, nNumber.Value)) return;
+                    return nNumber.Value;
+                }))
+                .ToList();
 
-                var page = (await HtmlClient.GetAsync(Urls.ProfessorPage(nNumber.Value))).Value;
+            nNumbers.Exceptions().ForEach(ex => Errors.Add(ex));
+            
+            await nNumbers.Values().ToHashSet().AsParallel().ForEachAsync(async nNumber =>
+            {
+                if (await Professors.FromNNumberAsync(dept, nNumber)) return;
+
+                var page = (await HtmlClient.GetAsync(Urls.ProfessorPage(nNumber))).Value;
 
                 var professorName = Try.Of(() => page.QueryAll<IHtmlTableCellElement>("td.dddefault").First(
                     elem => elem.PreviousElementSibling?.TextContent.HtmlDecode().Trim() == "Instructor:"));
 
                 if (!professorName)
                 {
-                    throw new ProfessorScrapeException(
-                        $"Could not find instructor name on '{Urls.ProfessorPage(nNumber.Value)}'.",
-                        professorName.Exception, nNumber.Value, dept, term);
+                    Errors.Add(new ProfessorScrapeException(
+                        $"Could not find instructor name on '{Urls.ProfessorPage(nNumber)}'.",
+                        professorName.Exception, nNumber, dept, term));
+                    return;
                 }
 
                 await Professors.AddAsync(new ProfessorModel
                 {
                     Department = dept,
                     FirstName = professorName.Value.TextContent.Split(" ").SkipLast(1).Join(" "),
-                    LastName = lname,
-                    NNumber = nNumber.Value
+                    LastName = professorName.Value.TextContent.Split(" ").Last(),
+                    NNumber = nNumber
                 });
             });
         });
@@ -194,6 +211,7 @@ namespace ISQExplorer.Web
 
             var mainRows = mainTable.Value.Rows.GroupBy(x => (x["Term"], x["CRN"], x["Course"]))
                 .ToDictionary(x => x.Key, x => x.First());
+
             var gpaRows = gpaTable.Value.Rows.GroupBy(x => (x["Term"], x["CRN"], x["Course"]))
                 .ToDictionary(x => x.Key, x => x.First());
 
@@ -276,9 +294,7 @@ namespace ISQExplorer.Web
                     Errors.Add(res2.Error);
                 }
             });
-
             Professors.AsParallel().ForEach(async prof => await ScrapeProfessorEntriesAsync(prof));
-            
             return new Result();
         });
     }

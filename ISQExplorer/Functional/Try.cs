@@ -1,5 +1,7 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ISQExplorer.Functional
@@ -13,7 +15,6 @@ namespace ISQExplorer.Functional
         /// <typeparam name="T">The type of the Try.</typeparam>
         /// <returns>A Try of the same type as the return value of the function.</returns>
         public static Try<T> Of<T>(Func<T> func) => new Try<T>(func);
-
 
         /// <summary>
         /// Constructs a Try out of the given value.
@@ -92,14 +93,29 @@ namespace ISQExplorer.Functional
 
             var res = typeof(TException).GetConstructor(new[] {typeof(string), typeof(Exception)})
                 ?.Invoke(new object[] {message, e});
-            
+
             if (res == null || !(res is TException te2))
             {
-                throw new InvalidOperationException($"Exception '{typeof(TException)}' does not have a (string, Exception) constructor.");
+                throw new InvalidOperationException(
+                    $"Exception '{typeof(TException)}' does not have a (string, Exception) constructor.");
             }
 
             return te2;
         }
+
+        public static IEnumerable<Exception> Exceptions<T>(this IEnumerable<Try<T>> enumerable) =>
+            enumerable.Where(x => !x.HasValue).Select(x => x.Exception);
+
+        public static IEnumerable<TException>
+            Exceptions<T, TException>(this IEnumerable<Try<T, TException>> enumerable) where TException : Exception =>
+            enumerable.Where(x => !x.HasValue).Select(x => x.Exception);
+
+        public static IEnumerable<T> Values<T>(this IEnumerable<Try<T>> enumerable) =>
+            enumerable.Where(x => x.HasValue).Select(x => x.Value);
+
+        public static IEnumerable<T> Values<T, TExeption>(this IEnumerable<Try<T, TExeption>> enumerable)
+            where TExeption : Exception =>
+            enumerable.Where(x => x.HasValue).Select(x => x.Value);
     }
 
     /// <summary>

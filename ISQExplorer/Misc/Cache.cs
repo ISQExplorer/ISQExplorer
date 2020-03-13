@@ -1,11 +1,13 @@
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace ISQExplorer.Misc
 {
-    public class Cache<TKey, TValue> where TKey : notnull
+    public class Cache<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>> where TKey : notnull
     {
         private readonly ConcurrentDictionary<TKey, TValue> _dict;
 
@@ -49,5 +51,9 @@ namespace ISQExplorer.Misc
                 _dict.TryRemove(key, out _);
             }
         });
+
+        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() => _dict.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
