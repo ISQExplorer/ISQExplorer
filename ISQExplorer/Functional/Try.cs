@@ -126,6 +126,7 @@ namespace ISQExplorer.Functional
     {
         private readonly T _value;
         private readonly Exception _ex;
+        private readonly string _stackTrace;
         public bool HasValue { get; }
 
         /// <summary>
@@ -135,6 +136,7 @@ namespace ISQExplorer.Functional
         public Try(T val)
         {
             (_value, _ex, HasValue) = (val, default!, true);
+            _stackTrace = Environment.StackTrace;
         }
 
         /// <summary>
@@ -144,6 +146,7 @@ namespace ISQExplorer.Functional
         public Try(Exception ex)
         {
             (_value, _ex, HasValue) = (default!, ex, false);
+            _stackTrace = Environment.StackTrace;
         }
 
         /// <summary>
@@ -160,6 +163,7 @@ namespace ISQExplorer.Functional
             {
                 (_value, _ex, HasValue) = (default!, ex, false);
             }
+            _stackTrace = Environment.StackTrace;
         }
 
         /// <summary>
@@ -170,6 +174,7 @@ namespace ISQExplorer.Functional
         {
             (_value, _ex, HasValue) = (other.HasValue ? other.Value : default!,
                 !other.HasValue ? other.Exception : default!, other.HasValue);
+            _stackTrace = Environment.StackTrace;
         }
 
         public T Value
@@ -181,7 +186,7 @@ namespace ISQExplorer.Functional
                     return _value;
                 }
 
-                throw new InvalidOperationException($"This Try has an exception, not a value.", _ex);
+                throw new InvalidOperationException($"This Try has an exception, not a value.\nStack trace of original Try: {_stackTrace}.", _ex);
             }
         }
 
@@ -377,6 +382,7 @@ namespace ISQExplorer.Functional
     {
         private readonly T _value;
         private readonly TException _ex;
+        private readonly string _stackTrace;
         public bool HasValue { get; }
 
         /// <summary>
@@ -386,6 +392,7 @@ namespace ISQExplorer.Functional
         public Try(T val)
         {
             (_value, _ex, HasValue) = (val, default!, true);
+            _stackTrace = Environment.StackTrace;
         }
 
         /// <summary>
@@ -395,6 +402,7 @@ namespace ISQExplorer.Functional
         public Try(TException ex)
         {
             (_value, _ex, HasValue) = (default!, ex, false);
+            _stackTrace = Environment.StackTrace;
         }
 
         /// <summary>
@@ -411,6 +419,7 @@ namespace ISQExplorer.Functional
             {
                 (_value, _ex, HasValue) = (default!, ex, false);
             }
+            _stackTrace = Environment.StackTrace;
         }
 
         /// <summary>
@@ -421,6 +430,7 @@ namespace ISQExplorer.Functional
         {
             (_value, _ex, HasValue) = (other.HasValue ? other.Value : default,
                 !other.HasValue ? other.Exception : default!, other.HasValue);
+            _stackTrace = Environment.StackTrace;
         }
 
         public T Value
@@ -432,7 +442,7 @@ namespace ISQExplorer.Functional
                     return _value;
                 }
 
-                throw new InvalidOperationException($"This Try has an exception, not a value.", _ex);
+                throw new InvalidOperationException($"This Try has an exception, not a value.\nStack trace of original Try: {_stackTrace}.", _ex);
             }
         }
 

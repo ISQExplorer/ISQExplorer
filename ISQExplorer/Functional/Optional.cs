@@ -1,9 +1,16 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ISQExplorer.Functional
 {
+    public static class Optional
+    {
+        public static IEnumerable<T> Values<T>(this IEnumerable<Optional<T>> enumerable) =>
+            enumerable.Where(x => x.HasValue).Select(x => x.Value);
+    }
+    
     /// <summary>
     /// Represents a value that can or can not be present.
     /// This is a replacement for nullable types since they don't quite work at the moment.
@@ -15,6 +22,7 @@ namespace ISQExplorer.Functional
     /// <typeparam name="T">The type of the underlying optional value.</typeparam>
     public struct Optional<T> : IEquatable<Optional<T>>
     {
+        private readonly string _stackTrace;
         private readonly T _value;
 
         /// <summary>
@@ -29,6 +37,8 @@ namespace ISQExplorer.Functional
         public Optional(T value)
         {
             (_value, HasValue) = (value, value != null);
+
+            _stackTrace = Environment.StackTrace;
         }
 
         /// <summary>
@@ -41,7 +51,7 @@ namespace ISQExplorer.Functional
             {
                 if (!HasValue)
                 {
-                    throw new InvalidOperationException("This Optional does not have a value.");
+                    throw new InvalidOperationException($"This Optional does not have a value.\nStack trace: {_stackTrace}");
                 }
 
                 return _value;

@@ -1,0 +1,3903 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/transitional.dtd">
+<HTML lang="en">
+<head>
+    <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Pragma" name="Cache-Control" content="no-cache">
+    <meta http-equiv="Cache-Control" name="Cache-Control" content="no-cache">
+    <LINK REL="stylesheet" HREF="/css/web_calendar.css" TYPE="text/css">
+    <LINK REL="stylesheet" HREF="/css/web_hover.css" TYPE="text/css">
+    <LINK REL="stylesheet" HREF="/css/jquery-ui.css" TYPE="text/css">
+    <LINK REL="stylesheet" href="/css/jquery.dataTables.css" TYPE="text/css">
+    <LINK REL="stylesheet" href="/css/dataTables.fixedColumns.min.css" TYPE="text/css">
+    <LINK REL="stylesheet" href="/css/dataTables.fixedHeader.min.css " TYPE="text/css">
+    <LINK REL="stylesheet" HREF="/css/web_defaultapp.css" TYPE="text/css">
+    <style>
+        DIV.circlediv {
+            width:100%;
+            border-style: solid;
+            border-width: 1px;
+            border-radius: 10px;
+            margin: 10px 2px 2px 0px;
+        }
+
+        .accordion {border: 4px ;
+            background: #013f70; overflow:hidden;
+            background: -moz-linear-gradient(left,  #013f70 17%, #1f89c5 82%);
+            background: -webkit-gradient(linear, left top, right top, color-stop(17%,#013f70), color-stop(82%,#1f89c5));
+            background: -webkit-linear-gradient(left,  #013f70 17%,#1f89c5 82%);
+            background: -o-linear-gradient(left,  #013f70 17%,#1f89c5 82%);
+            background: -ms-linear-gradient(left,  #013f70 17%,#1f89c5 82%);
+            background: linear-gradient(to right,  #013f70 17%,#1f89c5 82%);
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#013f70', endColorstr='#1f89c5',GradientType=1 );
+            color:white;
+            padding: 5px 10px 5px 10px;
+            border-radius: 10px;
+            font-size:calc(8px + .65vw);
+            cursor: pointer;
+            margin: 2px;
+        }
+
+        .accordion:hover {
+            background-image: linear-gradient(green, lightgreen);
+        }
+
+        }
+        .nonaccord {border: 4px ;
+            background: #013f70; overflow:hidden;
+            background: -moz-linear-gradient(left,  #013f70 17%, #1f89c5 82%);
+            background: -webkit-gradient(linear, left top, right top, color-stop(17%,#013f70), color-stop(82%,#1f89c5));
+            background: -webkit-linear-gradient(left,  #013f70 17%,#1f89c5 82%);
+            background: -o-linear-gradient(left,  #013f70 17%,#1f89c5 82%);
+            background: -ms-linear-gradient(left,  #013f70 17%,#1f89c5 82%);
+            background: linear-gradient(to right,  #013f70 17%,#1f89c5 82%);
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#013f70', endColorstr='#1f89c5',GradientType=1 );
+            color:white;
+            padding: 5px 10px 5px 10px;
+            border-radius: 10px;
+            font-size:calc(8px + .65vw);
+            margin: 2px;
+        }
+
+        .panel {
+            padding: 5px 10px 5px 10px;
+            font-size:calc(8px + .5vw);
+            color:black;
+            display: none;
+            margin: 2px;
+        }
+
+        .responsive {
+            border: 4px ;
+            padding: 5px 10px 5px 10px;
+            border-radius: 10px;
+            font-size:calc(8px + .5vw);
+            margin: 2px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style><LINK REL="stylesheet" HREF="/css/web_defaultprint.css" TYPE="text/css" media="print">
+    <title>ISQ and Grade Distributions for Instructor</title>
+    <script src="/javascripts/jquery-1.11.0.min.js" type="text/javascript"></script>
+    <script src="/javascripts/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="/javascripts/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="/javascripts/dataTables.fixedColumns.min.js" type="text/javascript"></script>
+    <script src="/javascripts/dataTables.fixedHeader.min.js" type="text/javascript"></script>
+    <script src="/javascripts/jquery.tablesorter.min.js" type="text/javascript"></script>
+    <script src="/javascripts/EZCalendar.js" type="text/javascript" defer="defer"></script>
+    <script type="text/javascript" src="/ckeditor/ckeditor.js"></script>
+    <meta http-equiv="Content-Script-Type" name="Default_Script_Language" content="text/javascript">
+    <SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+        <!-- Hide JavaScript from older browsers
+        window.onunload = function() {submitcount=0;}
+        var submitcount=0;
+        function checkSubmit() {
+            if (submitcount == 0)
+            {
+                submitcount++;
+                return true;
+            }
+            else
+            {
+                alert("Your changes have already been submitted.");
+                return false;
+            }
+        }
+        //  End script hiding -->
+    </SCRIPT>
+    <SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+        <!-- Hide JavaScript from older browsers
+        //  Function to open a window
+        function windowOpen(window_url) {
+            helpWin = window.open(window_url,'','toolbar=yes,status=no,scrollbars=yes,menubar=yes,resizable=yes,directories=no,location=no,width=350,height=400');
+            if (document.images) {
+                if (helpWin) helpWin.focus()
+            }
+        }
+        //  End script hiding -->
+    </SCRIPT>
+</head>
+<body>
+<div class="headerwrapperdiv">
+    <div class="pageheaderdiv1">
+        <a href="#main_content" onMouseover="window.status='Go to Main Content'; return true" onMouseout="window.status=''; return true" OnFocus="window.status='Go to Main Content'; return true" onBlur="window.status=''; return true" class="skiplinks">Go to Main Content</a>
+        <h1><div align=right><font color=000099>&nbsp;</h1></DIV><div class="headerlinksdiv">
+</DIV>
+    <table  CLASS="plaintable" SUMMARY="This table displays Menu Items and Banner Search textbox."
+            WIDTH="100%">
+        <tr>
+            <TD CLASS="pldefault">
+                <div class="headerlinksdiv2">
+                    &nbsp;
+                </div>
+            </TD>
+            <TD ALIGN="RIGHT" CLASS="pldefault">
+<SPAN class="pageheaderlinks">
+<a href="/wtlhelp/twbhhelp.htm" accesskey="H" onClick="popup = window.open('/wtlhelp/twbhhelp.htm', 'PopupPage','height=500,width=450,scrollbars=yes,resizable=yes'); return false" target="_blank" onMouseOver="window.status='';  return true" onMouseOut="window.status=''; return true"onFocus="window.status='';  return true" onBlur="window.status=''; return true"  class="submenulinktext2">HELP</a>
+|
+<a href="twbkwbis.P_Logout" accesskey="3" class="submenulinktext2">EXIT</a>
+</span>
+            </TD>
+        </tr>
+    </table>
+</DIV>
+<div class="pagetitlediv">
+    <table  CLASS="plaintable" SUMMARY="This table displays title and static header displays."
+            WIDTH="100%">
+        <tr>
+            <TD CLASS="pldefault">
+                <h2>ISQ and Grade Distributions for Instructor</h2>
+            </TD>
+            <TD CLASS="pldefault">
+                &nbsp;
+            </TD>
+            <TD CLASS="pldefault"><p class="rightaligntext" /p>
+                <div class="staticheaders">
+                </div>
+            </TD>
+        </tr>
+        <tr>
+            <TD class="bg3" width="100%" colSpan=3><img src="/wtlgifs/web_transparent.gif" alt="Transparent Image" CLASS="headerImg" TITLE="Transparent Image"  NAME="web_transparent" HSPACE=0 VSPACE=0 BORDER=0 HEIGHT=3 WIDTH=10 /></TD>
+        </tr>
+    </table>
+    <a name="main_content"></a>
+</DIV>
+<div class="pagebodydiv">
+    <!--  ** END OF twbkwbis.P_OpenDoc **  -->
+    <div class="infotextdiv"><table  CLASS="infotexttable" SUMMARY="This layout table contains information that may be helpful in understanding the content and functionality of this page.  It could be a brief set of instructions, a description of error messages, or other special information."><tr><td CLASS="indefault"><img src="/wtlgifs/web_info_cascade.png" alt="Information" CLASS="headerImg" TITLE="Information"  NAME="web_info" HSPACE=0 VSPACE=0 BORDER=0 HEIGHT=12 WIDTH=14 /></td><td CLASS="indefault"><SPAN class="infotext"> The Instructional Satisfaction Questionnaire data and Grade Distribution Percentages are displayed.  Courses with grade assignments that do not effectively demonstrate distributions are excluded from these calculations.
+<BR><BR>
+At the top of the page are hyperlinks to each section of data for easy access.  
+</SPAN></td></tr></table><p></DIV>
+    <HR>
+    <table  CLASS="datadisplaytable" summary="ISQ and Grade Distributions" width="70%">
+        <tr>
+            <td CLASS="dddefault"><a href="#ISQ">Instructional Satisfaction Questionnaire</a></td>
+            <td CLASS="dddefault"><a href="#Grade">Grade Distribution Percentages</a></td>
+        </tr>
+    </table>
+    <hr />
+    <table  CLASS="datadisplaytable" summary="ISQ and Grade Distributions" width="70%">
+        <tr>
+            <th CLASS="ddlabel" scope="row" >Instructor: </th>
+            <td CLASS="dddefault">Sandeep Reddivari</td>
+            <th CLASS="ddlabel" scope="row" >Item: </th>
+            <td CLASS="dddefault">Overall Rating for Instructor</td>
+        </tr>
+    </table>
+    <br />
+    <a name="ISQ"></a>
+    <table  CLASS="datadisplaytable" summary="ISQ and Grade Distributions" >
+        <tr>
+            <td CLASS="dddefault"><font color = blue><B>Instructional Satisfaction Questionnaire</B></font></td>
+        </tr>
+    </table>
+    <table  CLASS="datadisplaytable" summary="ISQ and Grade Distributions" width="100%">
+        <tr>
+            <th CLASS="ddheader" scope="col" >Term</th>
+            <th CLASS="ddheader" scope="col" >CRN</th>
+            <th CLASS="ddheader" scope="col" >Course ID</th>
+            <th CLASS="ddheader" scope="col" >Number</th>
+            <th CLASS="ddheader" scope="col" >Number</th>
+            <th CLASS="ddheader" scope="col" >Percent</th>
+            <th CLASS="ddheader" scope="col" >Excellent (5)</th>
+            <th CLASS="ddheader" scope="col" >Very Good (4)</th>
+            <th CLASS="ddheader" scope="col" >Good (3)</th>
+            <th CLASS="ddheader" scope="col" >Fair (2)</th>
+            <th CLASS="ddheader" scope="col" >Poor (1)</th>
+            <th CLASS="ddheader" scope="col" >NR/NA</th>
+            <th CLASS="ddheader" scope="col" >Mean</th>
+        </tr>
+        <tr>
+            <th CLASS="ddheader" scope="col" >&nbsp;</th>
+            <th CLASS="ddheader" scope="col" >&nbsp;</th>
+            <th CLASS="ddheader" scope="col" >&nbsp;</th>
+            <th CLASS="ddheader" scope="col" >Enrolled</th>
+            <th CLASS="ddheader" scope="col" >Responded</th>
+            <th CLASS="ddheader" scope="col" >Responded</th>
+            <th CLASS="ddheader" scope="col" >&nbsp;</th>
+            <th CLASS="ddheader" scope="col" >&nbsp;</th>
+            <th CLASS="ddheader" scope="col" >&nbsp;</th>
+            <th CLASS="ddheader" scope="col" >&nbsp;</th>
+            <th CLASS="ddheader" scope="col" >&nbsp;</th>
+            <th CLASS="ddheader" scope="col" >&nbsp;</th>
+            <th CLASS="ddheader" scope="col" >&nbsp;</th>
+        <tr>
+            <td CLASS="dddefault">Fall 2019</td>
+            <td CLASS="dddefault">81915</td>
+            <td CLASS="dddefault">CEN4010</td>
+            <TD CLASS="dddefault">
+                <div align="right">
+                    25
+            </TD>
+</div>
+<TD CLASS="dddefault">
+    <div align="right">
+        7
+</TD>
+</div>
+<TD CLASS="dddefault">
+    <div align="right">
+        28.00
+</TD>
+</div>
+<TD CLASS="dddefault">
+    <div align="right">
+        28.57
+</TD>
+</div>
+<TD CLASS="dddefault">
+    <div align="right">
+        14.29
+</TD>
+</div>
+<TD CLASS="dddefault">
+    <div align="right">
+        28.57
+</TD>
+</div>
+<TD CLASS="dddefault">
+    <div align="right">
+        0.00
+</TD>
+</div>
+<TD CLASS="dddefault">
+    <div align="right">
+        14.29
+</TD>
+</div>
+<TD CLASS="dddefault">
+    <div align="right">
+        14.29
+</TD>
+</div>
+<TD CLASS="dddefault">
+    <div align="right">
+        3.50
+</TD>
+</div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Summer 2019</td>
+    <td CLASS="dddefault">50223</td>
+    <td CLASS="dddefault">COP3530</td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            39
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            15
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            38.46
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            73.33
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            6.67
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            13.33
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.64
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Spring 2019</td>
+    <td CLASS="dddefault">17439</td>
+    <td CLASS="dddefault">CAP6768</td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            24
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            11
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            45.83
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            18.18
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            9.09
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            18.18
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            27.27
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            27.27
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            27.27
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            2.64
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Spring 2019</td>
+    <td CLASS="dddefault">16599</td>
+    <td CLASS="dddefault">CEN4010</td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            38
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            12
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            31.58
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            58.33
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            33.33
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            8.33
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.50
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Fall 2018</td>
+    <td CLASS="dddefault">82567</td>
+    <td CLASS="dddefault">CEN4010</td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            23
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            5
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            21.74
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            40.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            20.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            20.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            20.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            3.80
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Fall 2018</td>
+    <td CLASS="dddefault">82569</td>
+    <td CLASS="dddefault">CEN6016</td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            10
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            3
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            30.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            66.67
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            33.33
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.33
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Fall 2018</td>
+    <td CLASS="dddefault">82586</td>
+    <td CLASS="dddefault">COP3404</td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            48
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            11
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            22.92
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            54.55
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            18.18
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            27.27
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.27
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Summer 2018</td>
+    <td CLASS="dddefault">50753</td>
+    <td CLASS="dddefault">COP2551</td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            13
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            7
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            53.85
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            42.86
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            14.29
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            28.57
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.17
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Spring 2018</td>
+    <td CLASS="dddefault">11583</td>
+    <td CLASS="dddefault">CAP4770</td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            14
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            6
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            42.86
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            83.33
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            16.67
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.50
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Spring 2018</td>
+    <td CLASS="dddefault">13228</td>
+    <td CLASS="dddefault">CAP6768</td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            23
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            11
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            47.83
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            9.09
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            18.18
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            36.36
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            9.09
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            18.18
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            18.18
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            2.90
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Spring 2018</td>
+    <td CLASS="dddefault">11887</td>
+    <td CLASS="dddefault">CEN4010</td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            36
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            14
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            38.89
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            35.71
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            35.71
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            14.29
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            7.14
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.08
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Fall 2017</td>
+    <td CLASS="dddefault">83168</td>
+    <td CLASS="dddefault">CEN4010</td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            23
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            8
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            34.78
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            62.50
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            12.50
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            12.50
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            12.50
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            12.50
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.13
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Fall 2017</td>
+    <td CLASS="dddefault">83170</td>
+    <td CLASS="dddefault">CEN6016</td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            9
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            5
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            55.56
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            80.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            20.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.80
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Summer 2017</td>
+    <td CLASS="dddefault">51210</td>
+    <td CLASS="dddefault">COP3503</td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            33
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            15
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            45.45
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            46.67
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            33.33
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            13.33
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            6.67
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.20
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Spring 2017</td>
+    <td CLASS="dddefault">11865</td>
+    <td CLASS="dddefault">CAP4770</td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            21
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            3
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            14.29
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            66.67
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            33.33
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.33
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Spring 2017</td>
+    <td CLASS="dddefault">11012</td>
+    <td CLASS="dddefault">COP3404</td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            33
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            14
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            42.42
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            28.57
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            50.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            7.14
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            14.29
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            3.93
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Fall 2016</td>
+    <td CLASS="dddefault">81936</td>
+    <td CLASS="dddefault">COP3404</td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            32
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            14
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            43.75
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            50.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            7.14
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            21.43
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            7.14
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            7.14
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            7.14
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            3.92
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Summer 2016</td>
+    <td CLASS="dddefault">51115</td>
+    <td CLASS="dddefault">COP2551</td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            25
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            12
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            48.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            41.67
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            58.33
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.42
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Spring 2016</td>
+    <td CLASS="dddefault">12569</td>
+    <td CLASS="dddefault">CAP4770</td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            20
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            7
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            35.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            28.57
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            42.86
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            28.57
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.00
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Spring 2016</td>
+    <td CLASS="dddefault">10009</td>
+    <td CLASS="dddefault">CEN6017</td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            16
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            10
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            62.50
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            50.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            30.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            10.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            10.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            10.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.10
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Fall 2015</td>
+    <td CLASS="dddefault">80675</td>
+    <td CLASS="dddefault">CEN6016</td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            19
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            17
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            89.47
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            47.06
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            29.41
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            11.76
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.40
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Fall 2015</td>
+    <td CLASS="dddefault">83119</td>
+    <td CLASS="dddefault">CIS3253</td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            37
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            15
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            40.54
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            46.67
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            26.67
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            20.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            6.67
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            6.67
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.07
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Fall 2015</td>
+    <td CLASS="dddefault">82596</td>
+    <td CLASS="dddefault">COP3404</td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            43
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            25
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            58.14
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            20.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            44.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            28.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            3.83
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Summer 2015</td>
+    <td CLASS="dddefault">51141</td>
+    <td CLASS="dddefault">COP3503</td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            21
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            9
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            42.86
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            66.67
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            33.33
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.67
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Spring 2015</td>
+    <td CLASS="dddefault">11361</td>
+    <td CLASS="dddefault">CEN4010 </td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            38
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            18
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            47.37
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            50.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            33.33
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            16.67
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.33
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Spring 2015</td>
+    <td CLASS="dddefault">13123</td>
+    <td CLASS="dddefault">CIS6930 </td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            17
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            13
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            76.47
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            53.85
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            23.08
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            23.08
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.31
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Spring 2015</td>
+    <td CLASS="dddefault">11329</td>
+    <td CLASS="dddefault">COP3404 </td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            32
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            12
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            37.50
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            41.67
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            25.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            25.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            8.33
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.00
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Spring 2015</td>
+    <td CLASS="dddefault">10017</td>
+    <td CLASS="dddefault">COP3503 </td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            46
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            24
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            52.17
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            62.50
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            25.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            8.33
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.17
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.17
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.42
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Fall 2014</td>
+    <td CLASS="dddefault">83099</td>
+    <td CLASS="dddefault">CIS4253 </td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            25
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            14
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            56.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            71.43
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            28.57
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            0.00
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            4.71
+    </TD>
+    </div>
+</tr>
+<tr>
+    <td CLASS="dddefault">Fall 2014</td>
+    <td CLASS="dddefault">80507</td>
+    <td CLASS="dddefault">COP2551 </td>
+    <TD CLASS="dddefault">
+        <div align="right">
+            29
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            14
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            48.28
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            35.71
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            21.43
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            21.43
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            14.29
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            7.14
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            7.14
+    </TD>
+    </div>
+    <TD CLASS="dddefault">
+        <div align="right">
+            3.64
+    </TD>
+    </div>
+</tr>
+</table>
+<br />
+<hr />
+<a name="Grade"></a>
+<table  CLASS="datadisplaytable" summary="ISQ and Grade Distributions" >
+    <tr>
+        <td CLASS="dddefault"><font color = blue><B>Grade Distribution Percentages</B></font></td>
+    </tr>
+</table>
+<table  CLASS="datadisplaytable" summary="ISQ and Grade Distributions" width="100%">
+    <tr>
+        <th CLASS="ddheader" scope="col" >Term</th>
+        <th CLASS="ddheader" scope="col" >CRN</th>
+        <th CLASS="ddheader" scope="col" >Course</th>
+        <th CLASS="ddheader" scope="col" >Number</th>
+        <th CLASS="ddheader" scope="col" >A</th>
+        <th CLASS="ddheader" scope="col" >A-</th>
+        <th CLASS="ddheader" scope="col" >B+</th>
+        <th CLASS="ddheader" scope="col" >B</th>
+        <th CLASS="ddheader" scope="col" >B-</th>
+        <th CLASS="ddheader" scope="col" >C+</th>
+        <th CLASS="ddheader" scope="col" >C</th>
+        <th CLASS="ddheader" scope="col" >D</th>
+        <th CLASS="ddheader" scope="col" >F</th>
+        <th CLASS="ddheader" scope="col" >Withdraw</th>
+        <th CLASS="ddheader" scope="col" >Mean</th>
+    </tr>
+    <tr>
+        <th CLASS="ddheader" scope="col" >&nbsp;</th>
+        <th CLASS="ddheader" scope="col" >&nbsp;</th>
+        <th CLASS="ddheader" scope="col" >ID</th>
+        <th CLASS="ddheader" scope="col" >Enrolled</th>
+        <th CLASS="ddheader" scope="col" >&nbsp;</th>
+        <th CLASS="ddheader" scope="col" >&nbsp;</th>
+        <th CLASS="ddheader" scope="col" >&nbsp;</th>
+        <th CLASS="ddheader" scope="col" >&nbsp;</th>
+        <th CLASS="ddheader" scope="col" >&nbsp;</th>
+        <th CLASS="ddheader" scope="col" >&nbsp;</th>
+        <th CLASS="ddheader" scope="col" >&nbsp;</th>
+        <th CLASS="ddheader" scope="col" >&nbsp;</th>
+        <th CLASS="ddheader" scope="col" >&nbsp;</th>
+        <th CLASS="ddheader" scope="col" >&nbsp;</th>
+        <th CLASS="ddheader" scope="col" >GPA</th>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Fall 2019</td>
+        <td CLASS="dddefault">81915</td>
+        <td CLASS="dddefault">CEN4010</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                25
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                60.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                36.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                4.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.56
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Summer 2019</td>
+        <td CLASS="dddefault">50223</td>
+        <td CLASS="dddefault">COP3530</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                39
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                33.33
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                46.15
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                12.82
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                2.56
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                5.13
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.00
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Spring 2019</td>
+        <td CLASS="dddefault">17439</td>
+        <td CLASS="dddefault">CAP6768</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                25
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                56.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                28.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                4.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                4.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                4.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.48
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Spring 2019</td>
+        <td CLASS="dddefault">16599</td>
+        <td CLASS="dddefault">CEN4010</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                38
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                36.84
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                52.63
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                10.53
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.26
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Fall 2018</td>
+        <td CLASS="dddefault">82567</td>
+        <td CLASS="dddefault">CEN4010</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                24
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                37.50
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                37.50
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                16.67
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                4.17
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                4.17
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.09
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Fall 2018</td>
+        <td CLASS="dddefault">82569</td>
+        <td CLASS="dddefault">CEN6016</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                11
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                36.36
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                45.45
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                9.09
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                9.09
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.30
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Fall 2018</td>
+        <td CLASS="dddefault">82586</td>
+        <td CLASS="dddefault">COP3404</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                50
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                34.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                16.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                20.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                16.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                6.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                2.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                6.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.17
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Summer 2018</td>
+        <td CLASS="dddefault">50753</td>
+        <td CLASS="dddefault">COP2551</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                13
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                46.15
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                23.08
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                15.38
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                15.38
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                2.85
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Spring 2018</td>
+        <td CLASS="dddefault">11583</td>
+        <td CLASS="dddefault">CAP4770</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                14
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                42.86
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                57.14
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.43
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Spring 2018</td>
+        <td CLASS="dddefault">13228</td>
+        <td CLASS="dddefault">CAP6768</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                23
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                56.52
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                34.78
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                4.35
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.55
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Spring 2018</td>
+        <td CLASS="dddefault">11887</td>
+        <td CLASS="dddefault">CEN4010</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                36
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                58.33
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                30.56
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                2.78
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                2.78
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                5.56
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.33
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Fall 2017</td>
+        <td CLASS="dddefault">83168</td>
+        <td CLASS="dddefault">CEN4010</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                23
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                21.74
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                60.87
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                13.04
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                4.35
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                2.96
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Fall 2017</td>
+        <td CLASS="dddefault">83170</td>
+        <td CLASS="dddefault">CEN6016</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                10
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                70.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                10.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                10.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                10.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.67
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Summer 2017</td>
+        <td CLASS="dddefault">51210</td>
+        <td CLASS="dddefault">COP3503</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                34
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                35.29
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                41.18
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                14.71
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                5.88
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                2.94
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.03
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Spring 2017</td>
+        <td CLASS="dddefault">11865</td>
+        <td CLASS="dddefault">CAP4770</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                22
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                18.18
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                50.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                18.18
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                4.55
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                4.55
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                4.55
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.20
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Spring 2017</td>
+        <td CLASS="dddefault">11012</td>
+        <td CLASS="dddefault">COP3404</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                33
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                36.36
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                15.15
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                18.18
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                9.09
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                15.15
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.03
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.03
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.04
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Fall 2016</td>
+        <td CLASS="dddefault">81936</td>
+        <td CLASS="dddefault">COP3404</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                32
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                53.13
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                15.63
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                18.75
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.13
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                6.25
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.34
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Summer 2016</td>
+        <td CLASS="dddefault">51115</td>
+        <td CLASS="dddefault">COP2551</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                27
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                59.26
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                25.93
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                7.41
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                7.41
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.40
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Spring 2016</td>
+        <td CLASS="dddefault">12569</td>
+        <td CLASS="dddefault">CAP4770</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                20
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                70.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                15.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                10.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.78
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Spring 2016</td>
+        <td CLASS="dddefault">10009</td>
+        <td CLASS="dddefault">CEN6017</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                17
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                64.71
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                17.65
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                5.88
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                5.88
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                5.88
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.70
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Fall 2015</td>
+        <td CLASS="dddefault">80675</td>
+        <td CLASS="dddefault">CEN6016</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                19
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                84.21
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                15.79
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.84
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Fall 2015</td>
+        <td CLASS="dddefault">83119</td>
+        <td CLASS="dddefault">CIS3253</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                38
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                18.42
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                10.53
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                7.89
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                18.42
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                13.16
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                7.89
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                10.53
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                10.53
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                2.63
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Fall 2015</td>
+        <td CLASS="dddefault">82596</td>
+        <td CLASS="dddefault">COP3404</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                46
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                45.65
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                28.26
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                6.52
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                4.35
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                8.70
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                4.35
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.45
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Summer 2015</td>
+        <td CLASS="dddefault">51141</td>
+        <td CLASS="dddefault">COP3503</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                21
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                23.81
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                42.86
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                19.05
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                9.52
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                4.76
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.45
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Spring 2015</td>
+        <td CLASS="dddefault">11361</td>
+        <td CLASS="dddefault">CEN4010</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                39
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                74.36
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                15.38
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                5.13
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                2.56
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                2.56
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.79
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Spring 2015</td>
+        <td CLASS="dddefault">13123</td>
+        <td CLASS="dddefault">CIS6930</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                17
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                82.35
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                11.76
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                5.88
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.92
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Spring 2015</td>
+        <td CLASS="dddefault">11329</td>
+        <td CLASS="dddefault">COP3404</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                32
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                40.63
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                21.88
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                15.63
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.13
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.13
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                9.38
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                6.25
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.04
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Spring 2015</td>
+        <td CLASS="dddefault">10017</td>
+        <td CLASS="dddefault">COP3503</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                46
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                69.57
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                19.57
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                8.70
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                2.17
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.74
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Fall 2014</td>
+        <td CLASS="dddefault">83099</td>
+        <td CLASS="dddefault">CIS4253</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                25
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                44.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                20.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                8.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                12.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                4.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                4.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                8.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.24
+        </TD>
+        </div>
+    </tr>
+    <tr>
+        <td CLASS="dddefault">Fall 2014</td>
+        <td CLASS="dddefault">80507</td>
+        <td CLASS="dddefault">COP2551</td>
+        <TD CLASS="dddefault">
+            <div align="right">
+                34
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                41.18
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                20.59
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                14.71
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                0.00
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                8.82
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                14.71
+        </TD>
+        </div>
+        <TD CLASS="dddefault">
+            <div align="right">
+                3.00
+        </TD>
+        </div>
+    </tr>
+</table>
+<br />
+
+
+<!--  ** START OF twbkwbis.P_CloseDoc **  -->
+<table  CLASS="plaintable" SUMMARY="This is table displays line separator at end of the page."
+        WIDTH="100%" cellSpacing=0 cellPadding=0 border=0><tr><TD class="bgtabon" width="100%" colSpan=2><img src="/wtlgifs/web_transparent.gif" alt="Transparent Image" CLASS="headerImg" TITLE="Transparent Image"  NAME="web_transparent" HSPACE=0 VSPACE=0 BORDER=0 HEIGHT=3 WIDTH=10 /></TD></tr></table>
+<a href="#top" onMouseover="window.status='Skip to top of page'; return true" onMouseout="window.status=''; return true" OnFocus="window.status='Skip to top of page'; return true" onBlur="window.status=''; return true" class="skiplinks">Skip to top of page</a>
+</DIV>
+<div class="footerbeforediv">
+
+</DIV>
+<div class="footerafterdiv">
+
+</DIV>
+<div class="globalafterdiv">
+
+</DIV>
+<div class="globalfooterdiv">
+
+</DIV>
+<div class="pagefooterdiv">
+    <SPAN class="releasetext">Release: 6.4</SPAN>
+</DIV>
+<div class="poweredbydiv">
+</DIV>
+<DIV class="div1"></DIV>
+<DIV class="div2"></DIV>
+<DIV class="div3"></DIV>
+<DIV class="div4"></DIV>
+<DIV class="div5"></DIV>
+<DIV class="div6"></DIV>
+<div class="banner_copyright"> <br><h5>© 2020 Ellucian Company L.P. and its affiliates.<br></h5></div>
+</body>
+</html>

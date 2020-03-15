@@ -10,8 +10,8 @@ namespace ISQExplorer.Repositories
 {
     public class DepartmentRepository : IDepartmentRepository
     {
-        private readonly IDictionary<int, DepartmentModel> _idToDepartment;
-        private readonly IDictionary<string, DepartmentModel> _nameToDepartment;
+        private readonly OptionalDictionary<int, DepartmentModel> _idToDepartment;
+        private readonly OptionalDictionary<string, DepartmentModel> _nameToDepartment;
         private readonly ISQExplorerContext _context;
         private readonly ReadWriteLock _lock;
 
@@ -23,8 +23,8 @@ namespace ISQExplorer.Repositories
 
         public DepartmentRepository(ISQExplorerContext context)
         {
-            _idToDepartment = new Dictionary<int, DepartmentModel>();
-            _nameToDepartment = new Dictionary<string, DepartmentModel>();
+            _idToDepartment = new OptionalDictionary<int, DepartmentModel>();
+            _nameToDepartment = new OptionalDictionary<string, DepartmentModel>();
             _context = context;
             _lock = new ReadWriteLock();
         }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using AngleSharp.Html.Dom;
@@ -25,7 +26,7 @@ namespace ISQExplorer.Web
         private HtmlTable(IHtmlTableElement e)
         {
             var headings = e.QuerySelectorAll("tr")
-                .Where(x => x.Children.All(y => y is IHtmlHeadingElement))
+                .Where(x => x.Children.All(y => y is IHtmlTableHeaderCellElement))
                 .Select(x => (IHtmlTableRowElement) x)
                 .ToList();
 
@@ -45,16 +46,21 @@ namespace ISQExplorer.Web
 
                 ColumnTitles = Linq.Range(num)
                     .Select(i => rowChildren.Select(x => x.Children[i]))
-                    .Select(x => x.Select(y => y.TextContent.Trim()).Join(" "))
+                    .Select(x => x.Select(y => y.TextContent.Trim()).Join(" ").Trim())
                     .ToList();
+
+                _rows = e.QuerySelectorAll("tr").Skip(headings.Count).Select(row => (IHtmlTableRowElement) row).ToList();
+            }
+            else
+            {
+                ColumnTitles = Array.Empty<string>();
+
+                _rows = e.QuerySelectorAll("tr").Select(row => (IHtmlTableRowElement) row).ToList();
             }
 
-            ColumnTitles = e.QuerySelectorAll("th").Select(head => head.TextContent).ToList();
-            _columnTitleToIndex = ColumnTitles.Enumerate().ToDictionary(tup => tup.Elem, tup => tup.Index);
-
-            _rows = ColumnTitles.None()
-                ? e.QuerySelectorAll("tr").Select(row => (IHtmlTableRowElement) row).ToList()
-                : e.QuerySelectorAll("tr").Skip(1).Select(row => (IHtmlTableRowElement) row).ToList();
+            _columnTitleToIndex = ColumnTitles.Enumerate()
+                .Distinct((i1, i2) => i1.Index == i2.Index)
+                .ToDictionary(tup => tup.Elem, tup => tup.Index);
         }
 
         public IEnumerable<IHtmlTableCellElement> this[int index]

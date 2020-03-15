@@ -34,6 +34,27 @@ namespace ISQExplorer.Functional
                 : throw new InvalidOperationException(
                     $"This Either has a {typeof(TLeft).Name} value, and not a {typeof(TRight).Name} value.");
 
+        public void Match(Action<TLeft> left, Action<TRight> right)
+        {
+            if (HasLeft)
+            {
+                left(Left);
+            }
+            else
+            {
+                right(Right);
+            }
+        }
+
+        public TRes Match<TRes>(Func<TLeft, TRes> left, Func<TRight, TRes> right) =>
+            HasLeft ? left(Left) : right(Right);
+
+        public Task MatchAsync(Func<TLeft, Task> left, Func<TRight, Task> right) =>
+            HasLeft ? left(Left) : right(Right);
+
+        public Task<TRes> MatchAsync<TRes>(Func<TLeft, Task<TRes>> left, Func<TRight, Task<TRes>> right) =>
+            HasLeft ? left(Left) : right(Right);
+
         public TLeft Unite(Func<TRight, TLeft> func) => HasLeft ? Left : func(Right);
 
         public TRight Unite(Func<TLeft, TRight> func) => HasRight ? Right : func(Left);
@@ -81,17 +102,7 @@ namespace ISQExplorer.Functional
             return Equals((Either<TLeft, TRight>) obj);
         }
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = HasLeft.GetHashCode();
-                hashCode = (hashCode * 397) ^ HasRight.GetHashCode();
-                hashCode = (hashCode * 397) ^ EqualityComparer<TLeft>.Default.GetHashCode(_left);
-                hashCode = (hashCode * 397) ^ EqualityComparer<TRight>.Default.GetHashCode(_right);
-                return hashCode;
-            }
-        }
+        public override int GetHashCode() => HasLeft ? Left.GetHashCode() : Right.GetHashCode();
 
         public override string ToString() => HasLeft ? Left!.ToString()! : Right!.ToString()!;
     }

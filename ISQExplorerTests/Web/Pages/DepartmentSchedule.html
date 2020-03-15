@@ -1,0 +1,400 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/transitional.dtd">
+<HTML lang="en">
+<head>
+    <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Pragma" name="Cache-Control" content="no-cache">
+    <meta http-equiv="Cache-Control" name="Cache-Control" content="no-cache">
+    <LINK REL="stylesheet" HREF="/css/web_calendar.css" TYPE="text/css">
+    <LINK REL="stylesheet" HREF="/css/web_hover.css" TYPE="text/css">
+    <LINK REL="stylesheet" HREF="/css/jquery-ui.css" TYPE="text/css">
+    <LINK REL="stylesheet" href="/css/jquery.dataTables.css" TYPE="text/css">
+    <LINK REL="stylesheet" href="/css/dataTables.fixedColumns.min.css" TYPE="text/css">
+    <LINK REL="stylesheet" href="/css/dataTables.fixedHeader.min.css " TYPE="text/css">
+    <LINK REL="stylesheet" HREF="/css/web_defaultapp.css" TYPE="text/css">
+    <style>
+        DIV.circlediv {
+            width:100%;
+            border-style: solid;
+            border-width: 1px;
+            border-radius: 10px;
+            margin: 10px 2px 2px 0px;
+        }
+
+        .accordion {border: 4px ;
+            background: #013f70; overflow:hidden;
+            background: -moz-linear-gradient(left,  #013f70 17%, #1f89c5 82%);
+            background: -webkit-gradient(linear, left top, right top, color-stop(17%,#013f70), color-stop(82%,#1f89c5));
+            background: -webkit-linear-gradient(left,  #013f70 17%,#1f89c5 82%);
+            background: -o-linear-gradient(left,  #013f70 17%,#1f89c5 82%);
+            background: -ms-linear-gradient(left,  #013f70 17%,#1f89c5 82%);
+            background: linear-gradient(to right,  #013f70 17%,#1f89c5 82%);
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#013f70', endColorstr='#1f89c5',GradientType=1 );
+            color:white;
+            padding: 5px 10px 5px 10px;
+            border-radius: 10px;
+            font-size:calc(8px + .65vw);
+            cursor: pointer;
+            margin: 2px;
+        }
+
+        .accordion:hover {
+            background-image: linear-gradient(green, lightgreen);
+        }
+
+        }
+        .nonaccord {border: 4px ;
+            background: #013f70; overflow:hidden;
+            background: -moz-linear-gradient(left,  #013f70 17%, #1f89c5 82%);
+            background: -webkit-gradient(linear, left top, right top, color-stop(17%,#013f70), color-stop(82%,#1f89c5));
+            background: -webkit-linear-gradient(left,  #013f70 17%,#1f89c5 82%);
+            background: -o-linear-gradient(left,  #013f70 17%,#1f89c5 82%);
+            background: -ms-linear-gradient(left,  #013f70 17%,#1f89c5 82%);
+            background: linear-gradient(to right,  #013f70 17%,#1f89c5 82%);
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#013f70', endColorstr='#1f89c5',GradientType=1 );
+            color:white;
+            padding: 5px 10px 5px 10px;
+            border-radius: 10px;
+            font-size:calc(8px + .65vw);
+            margin: 2px;
+        }
+
+        .panel {
+            padding: 5px 10px 5px 10px;
+            font-size:calc(8px + .5vw);
+            color:black;
+            display: none;
+            margin: 2px;
+        }
+
+        .responsive {
+            border: 4px ;
+            padding: 5px 10px 5px 10px;
+            border-radius: 10px;
+            font-size:calc(8px + .5vw);
+            margin: 2px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style><LINK REL="stylesheet" HREF="/css/web_defaultprint.css" TYPE="text/css" media="print">
+    <title>Department Schedule</title>
+    <script src="/javascripts/jquery-1.11.0.min.js" type="text/javascript"></script>
+    <script src="/javascripts/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="/javascripts/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="/javascripts/dataTables.fixedColumns.min.js" type="text/javascript"></script>
+    <script src="/javascripts/dataTables.fixedHeader.min.js" type="text/javascript"></script>
+    <script src="/javascripts/jquery.tablesorter.min.js" type="text/javascript"></script>
+    <script src="/javascripts/EZCalendar.js" type="text/javascript" defer="defer"></script>
+    <script type="text/javascript" src="/ckeditor/ckeditor.js"></script>
+    <meta http-equiv="Content-Script-Type" name="Default_Script_Language" content="text/javascript">
+    <SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+        <!-- Hide JavaScript from older browsers
+        window.onunload = function() {submitcount=0;}
+        var submitcount=0;
+        function checkSubmit() {
+            if (submitcount == 0)
+            {
+                submitcount++;
+                return true;
+            }
+            else
+            {
+                alert("Your changes have already been submitted.");
+                return false;
+            }
+        }
+        //  End script hiding -->
+    </SCRIPT>
+    <SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+        <!-- Hide JavaScript from older browsers
+        //  Function to open a window
+        function windowOpen(window_url) {
+            helpWin = window.open(window_url,'','toolbar=yes,status=no,scrollbars=yes,menubar=yes,resizable=yes,directories=no,location=no,width=350,height=400');
+            if (document.images) {
+                if (helpWin) helpWin.focus()
+            }
+        }
+        //  End script hiding -->
+    </SCRIPT>
+</head>
+<body>
+<div class="headerwrapperdiv">
+    <div class="pageheaderdiv1">
+        <a href="#main_content" onMouseover="window.status='Go to Main Content'; return true" onMouseout="window.status=''; return true" OnFocus="window.status='Go to Main Content'; return true" onBlur="window.status=''; return true" class="skiplinks">Go to Main Content</a>
+        <h1><div align=right><font color=000099>&nbsp;</h1></DIV><div class="headerlinksdiv">
+</DIV>
+    <table  CLASS="plaintable" SUMMARY="This table displays Menu Items and Banner Search textbox."
+            WIDTH="100%">
+        <tr>
+            <TD CLASS="pldefault">
+                <div class="headerlinksdiv2">
+                    &nbsp;
+                </div>
+            </TD>
+            <TD ALIGN="RIGHT" CLASS="pldefault">
+<SPAN class="pageheaderlinks">
+<a href="/wtlhelp/twbhhelp.htm" accesskey="H" onClick="popup = window.open('/wtlhelp/twbhhelp.htm', 'PopupPage','height=500,width=450,scrollbars=yes,resizable=yes'); return false" target="_blank" onMouseOver="window.status='';  return true" onMouseOut="window.status=''; return true"onFocus="window.status='';  return true" onBlur="window.status=''; return true"  class="submenulinktext2">HELP</a>
+|
+<a href="twbkwbis.P_Logout" accesskey="3" class="submenulinktext2">EXIT</a>
+</span>
+            </TD>
+        </tr>
+    </table>
+</DIV>
+<div class="pagetitlediv">
+    <table  CLASS="plaintable" SUMMARY="This table displays title and static header displays."
+            WIDTH="100%">
+        <tr>
+            <TD CLASS="pldefault">
+                <h2>Department Schedule</h2>
+            </TD>
+            <TD CLASS="pldefault">
+                &nbsp;
+            </TD>
+            <TD CLASS="pldefault"><p class="rightaligntext" /p>
+                <div class="staticheaders">
+                </div>
+            </TD>
+        </tr>
+        <tr>
+            <TD class="bg3" width="100%" colSpan=3><img src="/wtlgifs/web_transparent.gif" alt="Transparent Image" CLASS="headerImg" TITLE="Transparent Image"  NAME="web_transparent" HSPACE=0 VSPACE=0 BORDER=0 HEIGHT=3 WIDTH=10 /></TD>
+        </tr>
+    </table>
+    <a name="main_content"></a>
+</DIV>
+<div class="pagebodydiv">
+    <!--  ** END OF twbkwbis.P_OpenDoc **  -->
+    <div class="infotextdiv"><table  CLASS="infotexttable" SUMMARY="This layout table contains information that may be helpful in understanding the content and functionality of this page.  It could be a brief set of instructions, a description of error messages, or other special information."><tr><td CLASS="indefault"><SPAN class="infotext"> To view <B>Instructional Satisfaction Questionnaire</B> data and <B>Grade Distribution Percentages</b> for a <B>Course</B>, select the Course ID. 
+<BR><BR> 
+To view <B>Instructional Satisfaction Questionnaire</B> data and <B>Grade Distribution Percentages</b> for an <B>Instructor</B>, select the Instructor name. 
+<p>A per-credit-hour distance learning fee applies to courses delivered online. See <A href="http://www.unf.edu/tuition/" target="_blank">http://www.unf.edu/tuition/</a> . Online classes may require proctoring services; you may incur additional charges in this course in the form of proctoring fees.</p>
+<P>
+<B>Term</B> is required. Either <B>Department</B> or <B>Campus</B> is required. If <B>Campus</B> is Main Campus, then <B>Department</B> is required. If a module term is selected, then a department is not required. </SPAN></td></tr></table><p></DIV>
+    <form action="wksfwbs.p_dept_schd" method="post">
+        <hr />
+        <table  CLASS="datadisplaytable" summary="This table displays the department course query form ">
+            <tr>
+                <th CLASS="ddlabel" scope="row" ><LABEL><SPAN class="fieldlabeltext">Term:</SPAN></LABEL></th>
+                <TD CLASS="dddefault">
+                    <select name="pv_term" size="1" ID="term_id" onchange="submit()">
+                        <OPTION VALUE="" SELECTED>None</OPTION>
+                        <OPTION VALUE="202050">Summer 2020</OPTION>
+                        <OPTION VALUE="202010">Spring 2020</OPTION>
+                        <OPTION VALUE="201980">Fall 2019</OPTION>
+                        <OPTION VALUE="201950">Summer 2019</OPTION>
+                        <OPTION VALUE="201910">Spring 2019</OPTION>
+                        <OPTION VALUE="201880">Fall 2018</OPTION>
+                        <OPTION VALUE="201850">Summer 2018</OPTION>
+                        <OPTION VALUE="201810">Spring 2018</OPTION>
+                        <OPTION VALUE="201780">Fall 2017</OPTION>
+                        <OPTION VALUE="201750">Summer 2017</OPTION>
+                        <OPTION VALUE="201710">Spring 2017</OPTION>
+                        <OPTION VALUE="201680">Fall 2016</OPTION>
+                        <OPTION VALUE="201652">Summer 2016 Module 2</OPTION>
+                        <OPTION VALUE="201651">Summer 2016 Module 1</OPTION>
+                        <OPTION VALUE="201650">Summer 2016</OPTION>
+                        <OPTION VALUE="201612">Spring 2016 Module 2</OPTION>
+                        <OPTION VALUE="201611">Spring 2016 Module 1</OPTION>
+                        <OPTION VALUE="201610">Spring 2016</OPTION>
+                        <OPTION VALUE="201582">Fall 2015 Module 2</OPTION>
+                        <OPTION VALUE="201581">Fall 2015 Module 1</OPTION>
+                        <OPTION VALUE="201580">Fall 2015</OPTION>
+                        <OPTION VALUE="201552">Summer 2015 Module 2</OPTION>
+                        <OPTION VALUE="201551">Summer 2015 Module 1</OPTION>
+                        <OPTION VALUE="201550">Summer 2015</OPTION>
+                        <OPTION VALUE="201512">Spring 2015 Module 2</OPTION>
+                        <OPTION VALUE="201511">Spring 2015 Module 1</OPTION>
+                        <OPTION VALUE="201510">Spring 2015</OPTION>
+                        <OPTION VALUE="201482">Fall 2014 Module 2</OPTION>
+                        <OPTION VALUE="201481">Fall 2014 Module 1</OPTION>
+                        <OPTION VALUE="201480">Fall 2014</OPTION>
+                        <OPTION VALUE="201452">Summer 2014 Module 2</OPTION>
+                        <OPTION VALUE="201451">Summer 2014 Module 1</OPTION>
+                        <OPTION VALUE="201450">Summer 2014</OPTION>
+                        <OPTION VALUE="201401">Spring 2014</OPTION>
+                        <OPTION VALUE="201308">Fall 2013</OPTION>
+                        <OPTION VALUE="201305">Summer 2013</OPTION>
+                        <OPTION VALUE="201301">Spring 2013</OPTION>
+                        <OPTION VALUE="201208">Fall 2012</OPTION>
+                        <OPTION VALUE="201205">Summer 2012</OPTION>
+                        <OPTION VALUE="201201">Spring 2012</OPTION>
+                        <OPTION VALUE="201108">Fall 2011</OPTION>
+                        <OPTION VALUE="201105">Summer 2011</OPTION>
+                        <OPTION VALUE="201101">Spring 2011</OPTION>
+                        <OPTION VALUE="201008">Fall 2010</OPTION>
+                        <OPTION VALUE="201005">Summer 2010</OPTION>
+                        <OPTION VALUE="201001">Spring 2010</OPTION>
+                        <OPTION VALUE="200908">Fall 2009</OPTION>
+                        <OPTION VALUE="200905">Summer 2009</OPTION>
+                        <OPTION VALUE="200901">Spring 2009</OPTION>
+                        <OPTION VALUE="200808">Fall 2008</OPTION>
+                        <OPTION VALUE="200805">Summer 2008</OPTION>
+                        <OPTION VALUE="200801">Spring 2008</OPTION>
+                        <OPTION VALUE="200708">Fall 2007</OPTION>
+                        <OPTION VALUE="200705">Summer 2007</OPTION>
+                        <OPTION VALUE="200701">Spring 2007</OPTION>
+                        <OPTION VALUE="200608">Fall 2006</OPTION>
+                        <OPTION VALUE="200605">Summer 2006</OPTION>
+                        <OPTION VALUE="200601">Spring 2006</OPTION>
+                        <OPTION VALUE="200508">Fall 2005</OPTION>
+                    </select>
+                <th CLASS="ddlabel" scope="row" ><LABEL><SPAN class="fieldlabeltext">Department:</SPAN></LABEL></th>
+                <TD CLASS="dddefault">
+                    <select name="pv_dept" size="1" ID="dept_id">
+                        <OPTION VALUE="" SELECTED>None</OPTION>
+                        <OPTION VALUE="6023">Academic Center for Excellence</OPTION>
+                        <OPTION VALUE="6202">Accounting & Finance          </OPTION>
+                        <OPTION VALUE="6122">Art, Art History, and Design</OPTION>
+                        <OPTION VALUE="6101">Arts & Sciences</OPTION>
+                        <OPTION VALUE="6120">Biology                       </OPTION>
+                        <OPTION VALUE="6401">Brooks College of Health</OPTION>
+                        <OPTION VALUE="6124">Chemistry</OPTION>
+                        <OPTION VALUE="6302">Childhood Ed, Literacy & TESOL</OPTION>
+                        <OPTION VALUE="6503">Civil Engineering             </OPTION>
+                        <OPTION VALUE="6404">Clinical & Applied Movement Sc</OPTION>
+                        <OPTION VALUE="6201">Coggin College of Business    </OPTION>
+                        <OPTION VALUE="6108">Communication</OPTION>
+                        <OPTION VALUE="6502">Computing</OPTION>
+                        <OPTION VALUE="6506">Construction Management</OPTION>
+                        <OPTION VALUE="0003">Cooperative Education</OPTION>
+                        <OPTION VALUE="6123">Criminology & Criminal Justice</OPTION>
+                        <OPTION VALUE="6203">Economics and Geography</OPTION>
+                        <OPTION VALUE="6301">Education & Human Services    </OPTION>
+                        <OPTION VALUE="6505">Electrical Engineering        </OPTION>
+                        <OPTION VALUE="6102">English                       </OPTION>
+                        <OPTION VALUE="6303">Except, Deaf & Interpreter Ed.</OPTION>
+                        <OPTION VALUE="6304">Foundations & Secondary Educ</OPTION>
+                        <OPTION VALUE="6406">Health Administration</OPTION>
+                        <OPTION VALUE="6107">History                       </OPTION>
+                        <OPTION VALUE="6007">Honors Program</OPTION>
+                        <OPTION VALUE="6121">Languages, Lits., and Cultures</OPTION>
+                        <OPTION VALUE="6307">Ldrship, Sch Counsel, Spt Mgmt</OPTION>
+                        <OPTION VALUE="0009">Learning Communities</OPTION>
+                        <OPTION VALUE="6205">Management</OPTION>
+                        <OPTION VALUE="6206">Marketing & Logistics</OPTION>
+                        <OPTION VALUE="0002">Math: College Preparatory</OPTION>
+                        <OPTION VALUE="6103">Mathematics & Statistics      </OPTION>
+                        <OPTION VALUE="6504">Mechanical Engineering        </OPTION>
+                        <OPTION VALUE="0001">Military Science</OPTION>
+                        <OPTION VALUE="6109">Music</OPTION>
+                        <OPTION VALUE="6403">Nursing                       </OPTION>
+                        <OPTION VALUE="6405">Nutrition & Dietetics</OPTION>
+                        <OPTION VALUE="6029">Office of Academic Testing</OPTION>
+                        <OPTION VALUE="6105">Philosophy & Religious Studies</OPTION>
+                        <OPTION VALUE="6104">Physics</OPTION>
+                        <OPTION VALUE="6111">Polit Science & Public Admin</OPTION>
+                        <OPTION VALUE="6114">Pre Med</OPTION>
+                        <OPTION VALUE="6106">Psychology                    </OPTION>
+                        <OPTION VALUE="6402">Public Health                 </OPTION>
+                        <OPTION VALUE="6110">Soc, Anthro, & Social Wk</OPTION>
+                        <OPTION VALUE="6305">Teaching, Learning & Curric</OPTION>
+                        <OPTION VALUE="6801">Undergraduate Studies</OPTION>
+                    </select>
+                </TD>
+                <th CLASS="ddlabel" scope="row" >Part of Term:</th>
+                </TD>
+                <TD CLASS="dddefault">
+                    <select name="pv_ptrm" size="1" ID="ptrm_id">
+                        <OPTION VALUE="" SELECTED>None</OPTION>
+                    </select>
+                </TD>
+                <th CLASS="ddlabel" scope="row" >Campus:</th>
+                </TD>
+                <TD CLASS="dddefault">
+                    <select name="pv_campus" size="1" ID="campus_id">
+                        <OPTION VALUE="" SELECTED>None</OPTION>
+                        <OPTION VALUE="AP">Accelerated-term Program</OPTION>
+                        <OPTION VALUE="AS">Austria</OPTION>
+                        <OPTION VALUE="BBM">Baptist Medical Center Beaches</OPTION>
+                        <OPTION VALUE="BMC">Baptist Medical Center South</OPTION>
+                        <OPTION VALUE="BHI">Black Hammock Island, FL</OPTION>
+                        <OPTION VALUE="BPT">Brooks PT Program/CE</OPTION>
+                        <OPTION VALUE="CRO">Croatia</OPTION>
+                        <OPTION VALUE="DL">Distance Learning</OPTION>
+                        <OPTION VALUE="DB">Dubai</OPTION>
+                        <OPTION VALUE="FH">Flagler Hospital</OPTION>
+                        <OPTION VALUE="GRE">Greece</OPTION>
+                        <OPTION VALUE="GU">Guatemala</OPTION>
+                        <OPTION VALUE="HAW">Hawaii</OPTION>
+                        <OPTION VALUE="HWI">Hawaii and Philippines Stdy Ab</OPTION>
+                        <OPTION VALUE="CAP">IN: Cathedral Arts Project</OPTION>
+                        <OPTION VALUE="IC">Iceland</OPTION>
+                        <OPTION VALUE="OFF">Inactive: Off Campus Event</OPTION>
+                        <OPTION VALUE="JPN">Japan</OPTION>
+                        <OPTION VALUE="JBD">Jesse Ball DuPont Center</OPTION>
+                        <OPTION VALUE="KO">Korea</OPTION>
+                        <OPTION VALUE="LSM">Lake Shore Middle School</OPTION>
+                        <OPTION VALUE="MC">Main Campus-UNF</OPTION>
+                        <OPTION VALUE="MAR">Marseille</OPTION>
+                        <OPTION VALUE="MEX">Mexico</OPTION>
+                        <OPTION VALUE="MO">Morocco</OPTION>
+                        <OPTION VALUE="MCA">Museum of Contemporary Art</OPTION>
+                        <OPTION VALUE="NYC">New York City</OPTION>
+                        <OPTION VALUE="OL">Online Program</OPTION>
+                        <OPTION VALUE="ORL">Orlando, FL</OPTION>
+                        <OPTION VALUE="OX">Oxford</OPTION>
+                        <OPTION VALUE="PVH">Ponte Vedra High School</OPTION>
+                        <OPTION VALUE="PR">Portugal</OPTION>
+                        <OPTION VALUE="SC">Scotland</OPTION>
+                        <OPTION VALUE="SCS">Seaside Charter School</OPTION>
+                        <OPTION VALUE="SHJ">Shands Jacksonville</OPTION>
+                        <OPTION VALUE="SIN">Singapore</OPTION>
+                        <OPTION VALUE="SP">Spain</OPTION>
+                        <OPTION VALUE="SA">Study Abroad - Out of Country</OPTION>
+                        <OPTION VALUE="EN">Study Abroad: England</OPTION>
+                        <OPTION VALUE="HA">Study Abroad: Haiti</OPTION>
+                        <OPTION VALUE="VCA">Study Abroad: Vietnam/Cambodia</OPTION>
+                        <OPTION VALUE="SWS">Switzerland</OPTION>
+                        <OPTION VALUE="TH">Thailand</OPTION>
+                        <OPTION VALUE="TB">The Bridge</OPTION>
+                        <OPTION VALUE="TA">Tiger Academy</OPTION>
+                        <OPTION VALUE="TUR">Turkey</OPTION>
+                        <OPTION VALUE="UT">Utah</OPTION>
+                        <OPTION VALUE="VRS">VRS Interpreting Institute</OPTION>
+                        <OPTION VALUE="WHE">Windy Hill Elementary</OPTION>
+                    </select>
+                </TD>
+            </tr>
+        </table>
+        <table  CLASS="datadisplaytable" summary="This table displays the course schedule">
+            <tr>
+                <TD CLASS="dddefault">
+                    <input type="submit" name="pv_sub" value="Submit" />
+                    <input type="submit" name="pv_sub" value="Clear" />
+                </TD>
+            </tr>
+        </table>
+    </form>
+
+    <!--  ** START OF twbkwbis.P_CloseDoc **  -->
+    <table  CLASS="plaintable" SUMMARY="This is table displays line separator at end of the page."
+            WIDTH="100%" cellSpacing=0 cellPadding=0 border=0><tr><TD class="bgtabon" width="100%" colSpan=2><img src="/wtlgifs/web_transparent.gif" alt="Transparent Image" CLASS="headerImg" TITLE="Transparent Image"  NAME="web_transparent" HSPACE=0 VSPACE=0 BORDER=0 HEIGHT=3 WIDTH=10 /></TD></tr></table>
+    <a href="#top" onMouseover="window.status='Skip to top of page'; return true" onMouseout="window.status=''; return true" OnFocus="window.status='Skip to top of page'; return true" onBlur="window.status=''; return true" class="skiplinks">Skip to top of page</a>
+</DIV>
+<div class="footerbeforediv">
+
+</DIV>
+<div class="footerafterdiv">
+
+</DIV>
+<div class="globalafterdiv">
+
+</DIV>
+<div class="globalfooterdiv">
+
+</DIV>
+<div class="pagefooterdiv">
+    <SPAN class="releasetext">Release: 6.4</SPAN>
+</DIV>
+<div class="poweredbydiv">
+</DIV>
+<DIV class="div1"></DIV>
+<DIV class="div2"></DIV>
+<DIV class="div3"></DIV>
+<DIV class="div4"></DIV>
+<DIV class="div5"></DIV>
+<DIV class="div6"></DIV>
+<div class="banner_copyright"> <br><h5>© 2020 Ellucian Company L.P. and its affiliates.<br></h5></div>
+</body>
+</html>

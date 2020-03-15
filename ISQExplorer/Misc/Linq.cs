@@ -71,6 +71,21 @@ namespace ISQExplorer.Misc
             return (double) accepted / total >= proportion;
         }
 
+        public static IEnumerable<T> Distinct<T>(this IEnumerable<T> enumerable, Func<T, T, bool> equalityPredicate)
+        {
+            var seen = new HashSet<T>();
+
+            foreach (var elem in enumerable)
+            {
+                if (seen.Contains(elem))
+                {
+                    continue;
+                }
+                seen.Add(elem);
+                yield return elem;
+            }
+        }
+
         /// <summary>
         /// Enumerates through each element of the input with both the element and the 0-based index.
         /// Equivalent to Python's enumerate().

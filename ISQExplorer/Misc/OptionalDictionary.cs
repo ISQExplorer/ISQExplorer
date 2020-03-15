@@ -7,15 +7,7 @@ namespace ISQExplorer.Misc
     {
         public new Optional<TValue> this[TKey key]
         {
-            get
-            {
-                if (!ContainsKey(key))
-                {
-                    return new Optional<TValue>();
-                }
-
-                return base[key];
-            }
+            get => !ContainsKey(key) ? new Optional<TValue>() : base[key];
 
             set => base[key] = value;
         }

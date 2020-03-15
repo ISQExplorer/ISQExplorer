@@ -12,10 +12,7 @@ namespace ISQExplorer.Web
     public static class ElementExtensions
     {
         public static IEnumerable<T> AnyChildren<T>(this IElement elem) where T : IElement =>
-            elem.Children
-                .Select(Cast<T>)
-                .Where(x => x.HasValue)
-                .Select(x => x.Value);
+            elem.Children.OfType<T>();
 
         public static Try<T, HtmlElementException> Cast<T>(this IElement elem) where T : IElement
         {

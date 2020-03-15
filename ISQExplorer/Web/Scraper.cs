@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using AngleSharp.Html.Dom;
+using ISQExplorer.Controllers;
 using ISQExplorer.Exceptions;
 using ISQExplorer.Functional;
 using ISQExplorer.Misc;
@@ -37,9 +38,9 @@ namespace ISQExplorer.Web
 
         public Task<Result> ScrapeDepartmentsAsync() => Result.OfAsync(async () =>
         {
-            (await HtmlClient.GetAsync(Urls.DeptSchedule)).Value.Query<IHtmlSelectElement>("#dept_id").Value
+            await (await HtmlClient.GetAsync(Urls.DeptSchedule)).Value.Query<IHtmlSelectElement>("#dept_id").Value
                 .Children<IHtmlOptionElement>().Value.Skip(1)
-                .ForEach(async e =>
+                .ForEachAsync(async e =>
                     await Departments.AddAsync(new DepartmentModel {Id = Parse.Int(e.Value).Value, Name = e.Label}));
         });
 
@@ -87,11 +88,11 @@ namespace ISQExplorer.Web
                     "The given cell was not an <a> element.", val.Exception.Element.TextContent, dept, term));
             });
 
-            links
+            await links
                 .Zip(titles)
                 .Where(x => x.First.HasValue)
                 .Select(x => (Course: x.First.Value, Title: x.Second.TextContent))
-                .ForEach(async val =>
+                .ForEachAsync(async val =>
                 {
                     var (course, title) = val;
                     await Courses.AddAsync(new CourseModel
@@ -136,7 +137,6 @@ namespace ISQExplorer.Web
                 .Where(x => !x.TextContent.HtmlDecode().IsBlank())
                 .Select(x => Try.Of(() =>
                 {
-                    var lname = x.TextContent;
                     var nNumber = x.Href.Capture(@"[nN]\d{8}").Select(y => y.ToUpper());
                     if (!nNumber)
                     {
@@ -156,9 +156,9 @@ namespace ISQExplorer.Web
             {
                 if (await Professors.FromNNumberAsync(dept, nNumber)) return;
 
-                var page = (await HtmlClient.GetAsync(Urls.ProfessorPage(nNumber))).Value;
+                var htmlPage = (await HtmlClient.GetAsync(Urls.ProfessorPage(nNumber))).Value;
 
-                var professorName = Try.Of(() => page.QueryAll<IHtmlTableCellElement>("td.dddefault").First(
+                var professorName = Try.Of(() => htmlPage.QueryAll<IHtmlTableCellElement>("td.dddefault").First(
                     elem => elem.PreviousElementSibling?.TextContent.HtmlDecode().Trim() == "Instructor:"));
 
                 if (!professorName)
@@ -209,15 +209,31 @@ namespace ISQExplorer.Web
                 return;
             }
 
-            var mainRows = mainTable.Value.Rows.GroupBy(x => (x["Term"], x["CRN"], x["Course"]))
+            var mainRows = mainTable.Value.Rows.GroupBy(x => (Term: x["Term"], Crn: x["CRN"], CourseCode: x["Course ID"]))
                 .ToDictionary(x => x.Key, x => x.First());
 
-            var gpaRows = gpaTable.Value.Rows.GroupBy(x => (x["Term"], x["CRN"], x["Course"]))
+            var gpaRows = gpaTable.Value.Rows.GroupBy(x => (Term: x["Term"], Crn: x["CRN"], CourseCode: x["Course ID"]))
                 .ToDictionary(x => x.Key, x => x.First());
 
-            var results = (from mrow in mainRows
-                join grow in gpaRows on mrow.Key equals grow.Key
-                select (mrow.Value, grow.Value)).Select(group => Result.Of(async () =>
+            /*
+            var mrKeys = mainRows
+                .Select(x => new[] {x.Key.Term.TextContent, x.Key.Crn.TextContent, x.Key.CourseCode.TextContent}.Join(", "))
+                .OrderBy(x => x).ToList();
+            var gpaKeys = gpaRows.Select(x => new[] {x.Key.Term.TextContent, x.Key.Crn.TextContent, x.Key.CourseCode.TextContent}.Join(", "))
+                .OrderBy(x => x).ToList();
+
+            var pairs = (from mrow in mainRows
+                join grow in gpaRows on
+                    (mrow.Key.Crn.TextContent, mrow.Key.Term.TextContent, mrow.Key.CourseCode.TextContent) equals
+                    (grow.Key.Crn.TextContent, grow.Key.Term.TextContent, grow.Key.CourseCode.TextContent)
+                select (mrow.Value, grow.Value)).ToList();
+                */
+            
+            var results = await Task.WhenAll((from mrow in mainRows
+                join grow in gpaRows on
+                    (mrow.Key.Crn.TextContent.HtmlDecode().Trim(), mrow.Key.Term.TextContent.HtmlDecode().Trim(), mrow.Key.CourseCode.TextContent.HtmlDecode().Trim()) equals
+                    (grow.Key.Crn.TextContent.HtmlDecode().Trim(), grow.Key.Term.TextContent.HtmlDecode().Trim(), grow.Key.CourseCode.TextContent.HtmlDecode().Trim())
+                select (mrow.Value, grow.Value)).Select(async group => await Result.OfAsync(async () =>
             {
                 var (mrow, grow) = group;
 
@@ -226,7 +242,7 @@ namespace ISQExplorer.Web
                     Course = (await Courses.FromCourseCodeAsync(mrow["Course ID"].TextContent)).Value,
                     Term = (await Terms.FromStringAsync(mrow["Term"].TextContent)).Value,
                     Professor = prof,
-                    Crn = Parse.Int(mrow["Crn"].TextContent).Value,
+                    Crn = Parse.Int(mrow["CRN"].TextContent).Value,
                     NEnrolled = Parse.Int(mrow["Number Enrolled"].TextContent).Value,
                     NResponded = Parse.Int(mrow["Number Responded"].TextContent).Value,
                     Pct5 = Parse.Double(mrow["Excellent (5)"].TextContent).Value,
@@ -247,7 +263,7 @@ namespace ISQExplorer.Web
                     PctWithdraw = Parse.Double(grow["Withdraw"].TextContent).Value,
                     MeanGpa = Parse.Double(grow["Mean GPA"].TextContent).Value
                 });
-            }));
+            })));
 
             results.Where(res => res.IsError).Select(res => res.Error).ForEach(Errors.Add);
         });
@@ -263,8 +279,8 @@ namespace ISQExplorer.Web
                 }
             }
 
-            Departments.SelectMany(x => Terms.Terms,
-                (model, termModel) => (model, termModel)).AsParallel().ForEach(async x =>
+            await Departments.SelectMany(x => Terms.Terms,
+                (model, termModel) => (model, termModel)).AsParallel().ForEachAsync(async x =>
             {
                 var (dept, term) = x;
 
@@ -294,7 +310,8 @@ namespace ISQExplorer.Web
                     Errors.Add(res2.Error);
                 }
             });
-            Professors.AsParallel().ForEach(async prof => await ScrapeProfessorEntriesAsync(prof));
+            
+            await Professors.AsParallel().ForEachAsync(async prof => await ScrapeProfessorEntriesAsync(prof));
             return new Result();
         });
     }

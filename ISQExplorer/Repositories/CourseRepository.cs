@@ -11,8 +11,8 @@ namespace ISQExplorer.Repositories
 {
     public class CourseRepository : ICourseRepository
     {
-        private readonly IDictionary<string, CourseModel> _courseCodeToCourse;
-        private readonly IDictionary<string, CourseModel> _courseNameToCourse;
+        private readonly OptionalDictionary<string, CourseModel> _courseCodeToCourse;
+        private readonly OptionalDictionary<string, CourseModel> _courseNameToCourse;
         private readonly ISQExplorerContext _context;
         private readonly ReadWriteLock _lock;
 
@@ -24,8 +24,8 @@ namespace ISQExplorer.Repositories
 
         public CourseRepository(ISQExplorerContext context)
         {
-            _courseCodeToCourse = new Dictionary<string, CourseModel>();
-            _courseNameToCourse = new Dictionary<string, CourseModel>();
+            _courseCodeToCourse = new OptionalDictionary<string, CourseModel>();
+            _courseNameToCourse = new OptionalDictionary<string, CourseModel>();
             _context = context;
             _lock = new ReadWriteLock();
         }

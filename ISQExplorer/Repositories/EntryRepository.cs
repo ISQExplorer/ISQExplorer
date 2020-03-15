@@ -5,13 +5,14 @@ using System.Threading.Tasks;
 using ISQExplorer.Functional;
 using ISQExplorer.Misc;
 using ISQExplorer.Models;
+// ReSharper disable CollectionNeverUpdated.Local
 
 namespace ISQExplorer.Repositories
 {
     public class EntryRepository : IEntryRepository
     {
-        private DefaultDictionary<CourseModel, ISet<ISQEntryModel>> _courseToEntries;
-        private DefaultDictionary<ProfessorModel, ISet<ISQEntryModel>> _professorToEntries;
+        private readonly DefaultDictionary<CourseModel, ISet<ISQEntryModel>> _courseToEntries;
+        private readonly DefaultDictionary<ProfessorModel, ISet<ISQEntryModel>> _professorToEntries;
         private readonly ISQExplorerContext _context;
         private readonly ReadWriteLock _lock;
 

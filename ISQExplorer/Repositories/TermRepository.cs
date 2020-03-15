@@ -10,8 +10,8 @@ namespace ISQExplorer.Repositories
 {
     public class TermRepository : ITermRepository
     {
-        private readonly IDictionary<int, TermModel> _idToTerm;
-        private readonly IDictionary<string, TermModel> _stringToTerm;
+        private readonly OptionalDictionary<int, TermModel> _idToTerm;
+        private readonly OptionalDictionary<string, TermModel> _stringToTerm;
         private readonly SortedSet<int> _ids;
         private readonly ISQExplorerContext _context;
 
@@ -19,8 +19,8 @@ namespace ISQExplorer.Repositories
 
         public TermRepository(ISQExplorerContext context)
         {
-            _idToTerm = new Dictionary<int, TermModel>();
-            _stringToTerm = new Dictionary<string, TermModel>();
+            _idToTerm = new OptionalDictionary<int, TermModel>();
+            _stringToTerm = new OptionalDictionary<string, TermModel>();
             _ids = new SortedSet<int>();
             _context = context;
 
@@ -88,7 +88,7 @@ namespace ISQExplorer.Repositories
                 : _idToTerm[_ids.ElementAt(index + howMany)]);
         });
 
-        public IEnumerable<TermModel> Terms => _ids.Select(id => _idToTerm[id]);
+        public IEnumerable<TermModel> Terms => _ids.Select(id => _idToTerm[id]).Values();
 
         public IEnumerator GetEnumerator() => Terms.GetEnumerator();
 

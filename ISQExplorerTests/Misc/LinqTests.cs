@@ -1,3 +1,4 @@
+using System.Linq;
 using ISQExplorer.Misc;
 using NUnit.Framework;
 
@@ -11,6 +12,16 @@ namespace ISQExplorerTests.Misc
             var ints = Linq.Range(1, 10).ToShuffledList(0);
             Assert.True(ints.AtLeastPercent(0.5, x => x >= 5));
             Assert.False(ints.AtLeastPercent(0.5, x => x > 5));
+        }
+
+        [Test]
+        public void TestDistinct()
+        {
+            var ints = Linq.Range(0, 10).ToList();
+            Assert.True(ints.Distinct((a, b) => a == b).Count() == 10);
+
+            var ints2 = new[] {1, 1, 2, 2, 3, 2, 2};
+            Assert.True(ints2.Distinct((a, b) => a == b).Count() == 3);
         }
         
         [Test]
