@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using AngleSharp.Common;
@@ -22,9 +24,6 @@ namespace ISQExplorerTests
 {
     public static class Fake
     {
-        private static int _dbCount = 0;
-        private static readonly object DbCountLock = new object();
-
         public static Mock<ICourseRepository> CourseRepository(out IList<CourseModel> courseList)
         {
             var mock = new Mock<ICourseRepository>();
@@ -54,9 +53,6 @@ namespace ISQExplorerTests
             var tmp = new List<CourseModel>();
 
             mock.Setup(cr => cr.AddAsync(It.IsAny<CourseModel>()))
-                .Returns((CourseModel cm) => Task.Run(() => tmp.Add(cm)));
-
-            mock.Setup(cr => cr.AddRangeAsync(It.IsAny<IEnumerable<CourseModel>>()))
                 .Returns((CourseModel cm) => Task.Run(() => tmp.Add(cm)));
             mock.Setup(cr => cr.AddRangeAsync(It.IsAny<IEnumerable<CourseModel>>()))
                 .Returns((IEnumerable<CourseModel> models) => Task.Run(() => tmp.AddRange(models)));
@@ -241,6 +237,10 @@ namespace ISQExplorerTests
             private HtmlClient? _realHtmlClient;
             private readonly ConcurrentDictionary<Either<Uri, string>, Try<HtmlPage, IOException>> _getMocks;
 
+            private Action<string>? _afterGetCallback;
+            private Action<string, IReadOnlyDictionary<string, string?>>? _afterPostDictCallback;
+            private Action<string, string>? _afterPostStringCallback;
+
             private readonly ConcurrentDictionary<(Either<Uri, string>, string), Try<HtmlPage, IOException>>
                 _postStringMocks;
 
@@ -266,6 +266,24 @@ namespace ISQExplorerTests
                 return this;
             }
 
+            public FakeHtmlClient SetAfterGetCallback(Action<string>? callback)
+            {
+                _afterGetCallback = callback;
+                return this;
+            }
+
+            public FakeHtmlClient SetAfterPostDictCallback(Action<string, IReadOnlyDictionary<string, string?>>? callback)
+            {
+                _afterPostDictCallback = callback;
+                return this;
+            }
+
+            public FakeHtmlClient SetAfterPostStringCallback(Action<string, string>? callback)
+            {
+                _afterPostStringCallback = callback;
+                return this;
+            }
+
             public FakeHtmlClient OnPost(Either<Uri, string> url,
                 Either<string, IReadOnlyDictionary<string, string>> postData, string? returnPage)
             {
@@ -287,9 +305,32 @@ namespace ISQExplorerTests
                 return this;
             }
 
-            public FakeHtmlClient DefaultToWeb(Func<string, RateLimiter> limiterFactory = null)
+            public FakeHtmlClient DefaultToWeb()
+            {
+                _realHtmlClient = new HtmlClient(() => new RateLimiter(3, 3000));
+                return this;
+            }
+
+            public FakeHtmlClient DefaultToWeb(Func<string, RateLimiter>? limiterFactory)
             {
                 _realHtmlClient = new HtmlClient(limiterFactory);
+                return this;
+            }
+
+            public FakeHtmlClient RemoveExceptions()
+            {
+                _getMocks
+                    .Where(x => !x.Value.HasValue)
+                    .ForEach(x => _getMocks.TryRemove(x.Key, out _));
+
+                _postDictMocks
+                    .Where(x => !x.Value.HasValue)
+                    .ForEach(x => _postDictMocks.TryRemove(x.Key, out _));
+
+                _postStringMocks
+                    .Where(x => !x.Value.HasValue)
+                    .ForEach(x => _postStringMocks.TryRemove(x.Key, out _));
+
                 return this;
             }
 
@@ -300,9 +341,13 @@ namespace ISQExplorerTests
                     return Task.FromResult(_getMocks[url]);
                 }
 
-                return _realHtmlClient != null
+                var res = _realHtmlClient != null
                     ? _realHtmlClient.GetAsync(url)
                     : Task.FromResult(new Try<HtmlPage, IOException>(new IOException($"Url '{url}' was not mocked.")));
+                
+                _afterGetCallback?.Invoke(url.Unite(uri => uri.ToString()));
+
+                return res;
             }
 
             public Task<Try<HtmlPage, IOException>> PostAsync(Either<Uri, string> url, string postData)
@@ -312,9 +357,13 @@ namespace ISQExplorerTests
                     return Task.FromResult(_postStringMocks[(url, postData)]);
                 }
 
-                return _realHtmlClient != null
+                var res = _realHtmlClient != null
                     ? _realHtmlClient.PostAsync(url, postData)
                     : Task.FromResult(new Try<HtmlPage, IOException>(new IOException($"Url '{url}' was not mocked.")));
+                
+                _afterPostStringCallback?.Invoke(url.Unite(uri => uri.ToString()), postData);
+
+                return res;
             }
 
             public Task<Try<HtmlPage, IOException>> PostAsync(Either<Uri, string> url,
@@ -326,9 +375,13 @@ namespace ISQExplorerTests
                     return Task.FromResult(_postDictMocks[(url, immut)]);
                 }
 
-                return _realHtmlClient != null
+                var res = _realHtmlClient != null
                     ? _realHtmlClient.PostAsync(url, postParams)
                     : Task.FromResult(new Try<HtmlPage, IOException>(new IOException($"Url '{url}' was not mocked.")));
+                
+                _afterPostDictCallback?.Invoke(url.Unite(uri => uri.ToString()), postParams);
+
+                return res;
             }
 
             public int Count => _getMocks.Count + _postDictMocks.Count + _postStringMocks.Count;
@@ -407,6 +460,61 @@ namespace ISQExplorerTests
                 public string? PostDataString { get; set; }
                 public string? Data { get; set; }
             }
+        }
+
+        public static class Compressor
+        {
+            public static Task<byte[]> Compress(string input) => Task.Run(() =>
+            {
+                var bytes = Encoding.UTF8.GetBytes(input);
+                using var ms = new MemoryStream();
+
+                using (var gz = new GZipStream(ms, CompressionLevel.Optimal))
+                {
+                    gz.Write(bytes);
+                }
+
+                return ms.GetBuffer();
+            });
+
+            public static Task<string> Decompress(byte[] input) => Task.Run(() =>
+            {
+                using var mso = new MemoryStream();
+
+                var buf = new byte[65536];
+
+                using (var msi = new MemoryStream(input))
+                {
+                    using var gz = new GZipStream(msi, CompressionMode.Decompress);
+                    int count;
+
+                    while ((count = gz.Read(buf, 0, buf.Length)) > 0)
+                    {
+                        mso.Write(buf, 0, count);
+                    }
+                }
+
+                return Encoding.UTF8.GetString(mso.ToArray());
+            });
+        }
+
+        private static int _dbCount = 0;
+        private static readonly object DbCountLock = new object();
+
+        public static ISQExplorerContext DbContext()
+        {
+            string dbName;
+            lock (DbCountLock)
+            {
+                dbName = $"db{_dbCount}";
+                _dbCount++;
+            }
+
+            var options = new DbContextOptionsBuilder<ISQExplorerContext>()
+                .UseInMemoryDatabase(dbName)
+                .Options;
+
+            return new ISQExplorerContext(options);
         }
     }
 }

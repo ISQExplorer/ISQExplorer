@@ -279,6 +279,15 @@ namespace ISQExplorer.Web
                 }
             }
 
+            if (recursive && Terms.None())
+            {
+                var res = await ScrapeTermsAsync();
+                if (!res)
+                {
+                    return res;
+                }
+            }
+
             await Departments.SelectMany(x => Terms.Terms,
                 (model, termModel) => (model, termModel)).AsParallel().ForEachAsync(async x =>
             {

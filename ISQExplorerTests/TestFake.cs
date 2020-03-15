@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using ISQExplorer.Functional;
+using ISQExplorer.Misc;
 using ISQExplorer.Web;
 using NUnit.Framework;
 
@@ -85,6 +87,26 @@ namespace ISQExplorerTests
             });
 
             Assert.Pass();
+        }
+
+        [Test]
+        public async Task TestCompression()
+        {
+            var t1 = "abcdef";
+            var t2builder = new StringBuilder();
+            Linq.Range(0, 100000).ForEach(_ => t2builder.Append("abcdef"));
+            var t2 = t2builder.ToString();
+
+            var t1compressed = await Fake.Compressor.Compress(t1);
+            var t1dec = await Fake.Compressor.Decompress(t1compressed);
+
+            Assert.AreEqual(t1, t1dec);
+
+            var t2compressed = await Fake.Compressor.Compress(t2);
+            Assert.Less(t2compressed.Length, t2.Length);
+            var t2dec = await Fake.Compressor.Decompress(t2compressed);
+            
+            Assert.AreEqual(t2, t2dec);
         }
     }
 }

@@ -2,7 +2,9 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using ISQExplorer.Functional;
 using ISQExplorer.Misc;
@@ -11,6 +13,7 @@ using ISQExplorer.Repositories;
 using ISQExplorer.Web;
 using Microsoft.EntityFrameworkCore.Internal;
 using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 
 namespace ISQExplorerTests
@@ -88,7 +91,7 @@ namespace ISQExplorerTests
                     (_depts ?? Fake.DepartmentRepository(out _)).Object,
                     (_entries ?? Fake.EntryRepository(out _)).Object,
                     (_courses ?? Fake.CourseRepository(out _)).Object,
-                    new HtmlClient(() => new RateLimiter(3, 1000)));
+                    _htmlClient);
             }
         }
 
@@ -190,6 +193,61 @@ namespace ISQExplorerTests
             Assert.True(entries.All(x => x.Course != null));
             Assert.True(entries.All(x => x.Professor != null));
             Assert.True(entries.All(x => x.Term != null));
+        }
+    }
+
+    public class FullScraperTests
+    {
+        private Fake.FakeHtmlClient _client;
+        private int _countOrig = 0;
+        private const string HtmlJsonPath = "Web/Pages/HtmlClientCache.json.gz";
+
+        [SetUp]
+        public async Task Setup()
+        {
+            var baseDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)?.Parent?.Parent?.Parent
+                ?.FullName;
+            Directory.SetCurrentDirectory(baseDirectory);
+
+            if (File.Exists(HtmlJsonPath))
+            {
+                var bytes = File.ReadAllBytes(HtmlJsonPath);
+                var str = await Fake.Compressor.Decompress(bytes);
+                _client = await Fake.FakeHtmlClient.Deserialize(str);
+            }
+            else
+            {
+                _client = new Fake.FakeHtmlClient();
+            }
+
+            _countOrig = _client.Count;
+            _client.DefaultToWeb()
+                .SetAfterGetCallback(s => System.Diagnostics.Trace.WriteLine($"GET {s}"))
+                .SetAfterPostDictCallback((s, d) => System.Diagnostics.Trace.WriteLine($"POST {s}:{JsonConvert.SerializeObject(d)}"))
+                .SetAfterPostStringCallback((s, p) => System.Diagnostics.Trace.WriteLine($"POST {s}:'{p}''"));
+        }
+
+        [TearDown]
+        public async Task TearDown()
+        {
+            var str = _client.Serialize();
+            var compressed = await Fake.Compressor.Compress(str);
+            
+            File.WriteAllBytes(HtmlJsonPath, compressed);
+        }
+
+        [Test]
+        public async Task TestScraper()
+        {
+            var ctx = Fake.DbContext();
+            var scraper = new Scraper(new TermRepository(ctx), new ProfessorRepository(ctx),
+                new DepartmentRepository(ctx), new EntryRepository(ctx), new CourseRepository(ctx), _client);
+
+            var res = await scraper.ScrapeEntriesAsync();
+            
+            Assert.False(res.IsError);
+            Assert.True(scraper.Entries.Any());
+            Assert.True(scraper.Errors.None());
         }
     }
 }
