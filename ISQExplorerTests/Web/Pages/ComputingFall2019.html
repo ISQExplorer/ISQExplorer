@@ -1,0 +1,3967 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/transitional.dtd">
+<html class=" idcae idcac" lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Pragma" name="Cache-Control" content="no-cache">
+<meta http-equiv="Cache-Control" name="Cache-Control" content="no-cache">
+<link rel="stylesheet" href="ComputingFall2019_files/web_calendar.css" type="text/css">
+<link rel="stylesheet" href="ComputingFall2019_files/web_hover.css" type="text/css">
+<link rel="stylesheet" href="ComputingFall2019_files/jquery-ui.css" type="text/css">
+<link rel="stylesheet" href="ComputingFall2019_files/jquery.css" type="text/css">
+<link rel="stylesheet" href="ComputingFall2019_files/dataTables_002.css" type="text/css">
+<link rel="stylesheet" href="ComputingFall2019_files/dataTables.css" type="text/css">
+<link rel="stylesheet" href="ComputingFall2019_files/web_defaultapp.css" type="text/css">
+<style>
+DIV.circlediv {
+width:100%;
+border-style: solid;
+border-width: 1px;
+border-radius: 10px;
+margin: 10px 2px 2px 0px;
+}
+
+.accordion {border: 4px ;
+background: #013f70; overflow:hidden; 
+background: -moz-linear-gradient(left,  #013f70 17%, #1f89c5 82%);
+background: -webkit-gradient(linear, left top, right top, color-stop(17%,#013f70), color-stop(82%,#1f89c5));
+background: -webkit-linear-gradient(left,  #013f70 17%,#1f89c5 82%); 
+background: -o-linear-gradient(left,  #013f70 17%,#1f89c5 82%); 
+background: -ms-linear-gradient(left,  #013f70 17%,#1f89c5 82%); 
+background: linear-gradient(to right,  #013f70 17%,#1f89c5 82%); 
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#013f70', endColorstr='#1f89c5',GradientType=1 ); 
+color:white;
+padding: 5px 10px 5px 10px;
+border-radius: 10px;
+font-size:calc(8px + .65vw);
+cursor: pointer; 
+margin: 2px;
+}
+
+.accordion:hover {
+background-image: linear-gradient(green, lightgreen); 
+}
+
+}
+.nonaccord {border: 4px ;
+background: #013f70; overflow:hidden; 
+background: -moz-linear-gradient(left,  #013f70 17%, #1f89c5 82%);
+background: -webkit-gradient(linear, left top, right top, color-stop(17%,#013f70), color-stop(82%,#1f89c5));
+background: -webkit-linear-gradient(left,  #013f70 17%,#1f89c5 82%); 
+background: -o-linear-gradient(left,  #013f70 17%,#1f89c5 82%); 
+background: -ms-linear-gradient(left,  #013f70 17%,#1f89c5 82%); 
+background: linear-gradient(to right,  #013f70 17%,#1f89c5 82%); 
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#013f70', endColorstr='#1f89c5',GradientType=1 ); 
+color:white;
+padding: 5px 10px 5px 10px;
+border-radius: 10px;
+font-size:calc(8px + .65vw); 
+margin: 2px;
+}
+
+.panel {
+padding: 5px 10px 5px 10px;
+font-size:calc(8px + .5vw);
+color:black;
+display: none; 
+margin: 2px;
+}
+
+.responsive {
+border: 4px ;
+padding: 5px 10px 5px 10px;
+border-radius: 10px;
+font-size:calc(8px + .5vw);
+margin: 2px;
+}
+
+.hidden {
+display: none; 
+}
+</style><link rel="stylesheet" href="ComputingFall2019_files/web_defaultprint.css" type="text/css" media="print">
+<title>Department Schedule</title>
+<script src="ComputingFall2019_files/jquery-1.js" type="text/javascript"></script>
+<script src="ComputingFall2019_files/jquery-ui.js" type="text/javascript"></script>
+<script src="ComputingFall2019_files/jquery.js" type="text/javascript"></script>
+<script src="ComputingFall2019_files/dataTables_002.js" type="text/javascript"></script>
+<script src="ComputingFall2019_files/dataTables.js" type="text/javascript"></script>
+<script src="ComputingFall2019_files/jquery_002.js" type="text/javascript"></script>
+<script src="ComputingFall2019_files/EZCalendar.js" type="text/javascript" defer="defer"></script>
+<script type="text/javascript" src="ComputingFall2019_files/ckeditor.js"></script><style>.cke{visibility:hidden;}</style>
+<meta http-equiv="Content-Script-Type" name="Default_Script_Language" content="text/javascript">
+<script language="JavaScript" type="text/javascript">
+<!-- Hide JavaScript from older browsers 
+window.onunload = function() {submitcount=0;}
+var submitcount=0;
+function checkSubmit() {
+if (submitcount == 0)
+   {
+   submitcount++;
+   return true;
+   }
+else
+   {
+alert("Your changes have already been submitted.");
+   return false;
+   }
+}
+//  End script hiding -->
+</script>
+<script language="JavaScript" type="text/javascript">
+<!-- Hide JavaScript from older browsers 
+//  Function to open a window
+function windowOpen(window_url) {
+   helpWin = window.open(window_url,'','toolbar=yes,status=no,scrollbars=yes,menubar=yes,resizable=yes,directories=no,location=no,width=350,height=400');
+   if (document.images) { 
+       if (helpWin) helpWin.focus()
+   }
+}
+//  End script hiding -->
+</script>
+</head>
+<body>
+<div class="headerwrapperdiv">
+<div class="pageheaderdiv1">
+<a href="#main_content" onmouseover="window.status='Go to Main Content'; return true" onmouseout="window.status=''; return true" onfocus="window.status='Go to Main Content'; return true" onblur="window.status=''; return true" class="skiplinks">Go to Main Content</a>
+<h1><div align="right"><font color="000099">&nbsp;</font></div></h1></div><div class="headerlinksdiv"><font color="000099">
+</font></div><font color="000099">
+<table class="plaintable" summary="This table displays Menu Items and Banner Search textbox." width="100%">
+<tbody><tr>
+<td class="pldefault">
+<div class="headerlinksdiv2">
+&nbsp;
+</div>
+</td>
+<td class="pldefault" align="RIGHT">
+<span class="pageheaderlinks">
+<a href="https://bannerssb.unf.edu/wtlhelp/twbhhelp.htm" accesskey="H" onclick="popup = window.open('/wtlhelp/twbhhelp.htm', 'PopupPage','height=500,width=450,scrollbars=yes,resizable=yes'); return false" target="_blank" onmouseover="window.status='';  return true" onmouseout="window.status=''; return true" onfocus="window.status='';  return true" onblur="window.status=''; return true" class="submenulinktext2">HELP</a>
+|
+<a href="https://bannerssb.unf.edu/nfpo-ssb/twbkwbis.P_Logout" accesskey="3" class="submenulinktext2">EXIT</a>
+</span>
+</td>
+</tr>
+</tbody></table>
+</font></div><font color="000099">
+<div class="pagetitlediv">
+<table class="plaintable" summary="This table displays title and static header displays." width="100%">
+<tbody><tr>
+<td class="pldefault">
+<h2>Department Schedule</h2>
+</td>
+<td class="pldefault">
+&nbsp;
+</td>
+<td class="pldefault"><p class="rightaligntext" p="">
+</p><div class="staticheaders">
+</div>
+</td>
+</tr>
+<tr>
+<td class="bg3" colspan="3" width="100%"><img src="ComputingFall2019_files/web_transparent.gif" alt="Transparent Image" class="headerImg" title="Transparent Image" name="web_transparent" width="10" vspace="0" hspace="0" height="3" border="0"></td>
+</tr>
+</tbody></table>
+<a name="main_content"></a>
+</div>
+<div class="pagebodydiv">
+<!--  ** END OF twbkwbis.P_OpenDoc **  -->
+<div class="infotextdiv"><table class="infotexttable" summary="This layout table contains information that may be helpful in understanding the content and functionality of this page.  It could be a brief set of instructions, a description of error messages, or other special information."><tbody><tr><td class="indefault"><span class="infotext"> To view <b>Instructional Satisfaction Questionnaire</b> data and <b>Grade Distribution Percentages</b> for a <b>Course</b>, select the Course ID. 
+<br><br> 
+To view <b>Instructional Satisfaction Questionnaire</b> data and <b>Grade Distribution Percentages</b> for an <b>Instructor</b>, select the Instructor name. 
+<p>A per-credit-hour distance learning fee applies to courses delivered online. See <a href="http://www.unf.edu/tuition/" target="_blank">http://www.unf.edu/tuition/</a>
+ . Online classes may require proctoring services; you may incur 
+additional charges in this course in the form of proctoring fees.</p>
+<p>
+<b>Term</b> is required. Either <b>Department</b> or <b>Campus</b> is required. If <b>Campus</b> is Main Campus, then <b>Department</b> is required. If a module term is selected, then a department is not required. </p></span></td></tr></tbody></table><p></p></div>
+<form action="wksfwbs.p_dept_schd" method="post">
+<hr>
+<table class="datadisplaytable" summary="This table displays the department course query form ">
+<tbody><tr>
+<th class="ddlabel" scope="row"><label><span class="fieldlabeltext">Term:</span></label></th>
+<td class="dddefault">
+<select name="pv_term" size="1" id="term_id" onchange="submit()">
+<option value="">None</option>
+<option value="202050">Summer 2020</option>
+<option value="202010">Spring 2020</option>
+<option value="201980" selected="selected">Fall 2019</option>
+<option value="201950">Summer 2019</option>
+<option value="201910">Spring 2019</option>
+<option value="201880">Fall 2018</option>
+<option value="201850">Summer 2018</option>
+<option value="201810">Spring 2018</option>
+<option value="201780">Fall 2017</option>
+<option value="201750">Summer 2017</option>
+<option value="201710">Spring 2017</option>
+<option value="201680">Fall 2016</option>
+<option value="201652">Summer 2016 Module 2</option>
+<option value="201651">Summer 2016 Module 1</option>
+<option value="201650">Summer 2016</option>
+<option value="201612">Spring 2016 Module 2</option>
+<option value="201611">Spring 2016 Module 1</option>
+<option value="201610">Spring 2016</option>
+<option value="201582">Fall 2015 Module 2</option>
+<option value="201581">Fall 2015 Module 1</option>
+<option value="201580">Fall 2015</option>
+<option value="201552">Summer 2015 Module 2</option>
+<option value="201551">Summer 2015 Module 1</option>
+<option value="201550">Summer 2015</option>
+<option value="201512">Spring 2015 Module 2</option>
+<option value="201511">Spring 2015 Module 1</option>
+<option value="201510">Spring 2015</option>
+<option value="201482">Fall 2014 Module 2</option>
+<option value="201481">Fall 2014 Module 1</option>
+<option value="201480">Fall 2014</option>
+<option value="201452">Summer 2014 Module 2</option>
+<option value="201451">Summer 2014 Module 1</option>
+<option value="201450">Summer 2014</option>
+<option value="201401">Spring 2014</option>
+<option value="201308">Fall 2013</option>
+<option value="201305">Summer 2013</option>
+<option value="201301">Spring 2013</option>
+<option value="201208">Fall 2012</option>
+<option value="201205">Summer 2012</option>
+<option value="201201">Spring 2012</option>
+<option value="201108">Fall 2011</option>
+<option value="201105">Summer 2011</option>
+<option value="201101">Spring 2011</option>
+<option value="201008">Fall 2010</option>
+<option value="201005">Summer 2010</option>
+<option value="201001">Spring 2010</option>
+<option value="200908">Fall 2009</option>
+<option value="200905">Summer 2009</option>
+<option value="200901">Spring 2009</option>
+<option value="200808">Fall 2008</option>
+<option value="200805">Summer 2008</option>
+<option value="200801">Spring 2008</option>
+<option value="200708">Fall 2007</option>
+<option value="200705">Summer 2007</option>
+<option value="200701">Spring 2007</option>
+<option value="200608">Fall 2006</option>
+<option value="200605">Summer 2006</option>
+<option value="200601">Spring 2006</option>
+<option value="200508">Fall 2005</option>
+</select>
+</td><th class="ddlabel" scope="row"><label><span class="fieldlabeltext">Department:</span></label></th>
+<td class="dddefault">
+<select name="pv_dept" size="1" id="dept_id">
+<option value="">None</option>
+<option value="6023">Academic Center for Excellence</option>
+<option value="6202">Accounting &amp; Finance          </option>
+<option value="6122">Art, Art History, and Design</option>
+<option value="6101">Arts &amp; Sciences</option>
+<option value="6120">Biology                       </option>
+<option value="6401">Brooks College of Health</option>
+<option value="6124">Chemistry</option>
+<option value="6302">Childhood Ed, Literacy &amp; TESOL</option>
+<option value="6503">Civil Engineering             </option>
+<option value="6404">Clinical &amp; Applied Movement Sc</option>
+<option value="6201">Coggin College of Business    </option>
+<option value="6108">Communication</option>
+<option value="6502" selected="selected">Computing</option>
+<option value="6506">Construction Management</option>
+<option value="0003">Cooperative Education</option>
+<option value="6123">Criminology &amp; Criminal Justice</option>
+<option value="6203">Economics and Geography</option>
+<option value="6301">Education &amp; Human Services    </option>
+<option value="6505">Electrical Engineering        </option>
+<option value="6102">English                       </option>
+<option value="6303">Except, Deaf &amp; Interpreter Ed.</option>
+<option value="6304">Foundations &amp; Secondary Educ</option>
+<option value="6406">Health Administration</option>
+<option value="6107">History                       </option>
+<option value="6007">Honors Program</option>
+<option value="6121">Languages, Lits., and Cultures</option>
+<option value="6307">Ldrship, Sch Counsel, Spt Mgmt</option>
+<option value="0009">Learning Communities</option>
+<option value="6205">Management</option>
+<option value="6206">Marketing &amp; Logistics</option>
+<option value="0002">Math: College Preparatory</option>
+<option value="6103">Mathematics &amp; Statistics      </option>
+<option value="6504">Mechanical Engineering        </option>
+<option value="0001">Military Science</option>
+<option value="6109">Music</option>
+<option value="6403">Nursing                       </option>
+<option value="6405">Nutrition &amp; Dietetics</option>
+<option value="6029">Office of Academic Testing</option>
+<option value="6105">Philosophy &amp; Religious Studies</option>
+<option value="6104">Physics</option>
+<option value="6111">Polit Science &amp; Public Admin</option>
+<option value="6114">Pre Med</option>
+<option value="6106">Psychology                    </option>
+<option value="6402">Public Health                 </option>
+<option value="6110">Soc, Anthro, &amp; Social Wk</option>
+<option value="6305">Teaching, Learning &amp; Curric</option>
+<option value="6801">Undergraduate Studies</option>
+</select>
+</td>
+<th class="ddlabel" scope="row">Part of Term:</th>
+
+<td class="dddefault">
+<select name="pv_ptrm" size="1" id="ptrm_id">
+<option value="" selected="selected">None</option>
+<option value="1">1 - Full Term</option>
+<option value="1H">1H - First Half Term</option>
+<option value="2H">2H - Second Half Term</option>
+</select>
+</td>
+<th class="ddlabel" scope="row">Campus:</th>
+
+<td class="dddefault">
+<select name="pv_campus" size="1" id="campus_id">
+<option value="" selected="selected">None</option>
+<option value="AP">Accelerated-term Program</option>
+<option value="AS">Austria</option>
+<option value="BBM">Baptist Medical Center Beaches</option>
+<option value="BMC">Baptist Medical Center South</option>
+<option value="BHI">Black Hammock Island, FL</option>
+<option value="BPT">Brooks PT Program/CE</option>
+<option value="CRO">Croatia</option>
+<option value="DL">Distance Learning</option>
+<option value="DB">Dubai</option>
+<option value="FH">Flagler Hospital</option>
+<option value="GRE">Greece</option>
+<option value="GU">Guatemala</option>
+<option value="HAW">Hawaii</option>
+<option value="HWI">Hawaii and Philippines Stdy Ab</option>
+<option value="CAP">IN: Cathedral Arts Project</option>
+<option value="IC">Iceland</option>
+<option value="OFF">Inactive: Off Campus Event</option>
+<option value="JPN">Japan</option>
+<option value="JBD">Jesse Ball DuPont Center</option>
+<option value="KO">Korea</option>
+<option value="LSM">Lake Shore Middle School</option>
+<option value="MC">Main Campus-UNF</option>
+<option value="MAR">Marseille</option>
+<option value="MEX">Mexico</option>
+<option value="MO">Morocco</option>
+<option value="MCA">Museum of Contemporary Art</option>
+<option value="NYC">New York City</option>
+<option value="OL">Online Program</option>
+<option value="ORL">Orlando, FL</option>
+<option value="OX">Oxford</option>
+<option value="PVH">Ponte Vedra High School</option>
+<option value="PR">Portugal</option>
+<option value="SC">Scotland</option>
+<option value="SCS">Seaside Charter School</option>
+<option value="SHJ">Shands Jacksonville</option>
+<option value="SIN">Singapore</option>
+<option value="SP">Spain</option>
+<option value="SA">Study Abroad - Out of Country</option>
+<option value="EN">Study Abroad: England</option>
+<option value="HA">Study Abroad: Haiti</option>
+<option value="VCA">Study Abroad: Vietnam/Cambodia</option>
+<option value="SWS">Switzerland</option>
+<option value="TH">Thailand</option>
+<option value="TB">The Bridge</option>
+<option value="TA">Tiger Academy</option>
+<option value="TUR">Turkey</option>
+<option value="UT">Utah</option>
+<option value="VRS">VRS Interpreting Institute</option>
+<option value="WHE">Windy Hill Elementary</option>
+</select>
+</td>
+</tr>
+</tbody></table>
+<table class="datadisplaytable" summary="This table displays the course schedule">
+<tbody><tr>
+<td class="dddefault">
+<input type="submit" name="pv_sub" value="Submit">
+<input type="submit" name="pv_sub" value="Clear">
+</td>
+</tr>
+</tbody></table>
+</form>
+<hr>
+<table class="datadisplaytable" summary="This table displays a list of courses for a department">
+<tbody><tr>
+<th class="ddlabel" scope="row">Status</th>
+<th class="ddlabel" scope="row">CRN</th>
+<th class="ddlabel" scope="row">Course</th>
+<th class="ddlabel" scope="row">Title</th>
+<th class="ddlabel" scope="row">Credit<br>Hours</th>
+<th class="ddlabel" scope="row">Part<br>of<br>Term</th>
+<th class="ddlabel" scope="row">Beg<br>Date</th>
+<th class="ddlabel" scope="row">End<br>Date</th>
+<th class="ddlabel" scope="row">Days</th>
+<th class="ddlabel" scope="row">Begin<br>Time</th>
+<th class="ddlabel" scope="row">End<br>Time</th>
+<th class="ddlabel" scope="row">Meet<br>Type</th>
+<th class="ddlabel" scope="row">Building</th>
+<th class="ddlabel" scope="row">Room</th>
+<th class="ddlabel" scope="row">Camp</th>
+<th class="ddlabel" scope="row">Wait<br>Count</th>
+<th class="ddlabel" scope="row">Approval</th>
+<th class="ddlabel" scope="row">Instructor</th>
+<th class="ddlabel" scope="row">Book Info</th>
+<th class="ddlabel" scope="row">&nbsp;</th>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83555</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CAP4630" target=" _blank">CAP4630</a>
+</td>
+<td class="dddefault">Intro To Artificial Intelligen</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">M W    </td>
+<td class="dddefault">03:00PM</td>
+<td class="dddefault">04:15PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0004</td>
+<td class="dddefault">1703</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N01388138" target=" _blank">Dutta</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CAP&amp;course-1=4630&amp;sect-1=83555" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83801</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CAP6768" target=" _blank">CAP6768</a>
+</td>
+<td class="dddefault">Data Analytics</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">DL</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00611704" target=" _blank">Umapathy</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CAP&amp;course-1=6768&amp;sect-1=83801" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81910</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CDA3101" target=" _blank">CDA3101</a>
+</td>
+<td class="dddefault">Introduction Computer Hardware</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-20</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T R   </td>
+<td class="dddefault">04:30PM</td>
+<td class="dddefault">05:45PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0051</td>
+<td class="dddefault">1205</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00006465" target=" _blank">Schuller</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CDA&amp;course-1=3101&amp;sect-1=81910" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81911</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CDA3101L" target=" _blank">CDA3101L</a>
+</td>
+<td class="dddefault">Intro Computer Hardware Lab</td>
+<td class="dddefault">  1.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T R   </td>
+<td class="dddefault">09:25AM</td>
+<td class="dddefault">10:40AM</td>
+<td class="dddefault">Laboratory</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">3126</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00006465" target=" _blank">Schuller</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CDA&amp;course-1=3101L&amp;sect-1=81911" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81912</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CDA3101L" target=" _blank">CDA3101L</a>
+</td>
+<td class="dddefault">Intro Computer Hardware Lab</td>
+<td class="dddefault">  1.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T R   </td>
+<td class="dddefault">10:50AM</td>
+<td class="dddefault">12:05PM</td>
+<td class="dddefault">Laboratory</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">3126</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00006465" target=" _blank">Schuller</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CDA&amp;course-1=3101L&amp;sect-1=81912" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81913</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CDA3101L" target=" _blank">CDA3101L</a>
+</td>
+<td class="dddefault">Intro Computer Hardware Lab</td>
+<td class="dddefault">  1.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-20</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T R   </td>
+<td class="dddefault">12:15PM</td>
+<td class="dddefault">01:30PM</td>
+<td class="dddefault">Laboratory</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">3126</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00006465" target=" _blank">Schuller</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CDA&amp;course-1=3101L&amp;sect-1=81913" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81914</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CDA4010" target=" _blank">CDA4010</a>
+</td>
+<td class="dddefault">Human Factrs/Collabr Cmpt</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T R   </td>
+<td class="dddefault">04:30PM</td>
+<td class="dddefault">05:45PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0004</td>
+<td class="dddefault">1703</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00481914" target=" _blank">Littleton</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CDA&amp;course-1=4010&amp;sect-1=81914" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81915</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CEN4010" target=" _blank">CEN4010</a>
+</td>
+<td class="dddefault">Software Engineering</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">M W    </td>
+<td class="dddefault">01:30PM</td>
+<td class="dddefault">02:45PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0002</td>
+<td class="dddefault">2210</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00959246" target=" _blank">Reddivari</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CEN&amp;course-1=4010&amp;sect-1=81915" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81917</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CEN6016" target=" _blank">CEN6016</a>
+</td>
+<td class="dddefault">Engineering of Software I</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">  W    </td>
+<td class="dddefault">06:00PM</td>
+<td class="dddefault">08:45PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">2203</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00959246" target=" _blank">Reddivari</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CEN&amp;course-1=6016&amp;sect-1=81917" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83556</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CEN6086" target=" _blank">CEN6086</a>
+</td>
+<td class="dddefault">Cloud Computing</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T     </td>
+<td class="dddefault">06:00PM</td>
+<td class="dddefault">08:45PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">1104</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00008863" target=" _blank">Ahuja</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CEN&amp;course-1=6086&amp;sect-1=83556" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81703</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CGS1100" target=" _blank">CGS1100</a>
+</td>
+<td class="dddefault">Computer Applications for Busi</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">DL</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00964349" target=" _blank">Marshall</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CGS&amp;course-1=1100&amp;sect-1=81703" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">81715</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CGS1100" target=" _blank">CGS1100</a>
+</td>
+<td class="dddefault">Computer Applications for Busi</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">DL</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00964349" target=" _blank">Marshall</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CGS&amp;course-1=1100&amp;sect-1=81715" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81726</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CGS1100" target=" _blank">CGS1100</a>
+</td>
+<td class="dddefault">Computer Applications for Busi</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">DL</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00964349" target=" _blank">Marshall</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CGS&amp;course-1=1100&amp;sect-1=81726" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81918</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CGS1100" target=" _blank">CGS1100</a>
+</td>
+<td class="dddefault">Computer Applications for Busi</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">DL</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00964349" target=" _blank">Marshall</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CGS&amp;course-1=1100&amp;sect-1=81918" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">81919</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CGS1100" target=" _blank">CGS1100</a>
+</td>
+<td class="dddefault">Computer Applications for Busi</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">DL</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00964349" target=" _blank">Marshall</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CGS&amp;course-1=1100&amp;sect-1=81919" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">81920</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CGS1100" target=" _blank">CGS1100</a>
+</td>
+<td class="dddefault">Computer Applications for Busi</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">DL</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00964349" target=" _blank">Marshall</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CGS&amp;course-1=1100&amp;sect-1=81920" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">81988</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CGS1100" target=" _blank">CGS1100</a>
+</td>
+<td class="dddefault">Computer Applications for Busi</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">DL</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00964349" target=" _blank">Marshall</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CGS&amp;course-1=1100&amp;sect-1=81988" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81989</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CGS1100" target=" _blank">CGS1100</a>
+</td>
+<td class="dddefault">Computer Applications for Busi</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">DL</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00964349" target=" _blank">Marshall</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CGS&amp;course-1=1100&amp;sect-1=81989" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81990</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CGS1100" target=" _blank">CGS1100</a>
+</td>
+<td class="dddefault">Computer Applications for Busi</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">DL</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00964349" target=" _blank">Marshall</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CGS&amp;course-1=1100&amp;sect-1=81990" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">82642</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CGS1100" target=" _blank">CGS1100</a>
+</td>
+<td class="dddefault">Computer Applications for Busi</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">DL</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00964349" target=" _blank">Marshall</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CGS&amp;course-1=1100&amp;sect-1=82642" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">82643</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CGS1100" target=" _blank">CGS1100</a>
+</td>
+<td class="dddefault">Computer Applications for Busi</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">DL</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00964349" target=" _blank">Marshall</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CGS&amp;course-1=1100&amp;sect-1=82643" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">82696</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CGS1100" target=" _blank">CGS1100</a>
+</td>
+<td class="dddefault">Computer Applications for Busi</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">DL</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00964349" target=" _blank">Marshall</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CGS&amp;course-1=1100&amp;sect-1=82696" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">82153</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CGS1930" target=" _blank">CGS1930</a>
+</td>
+<td class="dddefault">STEM LLC Seminar</td>
+<td class="dddefault">   .0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">   R   </td>
+<td class="dddefault">07:00PM</td>
+<td class="dddefault">08:00PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">000R</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00637134" target=" _blank">Curry</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CGS&amp;course-1=1930&amp;sect-1=82153" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83557</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS2990" target=" _blank">CIS2990</a>
+</td>
+<td class="dddefault">Exp: Intro to Programming Lab</td>
+<td class="dddefault">   .0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">DP</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=2990&amp;sect-1=83557" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83558</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS2990" target=" _blank">CIS2990</a>
+</td>
+<td class="dddefault">Exp: Intro to Programming Lab</td>
+<td class="dddefault">   .0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">DP</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=2990&amp;sect-1=83558" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83559</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS2990" target=" _blank">CIS2990</a>
+</td>
+<td class="dddefault">Exp: Intro to Programming Lab</td>
+<td class="dddefault">   .0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">DP</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=2990&amp;sect-1=83559" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83560</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS2990" target=" _blank">CIS2990</a>
+</td>
+<td class="dddefault">Exp: Intro to Programming Lab</td>
+<td class="dddefault">   .0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">DP</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=2990&amp;sect-1=83560" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83561</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS2990" target=" _blank">CIS2990</a>
+</td>
+<td class="dddefault">Exp: Intro to Programming Lab</td>
+<td class="dddefault">   .0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">DP</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=2990&amp;sect-1=83561" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83562</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS2990" target=" _blank">CIS2990</a>
+</td>
+<td class="dddefault">Exp: Intro to Programming Lab</td>
+<td class="dddefault">   .0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">DP</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=2990&amp;sect-1=83562" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83563</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS2990" target=" _blank">CIS2990</a>
+</td>
+<td class="dddefault">Exp: Intro to Programming Lab</td>
+<td class="dddefault">   .0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">DP</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=2990&amp;sect-1=83563" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83564</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS2990" target=" _blank">CIS2990</a>
+</td>
+<td class="dddefault">Exp: Intro to Programming Lab</td>
+<td class="dddefault">   .0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">DP</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=2990&amp;sect-1=83564" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83565</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS2990" target=" _blank">CIS2990</a>
+</td>
+<td class="dddefault">Exp: Intro to Programming Lab</td>
+<td class="dddefault">   .0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">DP</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=2990&amp;sect-1=83565" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83566</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS2990" target=" _blank">CIS2990</a>
+</td>
+<td class="dddefault">Exp: Intro to Programming Lab</td>
+<td class="dddefault">   .0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">DP</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=2990&amp;sect-1=83566" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83567</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS2990" target=" _blank">CIS2990</a>
+</td>
+<td class="dddefault">Exp: Intro to Programming Lab</td>
+<td class="dddefault">   .0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">DP</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=2990&amp;sect-1=83567" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83568</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS2990" target=" _blank">CIS2990</a>
+</td>
+<td class="dddefault">Exp: Intro to Programming Lab</td>
+<td class="dddefault">   .0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">DP</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=2990&amp;sect-1=83568" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83569</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS2990" target=" _blank">CIS2990</a>
+</td>
+<td class="dddefault">Exp: Intro to Programming Lab</td>
+<td class="dddefault">   .0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">DP</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=2990&amp;sect-1=83569" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83570</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS2990" target=" _blank">CIS2990</a>
+</td>
+<td class="dddefault">Exp: Intro to Programming Lab</td>
+<td class="dddefault">   .0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">DP</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=2990&amp;sect-1=83570" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81922</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS3253" target=" _blank">CIS3253</a>
+</td>
+<td class="dddefault">GW-Legal Ethical Iss in Comput</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">DL</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00481914" target=" _blank">Littleton</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=3253&amp;sect-1=81922" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83256</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS3526" target=" _blank">CIS3526</a>
+</td>
+<td class="dddefault">IT Project Management</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-20</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T R   </td>
+<td class="dddefault">12:15PM</td>
+<td class="dddefault">01:30PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0004</td>
+<td class="dddefault">1706</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00060166" target=" _blank">Daniels</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=3526&amp;sect-1=83256" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81945</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS3949" target=" _blank">CIS3949</a>
+</td>
+<td class="dddefault">Experiential Studies in Comput</td>
+<td class="dddefault">  1.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00008817" target=" _blank">Elfayoumy</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=3949&amp;sect-1=81945" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81946</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS3949" target=" _blank">CIS3949</a>
+</td>
+<td class="dddefault">Experiential Studies in Comput</td>
+<td class="dddefault">  2.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00008817" target=" _blank">Elfayoumy</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=3949&amp;sect-1=81946" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81947</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS3949" target=" _blank">CIS3949</a>
+</td>
+<td class="dddefault">Experiential Studies in Comput</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00008817" target=" _blank">Elfayoumy</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=3949&amp;sect-1=81947" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">84190</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS3949" target=" _blank">CIS3949</a>
+</td>
+<td class="dddefault">Experiential Studies in Comput</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">2H - Second Half Term</td>
+<td class="dddefault">10-14</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">OFF-MC</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">OIN</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00008817" target=" _blank">Elfayoumy</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=3949&amp;sect-1=84190" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83544</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS3990" target=" _blank">CIS3990</a>
+</td>
+<td class="dddefault">Exp: IT Practicum</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">OFF-MC</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">OIN</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">DP</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00008817" target=" _blank">Elfayoumy</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=3990&amp;sect-1=83544" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">81923</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS4327" target=" _blank">CIS4327</a>
+</td>
+<td class="dddefault">Information Syst Sr Project I</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">M W    </td>
+<td class="dddefault">04:30PM</td>
+<td class="dddefault">05:45PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">1104</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00611704" target=" _blank">Umapathy</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=4327&amp;sect-1=81923" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83571</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS4327" target=" _blank">CIS4327</a>
+</td>
+<td class="dddefault">Information Syst Sr Project I</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=4327&amp;sect-1=83571" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81924</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS4360" target=" _blank">CIS4360</a>
+</td>
+<td class="dddefault">Intro to Computer Security</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">M W    </td>
+<td class="dddefault">12:00PM</td>
+<td class="dddefault">01:15PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0004</td>
+<td class="dddefault">1705</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00909751" target=" _blank">Roy</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=4360&amp;sect-1=81924" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81925</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS4362" target=" _blank">CIS4362</a>
+</td>
+<td class="dddefault">Computer Cryptography</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">M W    </td>
+<td class="dddefault">12:00PM</td>
+<td class="dddefault">01:15PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">1206</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N01443369" target=" _blank">Vakilinia</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=4362&amp;sect-1=81925" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83572</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS4364" target=" _blank">CIS4364</a>
+</td>
+<td class="dddefault">IS Intrusion Detect</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=4364&amp;sect-1=83572" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83573</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS4364" target=" _blank">CIS4364</a>
+</td>
+<td class="dddefault">IS Intrusion Detect</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T R   </td>
+<td class="dddefault">01:40PM</td>
+<td class="dddefault">02:55PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">1205</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00909751" target=" _blank">Roy</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=4364&amp;sect-1=83573" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83574</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS4366" target=" _blank">CIS4366</a>
+</td>
+<td class="dddefault">Computer Forensics</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">M W    </td>
+<td class="dddefault">04:30PM</td>
+<td class="dddefault">05:45PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">2202</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00166552" target=" _blank">LaValley</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=4366&amp;sect-1=83574" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">81948</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS4900" target=" _blank">CIS4900</a>
+</td>
+<td class="dddefault">Directed Independent Study</td>
+<td class="dddefault">  2.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=4900&amp;sect-1=81948" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">81949</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS4900" target=" _blank">CIS4900</a>
+</td>
+<td class="dddefault">Directed Independent Study</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=4900&amp;sect-1=81949" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">82663</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS4900" target=" _blank">CIS4900</a>
+</td>
+<td class="dddefault">Directed Independent Study</td>
+<td class="dddefault">  1.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00006914" target=" _blank">Snedden</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=4900&amp;sect-1=82663" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">84188</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS4900" target=" _blank">CIS4900</a>
+</td>
+<td class="dddefault">Directed Independent Study</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">2H - Second Half Term</td>
+<td class="dddefault">10-14</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00008817" target=" _blank">Elfayoumy</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=4900&amp;sect-1=84188" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">84189</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS4900" target=" _blank">CIS4900</a>
+</td>
+<td class="dddefault">Directed Independent Study</td>
+<td class="dddefault">  1.0</td>
+<td class="dddefault">2H - Second Half Term</td>
+<td class="dddefault">10-14</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00006914" target=" _blank">Snedden</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=4900&amp;sect-1=84189" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">82144</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS4930" target=" _blank">CIS4930</a>
+</td>
+<td class="dddefault">ST: Software Defined Networks</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">M W    </td>
+<td class="dddefault">03:00PM</td>
+<td class="dddefault">04:15PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0009</td>
+<td class="dddefault">1411</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N01413660" target=" _blank">Faizian</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=4930&amp;sect-1=82144" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83582</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS4930" target=" _blank">CIS4930</a>
+</td>
+<td class="dddefault">ST: Software Testing</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=4930&amp;sect-1=83582" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83583</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS4930" target=" _blank">CIS4930</a>
+</td>
+<td class="dddefault">ST: Into to Neural Nets/ML</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=4930&amp;sect-1=83583" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83584</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS4930" target=" _blank">CIS4930</a>
+</td>
+<td class="dddefault">ST: Game Theory</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">M W    </td>
+<td class="dddefault">03:00PM</td>
+<td class="dddefault">04:15PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0002</td>
+<td class="dddefault">2212</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N01443369" target=" _blank">Vakilinia</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=4930&amp;sect-1=83584" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83751</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS5930" target=" _blank">CIS5930</a>
+</td>
+<td class="dddefault">ST: Software Testing</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=5930&amp;sect-1=83751" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83787</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS5930" target=" _blank">CIS5930</a>
+</td>
+<td class="dddefault">ST: Software Defined Networks</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=5930&amp;sect-1=83787" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83800</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS5930" target=" _blank">CIS5930</a>
+</td>
+<td class="dddefault">ST: Game Theory</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=5930&amp;sect-1=83800" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83257</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS5949" target=" _blank">CIS5949</a>
+</td>
+<td class="dddefault">Exp Studies in Computing</td>
+<td class="dddefault">  1.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=5949&amp;sect-1=83257" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83258</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS5949" target=" _blank">CIS5949</a>
+</td>
+<td class="dddefault">Exp Studies in Computing</td>
+<td class="dddefault">  2.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=5949&amp;sect-1=83258" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83259</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS5949" target=" _blank">CIS5949</a>
+</td>
+<td class="dddefault">Exp Studies in Computing</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00008817" target=" _blank">Elfayoumy</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=5949&amp;sect-1=83259" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81950</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS6900" target=" _blank">CIS6900</a>
+</td>
+<td class="dddefault">Directed Individual Study</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N01388138" target=" _blank">Dutta</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=6900&amp;sect-1=81950" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83260</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS6900" target=" _blank">CIS6900</a>
+</td>
+<td class="dddefault">Directed Individual Study</td>
+<td class="dddefault">  2.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=6900&amp;sect-1=83260" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83261</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS6900" target=" _blank">CIS6900</a>
+</td>
+<td class="dddefault">Directed Individual Study</td>
+<td class="dddefault">  1.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=6900&amp;sect-1=83261" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83666</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS6900" target=" _blank">CIS6900</a>
+</td>
+<td class="dddefault">Directed Individual Study</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=6900&amp;sect-1=83666" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83575</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS6913" target=" _blank">CIS6913</a>
+</td>
+<td class="dddefault">Research Methods in Computing</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T R   </td>
+<td class="dddefault">04:30PM</td>
+<td class="dddefault">05:45PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">1104</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00823146" target=" _blank">Asaithambi</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=6913&amp;sect-1=83575" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83262</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS6930" target=" _blank">CIS6930</a>
+</td>
+<td class="dddefault">ST: Internet of Things</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">   R   </td>
+<td class="dddefault">06:00PM</td>
+<td class="dddefault">08:45PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">1104</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00174929" target=" _blank">Prodanoff</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=6930&amp;sect-1=83262" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83576</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS6930" target=" _blank">CIS6930</a>
+</td>
+<td class="dddefault">Appl Machine Lrng Using Python</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">M      </td>
+<td class="dddefault">06:00PM</td>
+<td class="dddefault">08:45PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">1104</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N01237497" target=" _blank">Liu</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=6930&amp;sect-1=83576" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">81314</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS6970" target=" _blank">CIS6970</a>
+</td>
+<td class="dddefault">Thesis: Computer Science</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=6970&amp;sect-1=81314" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">81315</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS6970" target=" _blank">CIS6970</a>
+</td>
+<td class="dddefault">Thesis: Computer Science</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=6970&amp;sect-1=81315" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">81316</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS6970" target=" _blank">CIS6970</a>
+</td>
+<td class="dddefault">Thesis: Computer Science</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=6970&amp;sect-1=81316" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81317</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS6970" target=" _blank">CIS6970</a>
+</td>
+<td class="dddefault">Thesis: Computer Science</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N01237497" target=" _blank">Liu</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=6970&amp;sect-1=81317" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">81418</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS6970" target=" _blank">CIS6970</a>
+</td>
+<td class="dddefault">Thesis: Computer Science</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=6970&amp;sect-1=81418" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81951</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS6970" target=" _blank">CIS6970</a>
+</td>
+<td class="dddefault">Thesis: Computer Science</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00959246" target=" _blank">Reddivari</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=6970&amp;sect-1=81951" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">81952</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS6970" target=" _blank">CIS6970</a>
+</td>
+<td class="dddefault">Thesis: Computer Science</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=6970&amp;sect-1=81952" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">81953</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS6970" target=" _blank">CIS6970</a>
+</td>
+<td class="dddefault">Thesis: Computer Science</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=6970&amp;sect-1=81953" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">82728</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS6970" target=" _blank">CIS6970</a>
+</td>
+<td class="dddefault">Thesis: Computer Science</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">DP</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N01388138" target=" _blank">Dutta</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=6970&amp;sect-1=82728" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83263</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS6970" target=" _blank">CIS6970</a>
+</td>
+<td class="dddefault">Thesis: Computer Science</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=6970&amp;sect-1=83263" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83264</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS6970" target=" _blank">CIS6970</a>
+</td>
+<td class="dddefault">Thesis: Computer Science</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=6970&amp;sect-1=83264" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83577</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CIS6970" target=" _blank">CIS6970</a>
+</td>
+<td class="dddefault">Thesis: Computer Science</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">AA</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00823146" target=" _blank">Asaithambi</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CIS&amp;course-1=6970&amp;sect-1=83577" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">82652</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CNT4406" target=" _blank">CNT4406</a>
+</td>
+<td class="dddefault">Network Security/Management</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T R   </td>
+<td class="dddefault">04:30PM</td>
+<td class="dddefault">05:45PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">1203</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00174929" target=" _blank">Prodanoff</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CNT&amp;course-1=4406&amp;sect-1=82652" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81927</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CNT4504" target=" _blank">CNT4504</a>
+</td>
+<td class="dddefault">Computer Networks/Dist Process</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T R   </td>
+<td class="dddefault">04:30PM</td>
+<td class="dddefault">05:45PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0004</td>
+<td class="dddefault">1705</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00008863" target=" _blank">Ahuja</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CNT&amp;course-1=4504&amp;sect-1=81927" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">82641</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CNT4504" target=" _blank">CNT4504</a>
+</td>
+<td class="dddefault">Computer Networks/Dist Process</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T R   </td>
+<td class="dddefault">03:05PM</td>
+<td class="dddefault">04:20PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0004</td>
+<td class="dddefault">1705</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N01443957" target=" _blank">Kelly</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CNT&amp;course-1=4504&amp;sect-1=82641" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81928</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=CNT5505" target=" _blank">CNT5505</a>
+</td>
+<td class="dddefault">Computer Networks/Dist Process</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T R   </td>
+<td class="dddefault">04:30PM</td>
+<td class="dddefault">05:45PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0004</td>
+<td class="dddefault">1705</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00008863" target=" _blank">Ahuja</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=CNT&amp;course-1=5505&amp;sect-1=81928" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">80450</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP2220" target=" _blank">COP2220</a>
+</td>
+<td class="dddefault">Computer Science I</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Hybrid</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">HYB</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00006914" target=" _blank">Snedden</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=2220&amp;sect-1=80450" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">80451</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP2220" target=" _blank">COP2220</a>
+</td>
+<td class="dddefault">Computer Science I</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Hybrid</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">HYB</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00006914" target=" _blank">Snedden</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=2220&amp;sect-1=80451" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81467</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP2220" target=" _blank">COP2220</a>
+</td>
+<td class="dddefault">Computer Science I</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Hybrid</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">HYB</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00006914" target=" _blank">Snedden</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=2220&amp;sect-1=81467" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">81491</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP2220" target=" _blank">COP2220</a>
+</td>
+<td class="dddefault">Computer Science I</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Hybrid</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">HYB</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00006914" target=" _blank">Snedden</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=2220&amp;sect-1=81491" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81725</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP2220" target=" _blank">COP2220</a>
+</td>
+<td class="dddefault">Computer Science I</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Hybrid</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">HYB</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00006914" target=" _blank">Snedden</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=2220&amp;sect-1=81725" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">82500</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP2220" target=" _blank">COP2220</a>
+</td>
+<td class="dddefault">Computer Science I</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Hybrid</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">HYB</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00006914" target=" _blank">Snedden</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=2220&amp;sect-1=82500" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">82501</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP2220" target=" _blank">COP2220</a>
+</td>
+<td class="dddefault">Computer Science I</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Hybrid</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">HYB</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00006914" target=" _blank">Snedden</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=2220&amp;sect-1=82501" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">82502</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP2220" target=" _blank">COP2220</a>
+</td>
+<td class="dddefault">Computer Science I</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Hybrid</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">HYB</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00006914" target=" _blank">Snedden</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=2220&amp;sect-1=82502" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">82504</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP2220" target=" _blank">COP2220</a>
+</td>
+<td class="dddefault">Computer Science I</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Hybrid</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">HYB</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00006914" target=" _blank">Snedden</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=2220&amp;sect-1=82504" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">82505</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP2220" target=" _blank">COP2220</a>
+</td>
+<td class="dddefault">Computer Science I</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Hybrid</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">HYB</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00006914" target=" _blank">Snedden</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=2220&amp;sect-1=82505" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">82506</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP2220" target=" _blank">COP2220</a>
+</td>
+<td class="dddefault">Computer Science I</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Hybrid</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">HYB</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00006914" target=" _blank">Snedden</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=2220&amp;sect-1=82506" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83578</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP2220" target=" _blank">COP2220</a>
+</td>
+<td class="dddefault">Computer Science I</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Hybrid</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">HYB</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00006914" target=" _blank">Snedden</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=2220&amp;sect-1=83578" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83579</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP2220" target=" _blank">COP2220</a>
+</td>
+<td class="dddefault">Computer Science I</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Hybrid</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">HYB</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00006914" target=" _blank">Snedden</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=2220&amp;sect-1=83579" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83960</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP2220" target=" _blank">COP2220</a>
+</td>
+<td class="dddefault">Computer Science I</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Hybrid</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">HYB</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00006914" target=" _blank">Snedden</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=2220&amp;sect-1=83960" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81932</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP3503" target=" _blank">COP3503</a>
+</td>
+<td class="dddefault">Computer Science II</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">M W    </td>
+<td class="dddefault">12:00PM</td>
+<td class="dddefault">01:15PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">1203</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N01388138" target=" _blank">Dutta</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=3503&amp;sect-1=81932" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">82645</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP3503" target=" _blank">COP3503</a>
+</td>
+<td class="dddefault">Computer Science II</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">M W    </td>
+<td class="dddefault">01:30PM</td>
+<td class="dddefault">02:45PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">1203</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N01388138" target=" _blank">Dutta</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=3503&amp;sect-1=82645" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83580</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP3503" target=" _blank">COP3503</a>
+</td>
+<td class="dddefault">Computer Science II</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">M W    </td>
+<td class="dddefault">04:30PM</td>
+<td class="dddefault">05:45PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">1203</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N01445013" target=" _blank">Oranges</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=3503&amp;sect-1=83580" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83581</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP3503" target=" _blank">COP3503</a>
+</td>
+<td class="dddefault">Computer Science II</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">M W    </td>
+<td class="dddefault">06:00PM</td>
+<td class="dddefault">07:15PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">1203</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00164405" target=" _blank">Gomez</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=3503&amp;sect-1=83581" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81935</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP3855" target=" _blank">COP3855</a>
+</td>
+<td class="dddefault">Web Systems Development</td>
+<td class="dddefault">  4.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">M W    </td>
+<td class="dddefault">10:00AM</td>
+<td class="dddefault">11:40AM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">1203</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N01070080" target=" _blank">Jethwani</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=3855&amp;sect-1=81935" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83545</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP3990" target=" _blank">COP3990</a>
+</td>
+<td class="dddefault">Exp: Data Structures</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">M W    </td>
+<td class="dddefault">01:30PM</td>
+<td class="dddefault">02:45PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0004</td>
+<td class="dddefault">1706</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N01237497" target=" _blank">Liu</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=3990&amp;sect-1=83545" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83546</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP3990" target=" _blank">COP3990</a>
+</td>
+<td class="dddefault">Exp: Data Structures</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">M W    </td>
+<td class="dddefault">12:00PM</td>
+<td class="dddefault">01:15PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0002</td>
+<td class="dddefault">2210</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N01413660" target=" _blank">Faizian</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=3990&amp;sect-1=83546" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83547</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP3991" target=" _blank">COP3991</a>
+</td>
+<td class="dddefault">Exp: Intro to Databases</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T R   </td>
+<td class="dddefault">12:15PM</td>
+<td class="dddefault">01:30PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">1203</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N01070080" target=" _blank">Jethwani</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=3991&amp;sect-1=83547" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83548</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP3991" target=" _blank">COP3991</a>
+</td>
+<td class="dddefault">Exp: Intro to Databases</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T R   </td>
+<td class="dddefault">01:40PM</td>
+<td class="dddefault">02:55PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">1203</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N01070080" target=" _blank">Jethwani</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=3991&amp;sect-1=83548" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83549</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP3991" target=" _blank">COP3991</a>
+</td>
+<td class="dddefault">Exp: Intro to Databases</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">M W    </td>
+<td class="dddefault">03:00PM</td>
+<td class="dddefault">04:15PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">1203</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N01070080" target=" _blank">Jethwani</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=3991&amp;sect-1=83549" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83588</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP3992" target=" _blank">COP3992</a>
+</td>
+<td class="dddefault">Exp: Systems Software</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T R   </td>
+<td class="dddefault">12:15PM</td>
+<td class="dddefault">01:30PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0004</td>
+<td class="dddefault">1703</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00009894" target=" _blank">Eggen</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=3992&amp;sect-1=83588" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83589</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP3992" target=" _blank">COP3992</a>
+</td>
+<td class="dddefault">Exp: Systems Software</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T R   </td>
+<td class="dddefault">01:40PM</td>
+<td class="dddefault">02:55PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">1206</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00009894" target=" _blank">Eggen</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=3992&amp;sect-1=83589" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81939</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP4640" target=" _blank">COP4640</a>
+</td>
+<td class="dddefault">OS Env Admin</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">DL</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00481914" target=" _blank">Littleton</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=4640&amp;sect-1=81939" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83659</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP4640" target=" _blank">COP4640</a>
+</td>
+<td class="dddefault">OS Env Admin</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">DL</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00481914" target=" _blank">Littleton</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=4640&amp;sect-1=83659" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81942</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP4813" target=" _blank">COP4813</a>
+</td>
+<td class="dddefault">Internet Programming</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">DL</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00481914" target=" _blank">Littleton</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=4813&amp;sect-1=81942" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83550</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP4991" target=" _blank">COP4991</a>
+</td>
+<td class="dddefault">Exp: Constr of Language Trans</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T R   </td>
+<td class="dddefault">04:30PM</td>
+<td class="dddefault">05:45PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0004</td>
+<td class="dddefault">1706</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00009894" target=" _blank">Eggen</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=4991&amp;sect-1=83550" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">81943</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COP5819" target=" _blank">COP5819</a>
+</td>
+<td class="dddefault">Internet Programming</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">       </td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">ONLINE</td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">DL</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00481914" target=" _blank">Littleton</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COP&amp;course-1=5819&amp;sect-1=81943" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">82014</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COT3100" target=" _blank">COT3100</a>
+</td>
+<td class="dddefault">Computational Structures</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">M W    </td>
+<td class="dddefault">01:30PM</td>
+<td class="dddefault">02:45PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0004</td>
+<td class="dddefault">1703</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N01388139" target=" _blank">Ghosh</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COT&amp;course-1=3100&amp;sect-1=82014" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">82545</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COT3100" target=" _blank">COT3100</a>
+</td>
+<td class="dddefault">Computational Structures</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">M W    </td>
+<td class="dddefault">04:30PM</td>
+<td class="dddefault">05:45PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0004</td>
+<td class="dddefault">1704</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00659988" target=" _blank">Morrison</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COT&amp;course-1=3100&amp;sect-1=82545" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">82647</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COT3100" target=" _blank">COT3100</a>
+</td>
+<td class="dddefault">Computational Structures</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-20</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T R   </td>
+<td class="dddefault">04:30PM</td>
+<td class="dddefault">05:45PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0002</td>
+<td class="dddefault">2010</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N01430868" target=" _blank">Getahun</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COT&amp;course-1=3100&amp;sect-1=82647" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83552</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COT3100" target=" _blank">COT3100</a>
+</td>
+<td class="dddefault">Computational Structures</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T R   </td>
+<td class="dddefault">03:05PM</td>
+<td class="dddefault">04:20PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0002</td>
+<td class="dddefault">2010</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N01430868" target=" _blank">Getahun</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COT&amp;course-1=3100&amp;sect-1=83552" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">83554</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COT3100" target=" _blank">COT3100</a>
+</td>
+<td class="dddefault">Computational Structures</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault">M W    </td>
+<td class="dddefault">03:00PM</td>
+<td class="dddefault">04:15PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0057</td>
+<td class="dddefault">1260</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00909751" target=" _blank">Roy</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COT&amp;course-1=3100&amp;sect-1=83554" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">Closed</td>
+<td class="dddefault">81944</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COT3210" target=" _blank">COT3210</a>
+</td>
+<td class="dddefault">Computability And Automata</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-20</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T R   </td>
+<td class="dddefault">03:05PM</td>
+<td class="dddefault">04:20PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">1205</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00823146" target=" _blank">Asaithambi</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COT&amp;course-1=3210&amp;sect-1=81944" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">82646</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COT3210" target=" _blank">COT3210</a>
+</td>
+<td class="dddefault">Computability And Automata</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T R   </td>
+<td class="dddefault">10:50AM</td>
+<td class="dddefault">12:05PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0002</td>
+<td class="dddefault">2010</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00909751" target=" _blank">Roy</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COT&amp;course-1=3210&amp;sect-1=82646" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">83265</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=COT4400" target=" _blank">COT4400</a>
+</td>
+<td class="dddefault">Analysis of Algorithms</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T R   </td>
+<td class="dddefault">01:40PM</td>
+<td class="dddefault">02:55PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0004</td>
+<td class="dddefault">1706</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N01388139" target=" _blank">Ghosh</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=COT&amp;course-1=4400&amp;sect-1=83265" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">82511</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_course_isq_grade?pv_course_id=IDC2000" target=" _blank">IDC2000</a>
+</td>
+<td class="dddefault">Beauty and Joy of Computing</td>
+<td class="dddefault">  3.0</td>
+<td class="dddefault">1 - Full Term</td>
+<td class="dddefault">08-19</td>
+<td class="dddefault">12-13</td>
+<td class="dddefault"> T R   </td>
+<td class="dddefault">10:50AM</td>
+<td class="dddefault">12:05PM</td>
+<td class="dddefault">Class</td>
+<td class="dddefault">0015</td>
+<td class="dddefault">1203</td>
+<td class="dddefault">MC</td>
+<td class="dddefault"><p class="rightaligntext">0</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddefault">
+<a href="https://bannerssb.unf.edu/nfpo-ssb/wksfwbs.p_instructor_isq_grade?pv_instructor=N00060166" target=" _blank">Daniels</a>
+</td>
+<td class="dddefault">
+<a href="https://www.bkstr.com/webApp/discoverView?bookstore_id-1=647&amp;term_id-1=64719&amp;dept-1=IDC&amp;course-1=2000&amp;sect-1=82511" target="_blank">View</a>
+</td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+</tbody></table>
+
+<!--  ** START OF twbkwbis.P_CloseDoc **  -->
+<table class="plaintable" summary="This is table displays line separator at end of the page." width="100%" cellspacing="0" cellpadding="0" border="0"><tbody><tr><td class="bgtabon" colspan="2" width="100%"><img src="ComputingFall2019_files/web_transparent.gif" alt="Transparent Image" class="headerImg" title="Transparent Image" name="web_transparent" width="10" vspace="0" hspace="0" height="3" border="0"></td></tr></tbody></table>
+<a href="#top" onmouseover="window.status='Skip to top of page'; return true" onmouseout="window.status=''; return true" onfocus="window.status='Skip to top of page'; return true" onblur="window.status=''; return true" class="skiplinks">Skip to top of page</a>
+</div>
+<div class="footerbeforediv">
+
+</div>
+<div class="footerafterdiv">
+
+</div>
+<div class="globalafterdiv">
+
+</div>
+<div class="globalfooterdiv">
+
+</div>
+<div class="pagefooterdiv">
+<span class="releasetext">Release: 6.4</span>
+</div>
+<div class="poweredbydiv">
+</div>
+<div class="div1"></div>
+<div class="div2"></div>
+<div class="div3"></div>
+<div class="div4"></div>
+<div class="div5"></div>
+<div class="div6"></div>
+<div class="banner_copyright"> <br><h5>© 2020 Ellucian Company L.P. and its affiliates.<br></h5></div>
+
+
+</font><div id="EZcalendar" style="display: none;">	<input id="months" name="months" type="hidden" value="2">	<input id="years" name="years" type="hidden" value="2020">	<div id="EZcalendar_table">		<table cellspacing="0" cellpadding="0" border="1">			<tbody><tr>				<td><input type="button" value="«" onclick="prevYear()" title="Previous Year"></td>				<td><input type="button" value="‹" onclick="prevMonth()" title="Previous Month"></td>				<td colspan="3" id="EZcalendar_text">Mar 2020</td>				<td><input type="button" value="›" onclick="nextMonth()" title="Next Month"></td>				<td><input type="button" value="»" onclick="nextYear()" title="Next Year"></td>			</tr>			<tr>				<th scope="col">S</th>				<th scope="col">M</th>				<th scope="col">T</th>				<th scope="col">W</th>				<th scope="col">T</th>				<th scope="col">F</th>				<th scope="col">S</th>			</tr>	<tr>		<td><a href="javascript:setDateValue('03/01/2020')" id="cell00" class="" title="1 March, 2020">1</a></td>		<td><a href="javascript:setDateValue('03/02/2020')" id="cell01" class="" title="2 March, 2020">2</a></td>		<td><a href="javascript:setDateValue('03/03/2020')" id="cell02" class="" title="3 March, 2020">3</a></td>		<td><a href="javascript:setDateValue('03/04/2020')" id="cell03" class="" title="4 March, 2020">4</a></td>		<td><a href="javascript:setDateValue('03/05/2020')" id="cell04" class="" title="5 March, 2020">5</a></td>		<td><a href="javascript:setDateValue('03/06/2020')" id="cell05" class="" title="6 March, 2020">6</a></td>		<td><a href="javascript:setDateValue('03/07/2020')" id="cell06" class="" title="7 March, 2020">7</a></td>	</tr><tr>		<td><a href="javascript:setDateValue('03/08/2020')" id="cell10" class="" title="8 March, 2020">8</a></td>		<td><a href="javascript:setDateValue('03/09/2020')" id="cell11" class="" title="9 March, 2020">9</a></td>		<td><a href="javascript:setDateValue('03/10/2020')" id="cell12" class="" title="10 March, 2020">10</a></td>		<td><a href="javascript:setDateValue('03/11/2020')" id="cell13" class="" title="11 March, 2020">11</a></td>		<td><a href="javascript:setDateValue('03/12/2020')" id="cell14" class="" title="12 March, 2020">12</a></td>		<td><a href="javascript:setDateValue('03/13/2020')" id="cell15" class="" title="13 March, 2020">13</a></td>		<td><a href="javascript:setDateValue('03/14/2020')" id="cell16" class="today" title="14 March, 2020">14</a></td>	</tr><tr>		<td><a href="javascript:setDateValue('03/15/2020')" id="cell20" class="" title="15 March, 2020">15</a></td>		<td><a href="javascript:setDateValue('03/16/2020')" id="cell21" class="" title="16 March, 2020">16</a></td>		<td><a href="javascript:setDateValue('03/17/2020')" id="cell22" class="" title="17 March, 2020">17</a></td>		<td><a href="javascript:setDateValue('03/18/2020')" id="cell23" class="" title="18 March, 2020">18</a></td>		<td><a href="javascript:setDateValue('03/19/2020')" id="cell24" class="" title="19 March, 2020">19</a></td>		<td><a href="javascript:setDateValue('03/20/2020')" id="cell25" class="" title="20 March, 2020">20</a></td>		<td><a href="javascript:setDateValue('03/21/2020')" id="cell26" class="" title="21 March, 2020">21</a></td>	</tr><tr>		<td><a href="javascript:setDateValue('03/22/2020')" id="cell30" class="" title="22 March, 2020">22</a></td>		<td><a href="javascript:setDateValue('03/23/2020')" id="cell31" class="" title="23 March, 2020">23</a></td>		<td><a href="javascript:setDateValue('03/24/2020')" id="cell32" class="" title="24 March, 2020">24</a></td>		<td><a href="javascript:setDateValue('03/25/2020')" id="cell33" class="" title="25 March, 2020">25</a></td>		<td><a href="javascript:setDateValue('03/26/2020')" id="cell34" class="" title="26 March, 2020">26</a></td>		<td><a href="javascript:setDateValue('03/27/2020')" id="cell35" class="" title="27 March, 2020">27</a></td>		<td><a href="javascript:setDateValue('03/28/2020')" id="cell36" class="" title="28 March, 2020">28</a></td>	</tr><tr>		<td><a href="javascript:setDateValue('03/29/2020')" id="cell40" class="" title="29 March, 2020">29</a></td>		<td><a href="javascript:setDateValue('03/30/2020')" id="cell41" class="" title="30 March, 2020">30</a></td>		<td><a href="javascript:setDateValue('03/31/2020')" id="cell42" class="" title="31 March, 2020">31</a></td>		<td><a href="#" id="cell43" class="outsideMonth"> </a></td>		<td><a href="#" id="cell44" class="outsideMonth"> </a></td>		<td><a href="#" id="cell45" class="outsideMonth"> </a></td>		<td><a href="#" id="cell46" class="outsideMonth"> </a></td>	</tr><tr>		<td><a href="#" id="cell50" class="outsideMonth"> </a></td>		<td><a href="#" id="cell51" class="outsideMonth"> </a></td>		<td><a href="#" id="cell52" class="outsideMonth"> </a></td>		<td><a href="#" id="cell53" class="outsideMonth"> </a></td>		<td><a href="#" id="cell54" class="outsideMonth"> </a></td>		<td><a href="#" id="cell55" class="outsideMonth"> </a></td>		<td><a href="#" id="cell56" class="outsideMonth"> </a></td>	</tr></tbody></table><br><center><a href="#" id="seltoday" class="seltoday" onclick='javascript:setDateValue("03/14/2020")'>Today</a></center>	</div></div></body></html>
