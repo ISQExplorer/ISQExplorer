@@ -79,7 +79,7 @@ namespace ISQExplorer.Web
 
             if (links.Count != titles.Count)
             {
-                throw new WtfException("Different lengths of Course and Title column in the same table.");
+                throw new WtfException($"Different lengths of Course and Title column in the same table for dept schedule {Urls.DeptSchedulePostData(term.Id, dept.Id)}.");
             }
 
             links.Where(x => !x.HasValue && !x.Exception.Element.TextContent.HtmlDecode().IsBlank()).ForEach(val =>
@@ -151,7 +151,7 @@ namespace ISQExplorer.Web
                 .ToList();
 
             nNumbers.Exceptions().ForEach(ex => Errors.Add(ex));
-            
+
             await nNumbers.Values().ToHashSet().AsParallel().ForEachAsync(async nNumber =>
             {
                 if (await Professors.FromNNumberAsync(dept, nNumber)) return;
@@ -209,7 +209,8 @@ namespace ISQExplorer.Web
                 return;
             }
 
-            var mainRows = mainTable.Value.Rows.GroupBy(x => (Term: x["Term"], Crn: x["CRN"], CourseCode: x["Course ID"]))
+            var mainRows = mainTable.Value.Rows
+                .GroupBy(x => (Term: x["Term"], Crn: x["CRN"], CourseCode: x["Course ID"]))
                 .ToDictionary(x => x.Key, x => x.First());
 
             var gpaRows = gpaTable.Value.Rows.GroupBy(x => (Term: x["Term"], Crn: x["CRN"], CourseCode: x["Course ID"]))
@@ -228,11 +229,13 @@ namespace ISQExplorer.Web
                     (grow.Key.Crn.TextContent, grow.Key.Term.TextContent, grow.Key.CourseCode.TextContent)
                 select (mrow.Value, grow.Value)).ToList();
                 */
-            
+
             var results = await Task.WhenAll((from mrow in mainRows
                 join grow in gpaRows on
-                    (mrow.Key.Crn.TextContent.HtmlDecode().Trim(), mrow.Key.Term.TextContent.HtmlDecode().Trim(), mrow.Key.CourseCode.TextContent.HtmlDecode().Trim()) equals
-                    (grow.Key.Crn.TextContent.HtmlDecode().Trim(), grow.Key.Term.TextContent.HtmlDecode().Trim(), grow.Key.CourseCode.TextContent.HtmlDecode().Trim())
+                    (mrow.Key.Crn.TextContent.HtmlDecode().Trim(), mrow.Key.Term.TextContent.HtmlDecode().Trim(),
+                        mrow.Key.CourseCode.TextContent.HtmlDecode().Trim()) equals
+                    (grow.Key.Crn.TextContent.HtmlDecode().Trim(), grow.Key.Term.TextContent.HtmlDecode().Trim(),
+                        grow.Key.CourseCode.TextContent.HtmlDecode().Trim())
                 select (mrow.Value, grow.Value)).Select(async group => await Result.OfAsync(async () =>
             {
                 var (mrow, grow) = group;
@@ -268,9 +271,9 @@ namespace ISQExplorer.Web
             results.Where(res => res.IsError).Select(res => res.Error).ForEach(Errors.Add);
         });
 
-        public Task<Result> ScrapeEntriesAsync(bool recursive = true) => Result.OfAsync(async () =>
+        public Task<Result> ScrapeEntriesAsync() => Result.OfAsync(async () =>
         {
-            if (recursive && Departments.None())
+            if (Departments.None())
             {
                 var res = await ScrapeDepartmentsAsync();
                 if (!res)
@@ -279,7 +282,7 @@ namespace ISQExplorer.Web
                 }
             }
 
-            if (recursive && Terms.None())
+            if (Terms.None())
             {
                 var res = await ScrapeTermsAsync();
                 if (!res)
@@ -293,33 +296,13 @@ namespace ISQExplorer.Web
             {
                 var (dept, term) = x;
 
-                if (recursive && Courses.None())
+                var res = await ScrapeCoursesAsync(dept, term) && await ScrapeProfessorsAsync(dept, term);
+                if (!res)
                 {
-                    var res = await ScrapeCoursesAsync(dept, term);
-                    if (!res)
-                    {
-                        Errors.Add(res.Error);
-                        return;
-                    }
-                }
-
-                if (recursive && Professors.None())
-                {
-                    var res = await ScrapeProfessorsAsync(dept, term);
-                    if (!res)
-                    {
-                        Errors.Add(res.Error);
-                        return;
-                    }
-                }
-
-                var res2 = await ScrapeCoursesAsync(dept, term) && await ScrapeProfessorsAsync(dept, term);
-                if (!res2)
-                {
-                    Errors.Add(res2.Error);
+                    Errors.Add(res.Error);
                 }
             });
-            
+
             await Professors.AsParallel().ForEachAsync(async prof => await ScrapeProfessorEntriesAsync(prof));
             return new Result();
         });

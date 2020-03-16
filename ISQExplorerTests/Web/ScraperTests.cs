@@ -222,9 +222,16 @@ namespace ISQExplorerTests
 
             _countOrig = _client.Count;
             _client.DefaultToWeb()
-                .SetAfterGetCallback(s => System.Diagnostics.Trace.WriteLine($"GET {s}"))
+                .SetAfterGetCallback(async s =>
+                {
+                    System.Diagnostics.Trace.WriteLine($"GET {s}");
+                    if (_client.Count - 100 > _countOrig)
+                    {
+                        File.WriteAllBytes(HtmlJsonPath + _client.Count, await Fake.Compressor.Compress(_client.Serialize()));
+                    }
+                })
                 .SetAfterPostDictCallback((s, d) => System.Diagnostics.Trace.WriteLine($"POST {s}:{JsonConvert.SerializeObject(d)}"))
-                .SetAfterPostStringCallback((s, p) => System.Diagnostics.Trace.WriteLine($"POST {s}:'{p}''"));
+                .SetAfterPostStringCallback((s, p) => System.Diagnostics.Trace.WriteLine($"POST {s}:'{p}'"));
         }
 
         [TearDown]

@@ -307,7 +307,7 @@ namespace ISQExplorerTests
 
             public FakeHtmlClient DefaultToWeb()
             {
-                _realHtmlClient = new HtmlClient(() => new RateLimiter(3, 3000));
+                _realHtmlClient = new HtmlClient(() => new RateLimiter(3, 1000));
                 return this;
             }
 
@@ -334,50 +334,56 @@ namespace ISQExplorerTests
                 return this;
             }
 
-            public Task<Try<HtmlPage, IOException>> GetAsync(Either<Uri, string> url)
+            public async Task<Try<HtmlPage, IOException>> GetAsync(Either<Uri, string> url)
             {
                 if (_getMocks.ContainsKey(url))
                 {
-                    return Task.FromResult(_getMocks[url]);
+                    return _getMocks[url];
                 }
 
-                var res = _realHtmlClient != null
+                var res = await (_realHtmlClient != null
                     ? _realHtmlClient.GetAsync(url)
-                    : Task.FromResult(new Try<HtmlPage, IOException>(new IOException($"Url '{url}' was not mocked.")));
+                    : Task.FromResult(new Try<HtmlPage, IOException>(new IOException($"Url '{url}' was not mocked."))));
+
+                _getMocks[url] = res;
                 
                 _afterGetCallback?.Invoke(url.Unite(uri => uri.ToString()));
 
                 return res;
             }
 
-            public Task<Try<HtmlPage, IOException>> PostAsync(Either<Uri, string> url, string postData)
+            public async Task<Try<HtmlPage, IOException>> PostAsync(Either<Uri, string> url, string postData)
             {
                 if (_postStringMocks.ContainsKey((url, postData)))
                 {
-                    return Task.FromResult(_postStringMocks[(url, postData)]);
+                    return _postStringMocks[(url, postData)];
                 }
 
-                var res = _realHtmlClient != null
+                var res = await (_realHtmlClient != null
                     ? _realHtmlClient.PostAsync(url, postData)
-                    : Task.FromResult(new Try<HtmlPage, IOException>(new IOException($"Url '{url}' was not mocked.")));
+                    : Task.FromResult(new Try<HtmlPage, IOException>(new IOException($"Url '{url}' was not mocked."))));
+
+                _postStringMocks[(url, postData)] = res;
                 
                 _afterPostStringCallback?.Invoke(url.Unite(uri => uri.ToString()), postData);
 
                 return res;
             }
 
-            public Task<Try<HtmlPage, IOException>> PostAsync(Either<Uri, string> url,
+            public async Task<Try<HtmlPage, IOException>> PostAsync(Either<Uri, string> url,
                 IReadOnlyDictionary<string, string?> postParams)
             {
                 var immut = postParams.ToImmutableDictionary();
                 if (_postDictMocks.ContainsKey((url, immut)))
                 {
-                    return Task.FromResult(_postDictMocks[(url, immut)]);
+                    return _postDictMocks[(url, immut)];
                 }
 
-                var res = _realHtmlClient != null
+                var res = await (_realHtmlClient != null
                     ? _realHtmlClient.PostAsync(url, postParams)
-                    : Task.FromResult(new Try<HtmlPage, IOException>(new IOException($"Url '{url}' was not mocked.")));
+                    : Task.FromResult(new Try<HtmlPage, IOException>(new IOException($"Url '{url}' was not mocked."))));
+
+                _postDictMocks[(url, immut)] = res;
                 
                 _afterPostDictCallback?.Invoke(url.Unite(uri => uri.ToString()), postParams);
 
