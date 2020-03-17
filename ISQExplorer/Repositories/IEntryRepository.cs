@@ -11,6 +11,7 @@ namespace ISQExplorer.Repositories
         Task<IEnumerable<ISQEntryModel>> ByProfessorAsync(ProfessorModel professor, TermModel? since = null, TermModel? until = null);
         Task AddAsync(ISQEntryModel professor);
         Task AddRangeAsync(IEnumerable<ISQEntryModel> professors);
-        IEnumerable<ISQEntryModel> Entries { get; } 
+        IEnumerable<ISQEntryModel> Entries { get; }
+        Task SaveChangesAsync();
     }
 }

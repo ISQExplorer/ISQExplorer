@@ -12,5 +12,6 @@ namespace ISQExplorer.Repositories
         Task AddAsync(CourseModel course);
         Task AddRangeAsync(IEnumerable<CourseModel> courses);
         IEnumerable<CourseModel> Courses { get; }
+        Task SaveChangesAsync();
     }
 }

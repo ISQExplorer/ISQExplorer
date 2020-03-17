@@ -14,5 +14,6 @@ namespace ISQExplorer.Repositories
         Task AddAsync(ProfessorModel prof);
         Task AddRangeAsync(IEnumerable<ProfessorModel> profs);
         IEnumerable<ProfessorModel> Professors { get; }
+        Task SaveChangesAsync();
     }
 }

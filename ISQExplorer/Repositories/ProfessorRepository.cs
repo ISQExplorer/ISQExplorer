@@ -13,10 +13,18 @@ namespace ISQExplorer.Repositories
 {
     public class ProfessorRepository : IProfessorRepository
     {
-        private readonly DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>> _lastNameToProfessor;
-        private readonly DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>> _firstNameToProfessor;
-        private readonly DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>> _nameToProfessor;
-        private readonly DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>> _nNumberToProfessor;
+        private readonly DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>
+            _lastNameToProfessor;
+
+        private readonly DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>
+            _firstNameToProfessor;
+
+        private readonly DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>
+            _nameToProfessor;
+
+        private readonly DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>
+            _nNumberToProfessor;
+
         private readonly ISQExplorerContext _context;
 
         private readonly DefaultDictionary<DepartmentModel, ReadWriteLock> _locks;
@@ -49,11 +57,11 @@ namespace ISQExplorer.Repositories
             _context.Professors.ForEach(_updateProf);
         }
 
-        public Task AddAsync(ProfessorModel prof) => _locks[prof.Department].Write(async () =>
+        public Task AddAsync(ProfessorModel prof) => _locks[prof.Department].Write(() =>
         {
             _updateProf(prof);
             _context.Add(prof);
-            await _context.SaveChangesAsync();
+            return Task.CompletedTask;
         });
 
         public async Task AddRangeAsync(IEnumerable<ProfessorModel> profs)
@@ -62,13 +70,12 @@ namespace ISQExplorer.Repositories
             var byDept = pr.GroupBy(x => x.Department);
             await Task.WhenAll(byDept.Select(x => Task.Run(async () =>
             {
-                await _locks[x.Key].Write(async () =>
+                _locks[x.Key].Write(() =>
                 {
                     x.ForEach(_updateProf);
-                    await _context.Professors.AddRangeAsync();
+                    _context.Professors.AddRangeAsync();
                 });
             })));
-            await _context.SaveChangesAsync();
         }
 
         public async Task<Optional<ProfessorModel>> FromFirstNameAsync(DepartmentModel dept, string firstName) =>
@@ -83,7 +90,10 @@ namespace ISQExplorer.Repositories
         public async Task<Optional<ProfessorModel>> FromNNumberAsync(DepartmentModel dept, string nNumber) =>
             await Task.FromResult(_locks[dept].Read(() => _nNumberToProfessor[dept][nNumber]));
 
-        public IEnumerable<ProfessorModel> Professors => _context.Professors;
+        public IEnumerable<ProfessorModel> Professors => _nNumberToProfessor.Values.SelectMany(x => x.Values.Values(),
+            (_, y) => y);
+
+        public Task SaveChangesAsync() => _context.SaveChangesAsync();
 
         public IEnumerator<ProfessorModel> GetEnumerator() => Professors.GetEnumerator();
 

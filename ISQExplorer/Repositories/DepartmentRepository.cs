@@ -29,19 +29,19 @@ namespace ISQExplorer.Repositories
             _lock = new ReadWriteLock();
         }
 
-        public Task AddAsync(DepartmentModel department) => _lock.WriteAsync(async () =>
+        public Task AddAsync(DepartmentModel department) => _lock.Write(() =>
         {
             _addDepartment(department);
             _context.Departments.Add(department);
-            await _context.SaveChangesAsync();
+            return Task.CompletedTask;
         });
 
-        public Task AddRangeAsync(IEnumerable<DepartmentModel> departments) => _lock.WriteAsync(async () =>
+        public Task AddRangeAsync(IEnumerable<DepartmentModel> departments) => _lock.Write(() =>
         {
             var c = departments.ToList();
             c.ForEach(_addDepartment);
-            await _context.Departments.AddRangeAsync(c);
-            await _context.SaveChangesAsync();
+            _context.Departments.AddRange(c);
+            return Task.CompletedTask;
         });
 
         public async Task<Optional<DepartmentModel>> FromIdAsync(int id) =>
@@ -50,7 +50,10 @@ namespace ISQExplorer.Repositories
         public async Task<Optional<DepartmentModel>> FromNameAsync(string name) =>
             await _lock.Read(() => Task.FromResult(_nameToDepartment[name]));
 
-        public IEnumerable<DepartmentModel> Departments => _context.Departments;
+        public IEnumerable<DepartmentModel> Departments => _lock.Read(() =>_idToDepartment
+            .Values.Values().ToList());
+
+        public Task SaveChangesAsync() => _context.SaveChangesAsync();
 
         public IEnumerator<DepartmentModel> GetEnumerator() => Departments.GetEnumerator();
 

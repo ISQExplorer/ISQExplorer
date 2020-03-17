@@ -30,19 +30,19 @@ namespace ISQExplorer.Repositories
             _lock = new ReadWriteLock();
         }
 
-        public Task AddAsync(CourseModel course) => _lock.WriteAsync(async () =>
+        public Task AddAsync(CourseModel course) => _lock.Write(() =>
         {
             _addCourse(course);
             _context.Courses.Add(course);
-            await _context.SaveChangesAsync();
+            return Task.CompletedTask;
         });
 
-        public Task AddRangeAsync(IEnumerable<CourseModel> courses) => _lock.WriteAsync(async () =>
+        public Task AddRangeAsync(IEnumerable<CourseModel> courses) => _lock.Write(() =>
         {
             var c = courses.ToList();
             c.ForEach(_addCourse);
-            await _context.Courses.AddRangeAsync(c);
-            await _context.SaveChangesAsync();
+            _context.Courses.AddRange(c);
+            return Task.CompletedTask;
         });
 
         public async Task<Optional<CourseModel>> FromCourseCodeAsync(string courseCode) =>
@@ -51,7 +51,9 @@ namespace ISQExplorer.Repositories
         public async Task<Optional<CourseModel>> FromCourseNameAsync(string courseName) =>
             await _lock.Read(() => Task.FromResult(_courseNameToCourse[courseName]));
 
-        public IEnumerable<CourseModel> Courses => _context.Courses;
+        public IEnumerable<CourseModel> Courses => _lock.Read(() => _courseCodeToCourse.Values.Values().ToList());
+
+        public Task SaveChangesAsync() => _context.SaveChangesAsync();
 
         public IEnumerator<CourseModel> GetEnumerator() => Courses.GetEnumerator();
 

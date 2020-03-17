@@ -251,6 +251,7 @@ namespace ISQExplorerTests
                 new DepartmentRepository(ctx), new EntryRepository(ctx), new CourseRepository(ctx), _client);
 
             var res = await scraper.ScrapeEntriesAsync();
+            await scraper.SaveChangesAsync();
             
             Assert.False(res.IsError);
             Assert.True(scraper.Entries.Any());

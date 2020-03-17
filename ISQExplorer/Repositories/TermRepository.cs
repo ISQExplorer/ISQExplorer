@@ -34,15 +34,16 @@ namespace ISQExplorer.Repositories
             }));
         }
 
-        public Task AddAsync(TermModel term) => _lock.Write(async () =>
+        public Task AddAsync(TermModel term) => _lock.Write(() =>
         {
             _idToTerm[term.Id] = term;
             _stringToTerm[term.Name] = term;
             _ids.Add(term.Id);
-            await _context.Terms.AddAsync(term);
+            _context.Terms.AddAsync(term);
+            return Task.CompletedTask;
         });
 
-        public Task AddRangeAsync(IEnumerable<TermModel> terms) => _lock.Write(async () =>
+        public Task AddRangeAsync(IEnumerable<TermModel> terms) => _lock.Write(() =>
         {
             var t = terms.ToList();
 
@@ -53,7 +54,8 @@ namespace ISQExplorer.Repositories
                 _ids.Add(term.Id);
             }
 
-            await _context.Terms.AddRangeAsync(t);
+            _context.Terms.AddRange(t);
+            return Task.CompletedTask;
         });
 
         public async Task<Optional<TermModel>> FromIdAsync(int id) =>
@@ -89,6 +91,8 @@ namespace ISQExplorer.Repositories
         });
 
         public IEnumerable<TermModel> Terms => _ids.Select(id => _idToTerm[id]).Values();
+
+        public Task SaveChangesAsync() => _context.SaveChangesAsync();
 
         public IEnumerator GetEnumerator() => Terms.GetEnumerator();
 

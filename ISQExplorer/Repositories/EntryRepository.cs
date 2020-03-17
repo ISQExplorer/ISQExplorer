@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ISQExplorer.Functional;
 using ISQExplorer.Misc;
 using ISQExplorer.Models;
+
 // ReSharper disable CollectionNeverUpdated.Local
 
 namespace ISQExplorer.Repositories
@@ -32,31 +33,35 @@ namespace ISQExplorer.Repositories
             _lock = new ReadWriteLock();
         }
 
-        public Task AddAsync(ISQEntryModel entry) => _lock.WriteAsync(async () =>
+        public Task AddAsync(ISQEntryModel entry) => _lock.Write(() =>
         {
             _addEntity(entry);
             _context.IsqEntries.Add(entry);
-            await _context.SaveChangesAsync();
+            return Task.CompletedTask;
         });
 
-        public Task AddRangeAsync(IEnumerable<ISQEntryModel> entries) => _lock.WriteAsync(async () =>
+        public Task AddRangeAsync(IEnumerable<ISQEntryModel> entries) => _lock.Write(() =>
         {
             var e = entries.ToList();
             e.ForEach(_addEntity);
-            await _context.IsqEntries.AddRangeAsync(e);
-            await _context.SaveChangesAsync();
+            _context.IsqEntries.AddRange(e);
+            return Task.CompletedTask;
         });
 
         public async Task<IEnumerable<ISQEntryModel>> ByCourseAsync(CourseModel course, TermModel? since = null,
             TermModel? until = null) => await _lock.Read(() =>
             Task.FromResult(_context.IsqEntries.Where(x => x.Course == course).When(since, until)));
 
-        public async Task<IEnumerable<ISQEntryModel>> ByProfessorAsync(ProfessorModel professor, TermModel? since = null,
+        public async Task<IEnumerable<ISQEntryModel>> ByProfessorAsync(ProfessorModel professor,
+            TermModel? since = null,
             TermModel? until = null) =>
             await _lock.Read(() =>
                 Task.FromResult(_context.IsqEntries.Where(x => x.Professor == professor).When(since, until)));
 
-        public IEnumerable<ISQEntryModel> Entries => _context.IsqEntries;
+        public IEnumerable<ISQEntryModel> Entries =>
+            _lock.Read(() => _courseToEntries.Values.SelectMany(x => x).ToList());
+
+        public Task SaveChangesAsync() => _context.SaveChangesAsync();
 
         public IEnumerator<ISQEntryModel> GetEnumerator() => Entries.GetEnumerator();
 

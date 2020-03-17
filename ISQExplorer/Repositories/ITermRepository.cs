@@ -14,5 +14,6 @@ namespace ISQExplorer.Repositories
         Task AddAsync(TermModel term);
         Task AddRangeAsync(IEnumerable<TermModel> term);
         IEnumerable<TermModel> Terms { get; }
+        Task SaveChangesAsync();
     }
 }

@@ -12,5 +12,6 @@ namespace ISQExplorer.Repositories
         Task AddAsync(DepartmentModel department);
         Task AddRangeAsync(IEnumerable<DepartmentModel> departments);
         IEnumerable<DepartmentModel> Departments { get; }
+        Task SaveChangesAsync();
     }
 }

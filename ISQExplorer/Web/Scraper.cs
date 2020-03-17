@@ -306,5 +306,13 @@ namespace ISQExplorer.Web
             await Professors.AsParallel().ForEachAsync(async prof => await ScrapeProfessorEntriesAsync(prof));
             return new Result();
         });
+
+        public Task SaveChangesAsync() => Task.WhenAll(
+            Courses.SaveChangesAsync(),
+            Departments.SaveChangesAsync(),
+            Entries.SaveChangesAsync(),
+            Professors.SaveChangesAsync(),
+            Terms.SaveChangesAsync()
+        );
     }
 }
