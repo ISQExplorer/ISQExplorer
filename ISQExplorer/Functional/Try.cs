@@ -14,7 +14,7 @@ namespace ISQExplorer.Functional
         /// <param name="func">The function to execute.</param>
         /// <typeparam name="T">The type of the Try.</typeparam>
         /// <returns>A Try of the same type as the return value of the function.</returns>
-        public static Try<T> Of<T>(Func<T> func) => new Try<T>(func);
+        public static Try<T> Of<T>(Func<Either<T, Exception>> func) => new Try<T>(func);
 
         /// <summary>
         /// Constructs a Try out of the given value.
@@ -113,8 +113,8 @@ namespace ISQExplorer.Functional
         public static IEnumerable<T> Values<T>(this IEnumerable<Try<T>> enumerable) =>
             enumerable.Where(x => x.HasValue).Select(x => x.Value);
 
-        public static IEnumerable<T> Values<T, TExeption>(this IEnumerable<Try<T, TExeption>> enumerable)
-            where TExeption : Exception =>
+        public static IEnumerable<T> Values<T, TException>(this IEnumerable<Try<T, TException>> enumerable)
+            where TException : Exception =>
             enumerable.Where(x => x.HasValue).Select(x => x.Value);
     }
 
@@ -153,11 +153,20 @@ namespace ISQExplorer.Functional
         /// Executes the given function, constructing the Try out of the return value, or the exception the function might throw.
         /// </summary>
         /// <param name="func">The function to execute.</param>
-        public Try(Func<T> func)
+        public Try(Func<Either<T, Exception>> func)
         {
             try
             {
-                (_value, _ex, HasValue) = (func(), default!, true);
+                var val = func();
+
+                if (val.HasLeft)
+                {
+                    (_value, _ex, HasValue) = (val.Left, default!, true);
+                }
+                else
+                {
+                    (_value, _ex, HasValue) = (default!, val.Right, false);
+                }
             }
             catch (Exception ex)
             {
@@ -310,7 +319,7 @@ namespace ISQExplorer.Functional
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Try<T>) obj);
+            return Equals((Try<T>)obj);
         }
 
         public override int GetHashCode()
@@ -571,7 +580,7 @@ namespace ISQExplorer.Functional
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Try<T, TException>) obj);
+            return Equals((Try<T, TException>)obj);
         }
 
         public override int GetHashCode()

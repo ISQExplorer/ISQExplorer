@@ -7,3 +7,10 @@ ISQExplorer/bin
 ISQExplorer/obj
 ISQExplorerTests/bin
 ISQExplorerTests/obj
+.vs
+ISQExplorer.sln.DotSettings.user
+ISQExplorerTests/Web/Pages/*.json
+ISQExplorerTests/Web/Pages/*.gz1001
+ISQExplorerTests/Web/Pages/*.gz2002
+ISQExplorerTests/Web/Pages/*.gz3003
+ISQExplorerTests/Web/Pages/*.gz4004

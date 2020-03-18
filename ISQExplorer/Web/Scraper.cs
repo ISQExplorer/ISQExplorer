@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
+using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using ISQExplorer.Controllers;
 using ISQExplorer.Exceptions;
@@ -60,14 +61,14 @@ namespace ISQExplorer.Web
             var tables = page.QueryAll<IHtmlTableElement>("table.datadisplaytable").ToList();
             if (tables.Count != 3)
             {
-                throw new HtmlPageException(page,
-                    "This page does not have the required number (3) of table.datadisplaytable.");
+                return new OkayException($"Most likely there are no courses for department '{dept}' and term '{term}'.", new HtmlPageException(page,
+                    "This page does not have the required number (3) of table.datadisplaytable."));
             }
 
             var tab = HtmlTable.Create(tables.Last()).Value;
             if (!tab.ColumnTitles.Contains("Course"))
             {
-                throw new HtmlElementException(tables.Last(), "Expected a column in the main table titled 'Course'.");
+                return new HtmlElementException(tables.Last(), "Expected a column in the main table titled 'Course'.");
             }
 
             var links = tab["Course"]
@@ -75,11 +76,13 @@ namespace ISQExplorer.Web
                 .Select(x => x.Children.First().Cast<IHtmlAnchorElement>())
                 .ToList();
 
-            var titles = tab["Title"].ToList();
+            var titles = tab["Title"]
+                .Where(x => !x.TextContent.HtmlDecode().IsBlank())
+                .ToList();
 
             if (links.Count != titles.Count)
             {
-                throw new WtfException($"Different lengths of Course and Title column in the same table for dept schedule {Urls.DeptSchedulePostData(term.Id, dept.Id)}.");
+                return new WtfException($"Different lengths of Course and Title column in the same table for dept schedule {Urls.DeptSchedulePostData(term.Id, dept.Id)}.");
             }
 
             links.Where(x => !x.HasValue && !x.Exception.Element.TextContent.HtmlDecode().IsBlank()).ForEach(val =>
@@ -102,6 +105,8 @@ namespace ISQExplorer.Web
                         Name = title
                     });
                 });
+
+            return new Result();
         });
 
         public Task<Result> ScrapeProfessorsAsync(DepartmentModel dept, TermModel term) => Result.OfAsync(async () =>
@@ -111,14 +116,14 @@ namespace ISQExplorer.Web
             var tables = page.QueryAll<IHtmlTableElement>("table.datadisplaytable").ToList();
             if (tables.Count != 3)
             {
-                throw new HtmlPageException(page,
-                    "This page does not have the required number (3) of table.datadisplaytable.");
+                return new OkayException($"Most likely there is no course data for department '{dept}' and term '{term}'.", new HtmlPageException(page,
+                    "This page does not have the required number (3) of table.datadisplaytable."));
             }
 
             var tab = HtmlTable.Create(tables.Last()).Value;
             if (!tab.ColumnTitles.Contains("Instructor"))
             {
-                throw new HtmlElementException(tables.Last(),
+                return new HtmlElementException(tables.Last(),
                     "Expected a column in the main table titled 'Instructor'.");
             }
 
@@ -140,7 +145,7 @@ namespace ISQExplorer.Web
                     var nNumber = x.Href.Capture(@"[nN]\d{8}").Select(y => y.ToUpper());
                     if (!nNumber)
                     {
-                        throw new ProfessorScrapeException($"The URL '{x.Href}' does not contain an N-Number.",
+                        return new ProfessorScrapeException($"The URL '{x.Href}' does not contain an N-Number.",
                             null,
                             dept,
                             term);
@@ -158,22 +163,22 @@ namespace ISQExplorer.Web
 
                 var htmlPage = (await HtmlClient.GetAsync(Urls.ProfessorPage(nNumber))).Value;
 
-                var professorName = Try.Of(() => htmlPage.QueryAll<IHtmlTableCellElement>("td.dddefault").First(
-                    elem => elem.PreviousElementSibling?.TextContent.HtmlDecode().Trim() == "Instructor:"));
+                var professorName = htmlPage.QueryAll<IHtmlTableCellElement>("td.dddefault").FirstOrDefault(
+                    elem => elem.PreviousElementSibling?.TextContent.HtmlDecode().Trim() == "Instructor:");
 
-                if (!professorName)
+                if (professorName == null)
                 {
-                    Errors.Add(new ProfessorScrapeException(
+                    Errors.Add(new OkayException($"Most likely the professor with NNumber {nNumber} has no course data.", new ProfessorScrapeException(
                         $"Could not find instructor name on '{Urls.ProfessorPage(nNumber)}'.",
-                        professorName.Exception, nNumber, dept, term));
+                        nNumber, dept, term)));
                     return;
                 }
 
                 await Professors.AddAsync(new ProfessorModel
                 {
                     Department = dept,
-                    FirstName = professorName.Value.TextContent.Split(" ").SkipLast(1).Join(" "),
-                    LastName = professorName.Value.TextContent.Split(" ").Last(),
+                    FirstName = professorName.TextContent.Split(" ").SkipLast(1).Join(" "),
+                    LastName = professorName.TextContent.Split(" ").Last(),
                     NNumber = nNumber
                 });
             });
@@ -240,10 +245,24 @@ namespace ISQExplorer.Web
             {
                 var (mrow, grow) = group;
 
+                var course = await Courses.FromCourseCodeAsync(mrow["Course ID"].TextContent);
+                var term = await Terms.FromStringAsync(mrow["Term"].TextContent);
+
+                if (!course)
+                {
+                    throw new HtmlElementException(mrow["Course ID"], "This element's text did not show up in the course repository.");
+                }
+
+                if (!term)
+                {
+
+                    throw new HtmlElementException(mrow["Term"], "This element's text did not show up in the term repository.");
+                }
+
                 await Entries.AddAsync(new ISQEntryModel
                 {
-                    Course = (await Courses.FromCourseCodeAsync(mrow["Course ID"].TextContent)).Value,
-                    Term = (await Terms.FromStringAsync(mrow["Term"].TextContent)).Value,
+                    Course = course.Value,
+                    Term = term.Value,
                     Professor = prof,
                     Crn = Parse.Int(mrow["CRN"].TextContent).Value,
                     NEnrolled = Parse.Int(mrow["Number Enrolled"].TextContent).Value,
