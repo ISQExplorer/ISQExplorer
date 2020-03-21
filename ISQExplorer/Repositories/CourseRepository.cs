@@ -13,6 +13,7 @@ namespace ISQExplorer.Repositories
     {
         private readonly OptionalDictionary<string, CourseModel> _courseCodeToCourse;
         private readonly OptionalDictionary<string, CourseModel> _courseNameToCourse;
+        private readonly ISet<string> _courseCodes;
         private readonly ISQExplorerContext _context;
         private readonly ReadWriteLock _lock;
 
@@ -20,18 +21,25 @@ namespace ISQExplorer.Repositories
         {
             _courseCodeToCourse[course.CourseCode] = course;
             _courseNameToCourse[course.Name] = course;
+            _courseCodes.Add(course.CourseCode);
         }
 
         public CourseRepository(ISQExplorerContext context)
         {
             _courseCodeToCourse = new OptionalDictionary<string, CourseModel>();
             _courseNameToCourse = new OptionalDictionary<string, CourseModel>();
+            _courseCodes = new HashSet<string>();
             _context = context;
             _lock = new ReadWriteLock();
         }
 
         public Task AddAsync(CourseModel course) => _lock.Write(() =>
         {
+            if (_courseCodes.Contains(course.CourseCode))
+            {
+                return Task.CompletedTask;
+            }
+
             _addCourse(course);
             _context.Courses.Add(course);
             return Task.CompletedTask;
@@ -39,7 +47,7 @@ namespace ISQExplorer.Repositories
 
         public Task AddRangeAsync(IEnumerable<CourseModel> courses) => _lock.Write(() =>
         {
-            var c = courses.ToList();
+            var c = courses.Where(c => !_courseCodes.Contains(c.CourseCode)).ToList();
             c.ForEach(_addCourse);
             _context.Courses.AddRange(c);
             return Task.CompletedTask;

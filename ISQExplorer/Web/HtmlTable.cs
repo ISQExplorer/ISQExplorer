@@ -68,9 +68,8 @@ namespace ISQExplorer.Web
             get
             {
                 return _rows
-                    .Select(row => Try.Of(() => RowChildren(row).Skip(index).First()))
-                    .Where(res => res.HasValue)
-                    .Select(res => res.Value);
+                    .Select(row => RowChildren(row).Skip(index).FirstOrDefault())
+                    .Where(res => res != null);
             }
         }
 

@@ -38,7 +38,7 @@ namespace ISQExplorer.Models
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Equals(Course, other.Course) && Term == other.Term && Crn == other.Crn;
+            return Equals(Course?.Id, other.Course?.Id) && Term?.Id == other.Term?.Id && Crn == other.Crn;
         }
 
         public override bool Equals(object? obj)

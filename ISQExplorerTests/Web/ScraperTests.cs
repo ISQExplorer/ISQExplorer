@@ -6,11 +6,13 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ISQExplorer.Exceptions;
 using ISQExplorer.Functional;
 using ISQExplorer.Misc;
 using ISQExplorer.Models;
 using ISQExplorer.Repositories;
 using ISQExplorer.Web;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Moq;
 using Newtonsoft.Json;
@@ -198,7 +200,7 @@ namespace ISQExplorerTests
 
     public class FullScraperTests
     {
-        private Fake.FakeHtmlClient _client;
+        private Fake.FakeHtmlClient _client = null!;
         private int _countOrig = 0;
         private const string HtmlJsonPath = "Web/Pages/HtmlClientCache.json.gz";
 
@@ -227,25 +229,29 @@ namespace ISQExplorerTests
         [TearDown]
         public async Task TearDown()
         {
-            var str = _client.Serialize();
-            var compressed = await Fake.Compressor.Compress(str);
-            
-            File.WriteAllBytes(HtmlJsonPath, compressed);
+            if (_client.Count >= _countOrig)
+            {
+                var str = _client.Serialize();
+                var compressed = await Fake.Compressor.Compress(str);
+                File.WriteAllBytes(HtmlJsonPath, compressed);
+            }
         }
 
         [Test]
         public async Task TestScraper()
         {
+            System.Diagnostics.Trace.WriteLine("====test1====");
             var ctx = Fake.DbContext();
             var scraper = new Scraper(new TermRepository(ctx), new ProfessorRepository(ctx),
                 new DepartmentRepository(ctx), new EntryRepository(ctx), new CourseRepository(ctx), _client);
-
+            
+            System.Diagnostics.Trace.WriteLine("====test2====");
             var res = await scraper.ScrapeEntriesAsync();
             await scraper.SaveChangesAsync();
             
             Assert.False(res.IsError);
             Assert.True(scraper.Entries.Any());
-            Assert.True(scraper.Errors.None());
+            Assert.True(scraper.Errors.All(x => x is OkayException));
         }
     }
 }

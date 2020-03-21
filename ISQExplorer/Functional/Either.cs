@@ -102,7 +102,7 @@ namespace ISQExplorer.Functional
             return Equals((Either<TLeft, TRight>) obj);
         }
 
-        public override int GetHashCode() => HasLeft ? Left.GetHashCode() : Right.GetHashCode();
+        public override int GetHashCode() => HasLeft ? Left!.GetHashCode() : Right!.GetHashCode();
 
         public override string ToString() => HasLeft ? Left!.ToString()! : Right!.ToString()!;
     }

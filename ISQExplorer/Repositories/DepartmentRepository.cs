@@ -12,6 +12,7 @@ namespace ISQExplorer.Repositories
     {
         private readonly OptionalDictionary<int, DepartmentModel> _idToDepartment;
         private readonly OptionalDictionary<string, DepartmentModel> _nameToDepartment;
+        private readonly ISet<int> _deptIds;
         private readonly ISQExplorerContext _context;
         private readonly ReadWriteLock _lock;
 
@@ -19,18 +20,25 @@ namespace ISQExplorer.Repositories
         {
             _idToDepartment[department.Id] = department;
             _nameToDepartment[department.Name] = department;
+            _deptIds.Add(department.Id);
         }
 
         public DepartmentRepository(ISQExplorerContext context)
         {
             _idToDepartment = new OptionalDictionary<int, DepartmentModel>();
             _nameToDepartment = new OptionalDictionary<string, DepartmentModel>();
+            _deptIds = new HashSet<int>();
             _context = context;
             _lock = new ReadWriteLock();
         }
 
         public Task AddAsync(DepartmentModel department) => _lock.Write(() =>
         {
+            if (_deptIds.Contains(department.Id))
+            {
+                return Task.CompletedTask;
+            }
+            
             _addDepartment(department);
             _context.Departments.Add(department);
             return Task.CompletedTask;
@@ -38,7 +46,7 @@ namespace ISQExplorer.Repositories
 
         public Task AddRangeAsync(IEnumerable<DepartmentModel> departments) => _lock.Write(() =>
         {
-            var c = departments.ToList();
+            var c = departments.Where(d => !_deptIds.Contains(d.Id)).ToList();
             c.ForEach(_addDepartment);
             _context.Departments.AddRange(c);
             return Task.CompletedTask;

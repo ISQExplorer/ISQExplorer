@@ -14,7 +14,35 @@ namespace ISQExplorer.Functional
         /// <param name="func">The function to execute.</param>
         /// <typeparam name="T">The type of the Try.</typeparam>
         /// <returns>A Try of the same type as the return value of the function.</returns>
-        public static Try<T> Of<T>(Func<Either<T, Exception>> func) => new Try<T>(func);
+        public static Try<T> Of<T>(Func<T> func) => new Try<T>(func);
+
+        /// <summary>
+        /// Executes the given function, constructing the Try out of the return value, or the exception the function might throw.
+        /// </summary>
+        /// <param name="func">The function to execute.</param>
+        /// <typeparam name="T">The type of the Try.</typeparam>
+        /// <returns>A Try of the same type as the return value of the function.</returns>
+        public static Try<T> OfEither<T>(Func<Either<T, Exception>> func) => new Try<T>(func);
+
+        /// <summary>
+        /// Executes the given function, constructing the Try out of the return value, or the exception the function might throw.
+        /// </summary>
+        /// <param name="func">The function to execute.</param>
+        /// <typeparam name="T">The type of the Try.</typeparam>
+        /// <typeparam name="TException">The type of the Try's exception.</typeparam>
+        /// <returns>A Try of the same type as the return value of the function.</returns>
+        public static Try<T> OfEither<T, TException>(Func<Either<T, TException>> func) where TException : Exception
+            => new Try<T, TException>(func);
+
+        /// <summary>
+        /// Executes the given function, constructing the Try out of the return value, or the exception the function might throw.
+        /// </summary>
+        /// <param name="func">The function to execute.</param>
+        /// <typeparam name="T">The type of the Try.</typeparam>
+        /// <typeparam name="TException">The type of the Try's exception.</typeparam>
+        /// <returns>A Try of the same type as the return value of the function.</returns>
+        public static Try<T> Of<T, TException>(Func<T> func) where TException : Exception
+            => new Try<T, TException>(func);
 
         /// <summary>
         /// Constructs a Try out of the given value.
@@ -35,7 +63,49 @@ namespace ISQExplorer.Functional
         {
             try
             {
-                return new Try<T>(await func());
+                return await func();
+            }
+            catch (Exception e)
+            {
+                return e;
+            }
+        }
+
+        /// <summary>
+        /// Constructs a Try out of an async function, containing either the value returned by the Task, or the exception it may throw.
+        /// This function itself will not throw any exceptions the function passed to it may throw, but said exceptions will be present in the resulting Try.
+        /// </summary>
+        /// <param name="func">The function returning a Task returning the desired value.</param>
+        /// <typeparam name="T">The type of the desired value.</typeparam>
+        /// <typeparam name="TException">The type of the exception to catch.</typeparam>
+        /// <returns>A Task of the given Try.</returns>
+        public static async Task<Try<T, TException>> OfAsync<T, TException>(Func<Task<T>> func) where TException : Exception
+        {
+            try
+            {
+                return await func();
+            }
+            catch (TException e)
+            {
+                return e;
+            }
+        }
+
+        /// <summary>
+        /// Constructs a Try out of an async function, containing either the value returned by the Task, or the exception it may throw.
+        /// This function itself will not throw any exceptions the function passed to it may throw, but said exceptions will be present in the resulting Try.
+        /// </summary>
+        /// <param name="func">The function returning a Task returning the desired value.</param>
+        /// <typeparam name="T">The type of the desired value.</typeparam>
+        /// <returns>A Task of the given Try.</returns>
+        public static async Task<Try<T>> OfEitherAsync<T>(Func<Task<Either<T, Exception>>> func)
+        {
+            try
+            {
+                return (await func()).Match(
+                    val => new Try<T>(val),
+                    ex => new Try<T>(ex)
+                );
             }
             catch (Exception e)
             {
@@ -51,31 +121,22 @@ namespace ISQExplorer.Functional
         /// <typeparam name="T">The type of the desired value.</typeparam>
         /// <typeparam name="TException">The type of the desired exception.</typeparam>
         /// <returns>A Task of the given Try.</returns>
-        public static async Task<Try<T, TException>> OfAsync<T, TException>(Func<Task<T>> func)
+        public static async Task<Try<T, TException>> OfEitherAsync<T, TException>(
+            Func<Task<Either<T, TException>>> func)
             where TException : Exception
         {
             try
             {
-                return new Try<T, TException>(await func());
+                return (await func()).Match(
+                    val => new Try<T, TException>(val),
+                    ex => new Try<T, TException>(ex)
+                );
             }
             catch (TException e)
             {
                 return e;
             }
         }
-
-        /// <summary>
-        /// Constructs a Try out of the given value if the condition is true, otherwise constructs it out of the given exception.
-        /// </summary>
-        /// <param name="condition">True if the value should be used, false if the exception should be used.</param>
-        /// <param name="val">A function returning the value to use.</param>
-        /// <param name="ex">A function returning the exception to use.</param>
-        /// <typeparam name="T">The type of the value.</typeparam>
-        /// <typeparam name="TException">The type of the exception.</typeparam>
-        /// <returns>A new Try{T, TException} out of either the given value or the given exception.</returns>
-        public static Try<T, TException> Of<T, TException>(bool condition, Func<T> val, Func<TException> ex)
-            where TException : Exception =>
-            condition ? val() : new Try<T, TException>(ex());
 
         /// <summary>
         /// Converts the exception to a different type if necessary.
@@ -172,6 +233,26 @@ namespace ISQExplorer.Functional
             {
                 (_value, _ex, HasValue) = (default!, ex, false);
             }
+
+            _stackTrace = Environment.StackTrace;
+        }
+
+        /// <summary>
+        /// Executes the given function, constructing the Try out of the return value, or the exception the function might throw.
+        /// </summary>
+        /// <param name="func">The function to execute.</param>
+        public Try(Func<T> func)
+        {
+            try
+            {
+                var val = func();
+                (_value, _ex, HasValue) = (val, default!, true);
+            }
+            catch (Exception ex)
+            {
+                (_value, _ex, HasValue) = (default!, ex, false);
+            }
+
             _stackTrace = Environment.StackTrace;
         }
 
@@ -195,7 +276,8 @@ namespace ISQExplorer.Functional
                     return _value;
                 }
 
-                throw new InvalidOperationException($"This Try has an exception, not a value.\nStack trace of original Try: {_stackTrace}.", _ex);
+                throw new InvalidOperationException(
+                    $"This Try has an exception, not a value.\nStack trace of original Try: {_stackTrace}.", _ex);
             }
         }
 
@@ -319,7 +401,7 @@ namespace ISQExplorer.Functional
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Try<T>)obj);
+            return Equals((Try<T>) obj);
         }
 
         public override int GetHashCode()
@@ -418,16 +500,44 @@ namespace ISQExplorer.Functional
         /// Executes the given function, constructing the Try out of the return value, or the exception the function might throw.
         /// </summary>
         /// <param name="func">The function to execute.</param>
-        public Try(Func<T> func)
+        public Try(Func<Either<T, TException>> func)
         {
             try
             {
-                (_value, _ex, HasValue) = (func(), default!, true);
+                var val = func();
+                if (val.HasLeft)
+                {
+                    (_value, _ex, HasValue) = (val.Left, default!, true);
+                }
+                else
+                {
+                    (_value, _ex, HasValue) = (default!, val.Right, false);
+                }
             }
             catch (TException ex)
             {
                 (_value, _ex, HasValue) = (default!, ex, false);
             }
+
+            _stackTrace = Environment.StackTrace;
+        }
+
+        /// <summary>
+        /// Executes the given function, constructing the Try out of the return value, or the exception the function might throw.
+        /// </summary>
+        /// <param name="func">The function to execute.</param>
+        public Try(Func<T> func)
+        {
+            try
+            {
+                var val = func();
+                (_value, _ex, HasValue) = (val, default!, true);
+            }
+            catch (TException ex)
+            {
+                (_value, _ex, HasValue) = (default!, ex, false);
+            }
+
             _stackTrace = Environment.StackTrace;
         }
 
@@ -451,7 +561,8 @@ namespace ISQExplorer.Functional
                     return _value;
                 }
 
-                throw new InvalidOperationException($"This Try has an exception, not a value.\nStack trace of original Try: {_stackTrace}.", _ex);
+                throw new InvalidOperationException(
+                    $"This Try has an exception, not a value.\nStack trace of original Try: {_stackTrace}.", _ex);
             }
         }
 
@@ -580,7 +691,7 @@ namespace ISQExplorer.Functional
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Try<T, TException>)obj);
+            return Equals((Try<T, TException>) obj);
         }
 
         public override int GetHashCode()

@@ -15,6 +15,7 @@ using ISQExplorer.Misc;
 using ISQExplorer.Models;
 using ISQExplorer.Repositories;
 using ISQExplorer.Web;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -234,6 +235,36 @@ namespace ISQExplorerTests
                 }
             }
 
+            public class PostStringComparer : IEqualityComparer<(Either<Uri, string>, string)>
+            {
+                public bool Equals((Either<Uri, string>, string) x, (Either<Uri, string>, string) y)
+                {
+                    return x.Item1.Unite(uri => uri.ToString()) == y.Item1.Unite(uri => uri.ToString()) &&
+                           x.Item2 == y.Item2;
+                }
+
+                public int GetHashCode((Either<Uri, string>, string) obj)
+                {
+                    unchecked
+                    {
+                        return HashCode.Combine(obj.Item1.Unite(uri => uri.ToString()).GetHashCode(), obj.Item2);
+                    }
+                }
+            }
+
+            public class GetDataComparer : IEqualityComparer<Either<Uri, string>>
+            {
+                public bool Equals(Either<Uri, string> x, Either<Uri, string> y)
+                {
+                    return x?.Unite(uri => uri.ToString()) == y?.Unite(uri => uri.ToString());
+                }
+
+                public int GetHashCode(Either<Uri, string> obj)
+                {
+                    return obj.Unite(uri => uri.ToString()).GetHashCode();
+                }
+            }
+
             private HtmlClient? _realHtmlClient;
             private readonly ConcurrentDictionary<Either<Uri, string>, Try<HtmlPage, IOException>> _getMocks;
 
@@ -250,12 +281,14 @@ namespace ISQExplorerTests
 
             public FakeHtmlClient()
             {
-                _getMocks = new ConcurrentDictionary<Either<Uri, string>, Try<HtmlPage, IOException>>();
+                _getMocks =
+                    new ConcurrentDictionary<Either<Uri, string>, Try<HtmlPage, IOException>>(new GetDataComparer());
                 _postStringMocks =
-                    new ConcurrentDictionary<(Either<Uri, string>, string), Try<HtmlPage, IOException>>();
+                    new ConcurrentDictionary<(Either<Uri, string>, string), Try<HtmlPage, IOException>>(
+                        new PostStringComparer());
                 _postDictMocks =
                     new ConcurrentDictionary<(Either<Uri, string>, ImmutableDictionary<string, string?>),
-                        Try<HtmlPage, IOException>>(new PostDataComparer());
+                        Try<HtmlPage, IOException>>(new PostDataComparer()!);
             }
 
             public FakeHtmlClient OnGet(Either<Uri, string> url, string? returnPage)
@@ -272,7 +305,8 @@ namespace ISQExplorerTests
                 return this;
             }
 
-            public FakeHtmlClient SetAfterPostDictCallback(Action<string, IReadOnlyDictionary<string, string?>>? callback)
+            public FakeHtmlClient SetAfterPostDictCallback(
+                Action<string, IReadOnlyDictionary<string, string?>>? callback)
             {
                 _afterPostDictCallback = callback;
                 return this;
@@ -285,7 +319,7 @@ namespace ISQExplorerTests
             }
 
             public FakeHtmlClient OnPost(Either<Uri, string> url,
-                Either<string, IReadOnlyDictionary<string, string>> postData, string? returnPage)
+                Either<string, IReadOnlyDictionary<string, string?>> postData, string? returnPage)
             {
                 var val = returnPage != null
                     ? new Try<HtmlPage, IOException>(HtmlPage.FromHtmlAsync(returnPage).Result)
@@ -346,7 +380,7 @@ namespace ISQExplorerTests
                     : Task.FromResult(new Try<HtmlPage, IOException>(new IOException($"Url '{url}' was not mocked."))));
 
                 _getMocks[url] = res;
-                
+
                 _afterGetCallback?.Invoke(url.Unite(uri => uri.ToString()));
 
                 return res;
@@ -364,7 +398,7 @@ namespace ISQExplorerTests
                     : Task.FromResult(new Try<HtmlPage, IOException>(new IOException($"Url '{url}' was not mocked."))));
 
                 _postStringMocks[(url, postData)] = res;
-                
+
                 _afterPostStringCallback?.Invoke(url.Unite(uri => uri.ToString()), postData);
 
                 return res;
@@ -384,7 +418,7 @@ namespace ISQExplorerTests
                     : Task.FromResult(new Try<HtmlPage, IOException>(new IOException($"Url '{url}' was not mocked."))));
 
                 _postDictMocks[(url, immut)] = res;
-                
+
                 _afterPostDictCallback?.Invoke(url.Unite(uri => uri.ToString()), postParams);
 
                 return res;
@@ -461,7 +495,7 @@ namespace ISQExplorerTests
 
             public class SerializationUrlEntry
             {
-                public string Url { get; set; }
+                public string Url { get; set; } = null!;
                 public IReadOnlyDictionary<string, string?>? PostDataDict;
                 public string? PostDataString { get; set; }
                 public string? Data { get; set; }
@@ -504,23 +538,18 @@ namespace ISQExplorerTests
             });
         }
 
-        private static int _dbCount = 0;
-        private static readonly object DbCountLock = new object();
-
         public static ISQExplorerContext DbContext()
         {
-            string dbName;
-            lock (DbCountLock)
-            {
-                dbName = $"db{_dbCount}";
-                _dbCount++;
-            }
-
+            File.Delete("test.db");
+            
             var options = new DbContextOptionsBuilder<ISQExplorerContext>()
-                .UseInMemoryDatabase(dbName)
+                .UseSqlite("DataSource=test.db")
                 .Options;
 
-            return new ISQExplorerContext(options);
+            var ctx = new ISQExplorerContext(options);
+            ctx.Database.EnsureCreated();
+            
+            return ctx;
         }
     }
 }

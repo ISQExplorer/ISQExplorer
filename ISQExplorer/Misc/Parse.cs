@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using ISQExplorer.Functional;
 
 namespace ISQExplorer.Misc
@@ -14,7 +15,7 @@ namespace ISQExplorer.Misc
         {
             try
             {
-                return int.Parse(s);
+                return int.Parse(s, NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite);
             }
             catch (Exception e)
             {
@@ -31,7 +32,8 @@ namespace ISQExplorer.Misc
         {
             try
             {
-                return double.Parse(s);
+                return double.Parse(s,
+                    NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite | NumberStyles.AllowDecimalPoint);
             }
             catch (Exception e)
             {

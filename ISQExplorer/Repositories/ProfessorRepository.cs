@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AngleSharp.Common;
 using ISQExplorer.Functional;
 using ISQExplorer.Misc;
 using ISQExplorer.Models;
@@ -24,10 +25,12 @@ namespace ISQExplorer.Repositories
 
         private readonly DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>
             _nNumberToProfessor;
+        
+        private readonly ISet<string> _nNumbers;
 
         private readonly ISQExplorerContext _context;
 
-        private readonly DefaultDictionary<DepartmentModel, ReadWriteLock> _locks;
+        private readonly ReadWriteLock _lock;
 
         private void _updateProf(ProfessorModel prof)
         {
@@ -35,6 +38,7 @@ namespace ISQExplorer.Repositories
             _firstNameToProfessor[prof.Department][prof.FirstName] = prof;
             _nameToProfessor[prof.Department][prof.FirstName + " " + prof.LastName] = prof;
             _nNumberToProfessor[prof.Department][prof.NNumber] = prof;
+            _nNumbers.Add(prof.NNumber);
         }
 
         public ProfessorRepository(ISQExplorerContext context)
@@ -51,44 +55,44 @@ namespace ISQExplorer.Repositories
             _nNumberToProfessor =
                 new DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>(() =>
                     new OptionalDictionary<string, ProfessorModel>());
-            _locks = new DefaultDictionary<DepartmentModel, ReadWriteLock>(() => new ReadWriteLock());
+            _nNumbers = new HashSet<string>();
+            _lock = new ReadWriteLock();
             _context = context;
 
             _context.Professors.ForEach(_updateProf);
         }
 
-        public Task AddAsync(ProfessorModel prof) => _locks[prof.Department].Write(() =>
+        public Task AddAsync(ProfessorModel prof) => _lock.Write(() =>
         {
+            if (_nNumbers.Contains(prof.NNumber))
+            {
+                return Task.CompletedTask;
+            }
+            
             _updateProf(prof);
             _context.Add(prof);
             return Task.CompletedTask;
         });
 
-        public async Task AddRangeAsync(IEnumerable<ProfessorModel> profs)
+        public Task AddRangeAsync(IEnumerable<ProfessorModel> profs) => _lock.Write(() =>
         {
-            var pr = profs.ToList();
-            var byDept = pr.GroupBy(x => x.Department);
-            await Task.WhenAll(byDept.Select(x => Task.Run(async () =>
-            {
-                _locks[x.Key].Write(() =>
-                {
-                    x.ForEach(_updateProf);
-                    _context.Professors.AddRangeAsync();
-                });
-            })));
-        }
+            var pr = profs.Where(p => !_nNumbers.Contains(p.NNumber)).ToList();
+            pr.ForEach(_updateProf);
+            _context.AddRange(pr);
+            return Task.CompletedTask;
+        });
 
         public async Task<Optional<ProfessorModel>> FromFirstNameAsync(DepartmentModel dept, string firstName) =>
-            await Task.FromResult(_locks[dept].Read(() => _firstNameToProfessor[dept][firstName]));
+            await Task.FromResult(_lock.Read(() => _firstNameToProfessor[dept][firstName]));
 
         public async Task<Optional<ProfessorModel>> FromLastNameAsync(DepartmentModel dept, string lastName) =>
-            await Task.FromResult(_locks[dept].Read(() => _lastNameToProfessor[dept][lastName]));
+            await Task.FromResult(_lock.Read(() => _lastNameToProfessor[dept][lastName]));
 
         public async Task<Optional<ProfessorModel>> FromNameAsync(DepartmentModel dept, string name) =>
-            await Task.FromResult(_locks[dept].Read(() => _nameToProfessor[dept][name]));
+            await Task.FromResult(_lock.Read(() => _nameToProfessor[dept][name]));
 
         public async Task<Optional<ProfessorModel>> FromNNumberAsync(DepartmentModel dept, string nNumber) =>
-            await Task.FromResult(_locks[dept].Read(() => _nNumberToProfessor[dept][nNumber]));
+            await Task.FromResult(_lock.Read(() => _nNumberToProfessor[dept][nNumber]));
 
         public IEnumerable<ProfessorModel> Professors => _nNumberToProfessor.Values.SelectMany(x => x.Values.Values(),
             (_, y) => y);

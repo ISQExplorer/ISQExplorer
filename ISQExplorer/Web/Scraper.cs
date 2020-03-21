@@ -61,8 +61,9 @@ namespace ISQExplorer.Web
             var tables = page.QueryAll<IHtmlTableElement>("table.datadisplaytable").ToList();
             if (tables.Count != 3)
             {
-                return new OkayException($"Most likely there are no courses for department '{dept}' and term '{term}'.", new HtmlPageException(page,
-                    "This page does not have the required number (3) of table.datadisplaytable."));
+                return new OkayException($"Most likely there are no courses for department '{dept}' and term '{term}'.",
+                    new HtmlPageException(page,
+                        "This page does not have the required number (3) of table.datadisplaytable."));
             }
 
             var tab = HtmlTable.Create(tables.Last()).Value;
@@ -82,7 +83,8 @@ namespace ISQExplorer.Web
 
             if (links.Count != titles.Count)
             {
-                return new WtfException($"Different lengths of Course and Title column in the same table for dept schedule {Urls.DeptSchedulePostData(term.Id, dept.Id)}.");
+                return new WtfException(
+                    $"Different lengths of Course and Title column in the same table for dept schedule {Urls.DeptSchedulePostData(term.Id, dept.Id)}.");
             }
 
             links.Where(x => !x.HasValue && !x.Exception.Element.TextContent.HtmlDecode().IsBlank()).ForEach(val =>
@@ -116,8 +118,10 @@ namespace ISQExplorer.Web
             var tables = page.QueryAll<IHtmlTableElement>("table.datadisplaytable").ToList();
             if (tables.Count != 3)
             {
-                return new OkayException($"Most likely there is no course data for department '{dept}' and term '{term}'.", new HtmlPageException(page,
-                    "This page does not have the required number (3) of table.datadisplaytable."));
+                return new OkayException(
+                    $"Most likely there is no course data for department '{dept}' and term '{term}'.",
+                    new HtmlPageException(page,
+                        "This page does not have the required number (3) of table.datadisplaytable."));
             }
 
             var tab = HtmlTable.Create(tables.Last()).Value;
@@ -140,7 +144,7 @@ namespace ISQExplorer.Web
 
             var nNumbers = links.Values()
                 .Where(x => !x.TextContent.HtmlDecode().IsBlank())
-                .Select(x => Try.Of(() =>
+                .Select(x => Try.OfEither<string, ProfessorScrapeException>(() =>
                 {
                     var nNumber = x.Href.Capture(@"[nN]\d{8}").Select(y => y.ToUpper());
                     if (!nNumber)
@@ -168,9 +172,11 @@ namespace ISQExplorer.Web
 
                 if (professorName == null)
                 {
-                    Errors.Add(new OkayException($"Most likely the professor with NNumber {nNumber} has no course data.", new ProfessorScrapeException(
-                        $"Could not find instructor name on '{Urls.ProfessorPage(nNumber)}'.",
-                        nNumber, dept, term)));
+                    Errors.Add(new OkayException(
+                        $"Most likely the professor with NNumber {nNumber} has no course data.",
+                        new ProfessorScrapeException(
+                            $"Could not find instructor name on '{Urls.ProfessorPage(nNumber)}'.",
+                            nNumber, dept, term)));
                     return;
                 }
 
@@ -182,6 +188,8 @@ namespace ISQExplorer.Web
                     NNumber = nNumber
                 });
             });
+
+            return new Result();
         });
 
         public Task<Result> ScrapeProfessorEntriesAsync(ProfessorModel prof) => Result.OfAsync(async () =>
@@ -196,6 +204,71 @@ namespace ISQExplorer.Web
             var tables = page.Value.QueryAll<IHtmlTableElement>("table.datadisplaytable").ToList();
             if (tables.Count != 6)
             {
+                if (tables.Count == 4)
+                {
+                    var table = HtmlTable.Create(tables[3]);
+                    if (!table)
+                    {
+                        Errors.Add(table.Exception);
+                        return;
+                    }
+
+                    var rows = table.Value.Rows
+                        .GroupBy(x => (Term: x["Term"], Crn: x["CRN"], CourseCode: x["Course ID"]))
+                        .ToDictionary(x => x.Key, x => x.First());
+
+                    var resultsInner = await Task.WhenAll(rows.Select(async x => await Result.OfAsync(async () =>
+                    {
+                        var mrow = x.Value;
+                        
+                        var course =
+                            await Courses.FromCourseCodeAsync(mrow["Course ID"].TextContent.HtmlDecode().Trim());
+                        var term = await Terms.FromStringAsync(mrow["Term"].TextContent.HtmlDecode().Trim());
+
+                        if (!course)
+                        {
+                            throw new HtmlElementException(mrow["Course ID"],
+                                "This element's text did not show up in the course repository.");
+                        }
+
+                        if (!term)
+                        {
+                            throw new HtmlElementException(mrow["Term"],
+                                "This element's text did not show up in the term repository.");
+                        }
+
+                        await Entries.AddAsync(new ISQEntryModel
+                        {
+                            Course = course.Value,
+                            Term = term.Value,
+                            Professor = prof,
+                            Crn = Parse.Int(mrow["CRN"].TextContent).Value,
+                            NEnrolled = Parse.Int(mrow["Number Enrolled"].TextContent).Value,
+                            NResponded = Parse.Int(mrow["Number Responded"].TextContent).Value,
+                            Pct5 = Parse.Double(mrow["Excellent (5)"].TextContent).Value,
+                            Pct4 = Parse.Double(mrow["Very Good (4)"].TextContent).Value,
+                            Pct3 = Parse.Double(mrow["Good (3)"].TextContent).Value,
+                            Pct2 = Parse.Double(mrow["Fair (2)"].TextContent).Value,
+                            Pct1 = Parse.Double(mrow["Poor (1)"].TextContent).Value,
+                            PctNa = Parse.Double(mrow["NR/NA"].TextContent).Value,
+                            PctA = 0.0,
+                            PctAMinus = 0.0,
+                            PctBPlus = 0.0,
+                            PctB = 0.0,
+                            PctBMinus = 0.0,
+                            PctCPlus = 0.0,
+                            PctC = 0.0,
+                            PctD = 0.0,
+                            PctF = 0.0,
+                            PctWithdraw = 0.0,
+                            MeanGpa = 0.0
+                        });
+                    })));
+                    
+                    resultsInner.Where(res => res.IsError).Select(res => res.Error).ForEach(Errors.Add);
+                    return;
+                }
+
                 Errors.Add(new HtmlPageException(page.Value, $"Expected 6 tables, got {tables.Count}"));
                 return;
             }
@@ -245,19 +318,27 @@ namespace ISQExplorer.Web
             {
                 var (mrow, grow) = group;
 
-                var course = await Courses.FromCourseCodeAsync(mrow["Course ID"].TextContent);
-                var term = await Terms.FromStringAsync(mrow["Term"].TextContent);
+                var course = await Courses.FromCourseCodeAsync(mrow["Course ID"].TextContent.HtmlDecode().Trim());
+                var term = await Terms.FromStringAsync(mrow["Term"].TextContent.HtmlDecode().Trim());
 
                 if (!course)
                 {
-                    throw new HtmlElementException(mrow["Course ID"], "This element's text did not show up in the course repository.");
+                    throw new HtmlElementException(mrow["Course ID"],
+                        "This element's text did not show up in the course repository.");
                 }
 
                 if (!term)
                 {
-
-                    throw new HtmlElementException(mrow["Term"], "This element's text did not show up in the term repository.");
+                    throw new HtmlElementException(mrow["Term"],
+                        "This element's text did not show up in the term repository.");
                 }
+
+                var meanGpa = grow["Mean GPA"].TextContent.HtmlDecode().Trim();
+                if (meanGpa == "")
+                {
+                    meanGpa = "0.0";
+                }
+
 
                 await Entries.AddAsync(new ISQEntryModel
                 {
@@ -283,7 +364,7 @@ namespace ISQExplorer.Web
                     PctD = Parse.Double(grow["D"].TextContent).Value,
                     PctF = Parse.Double(grow["F"].TextContent).Value,
                     PctWithdraw = Parse.Double(grow["Withdraw"].TextContent).Value,
-                    MeanGpa = Parse.Double(grow["Mean GPA"].TextContent).Value
+                    MeanGpa = Parse.Double(meanGpa).Value
                 });
             })));
 

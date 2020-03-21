@@ -13,6 +13,7 @@ namespace ISQExplorer.Repositories
         private readonly OptionalDictionary<int, TermModel> _idToTerm;
         private readonly OptionalDictionary<string, TermModel> _stringToTerm;
         private readonly SortedSet<int> _ids;
+        private readonly HashSet<int> _idHashSet;
         private readonly ISQExplorerContext _context;
 
         private readonly ReadWriteLock _lock;
@@ -22,6 +23,7 @@ namespace ISQExplorer.Repositories
             _idToTerm = new OptionalDictionary<int, TermModel>();
             _stringToTerm = new OptionalDictionary<string, TermModel>();
             _ids = new SortedSet<int>();
+            _idHashSet = new HashSet<int>();
             _context = context;
 
             _lock = new ReadWriteLock();
@@ -36,22 +38,30 @@ namespace ISQExplorer.Repositories
 
         public Task AddAsync(TermModel term) => _lock.Write(() =>
         {
+            if (_idHashSet.Contains(term.Id))
+            {
+                return Task.CompletedTask;
+            } 
+            
             _idToTerm[term.Id] = term;
             _stringToTerm[term.Name] = term;
             _ids.Add(term.Id);
+            _idHashSet.Add(term.Id);
+            
             _context.Terms.AddAsync(term);
             return Task.CompletedTask;
         });
 
         public Task AddRangeAsync(IEnumerable<TermModel> terms) => _lock.Write(() =>
         {
-            var t = terms.ToList();
+            var t = terms.Where(ter => !_idHashSet.Contains(ter.Id)).ToList();
 
             foreach (var term in t)
             {
                 _idToTerm[term.Id] = term;
                 _stringToTerm[term.Name] = term;
                 _ids.Add(term.Id);
+                _idHashSet.Add(term.Id);
             }
 
             _context.Terms.AddRange(t);
