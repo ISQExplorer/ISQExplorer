@@ -1,21 +1,14 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using ISQExplorer.Exceptions;
-using ISQExplorer.Functional;
 using ISQExplorer.Misc;
 using ISQExplorer.Models;
 using ISQExplorer.Repositories;
 using ISQExplorer.Web;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Moq;
-using Newtonsoft.Json;
 using NUnit.Framework;
 
 namespace ISQExplorerTests

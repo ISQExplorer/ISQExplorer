@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ISQExplorer.Functional;
 using ISQExplorer.Models;
 
 namespace ISQExplorer.Repositories
