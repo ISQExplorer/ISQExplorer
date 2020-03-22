@@ -52,9 +52,9 @@ namespace ISQExplorer
                 {
                     var user = Environment.GetEnvironmentVariable("ISQEXPLORER_DB_USER");
                     var password = Environment.GetEnvironmentVariable("ISQEXPLORER_DB_PASSWORD");
-                    var host = Environment.GetEnvironmentVariable("ISQEXPLORER_DB_HOST");
+                    var host = Environment.GetEnvironmentVariable("ISQEXPLORER_DB_HOST") ?? "localhost";
                     var portString = Environment.GetEnvironmentVariable("ISQEXPLORER_DB_PORT");
-                    var db = Environment.GetEnvironmentVariable("ISQEXPLORER_DB_DATABASE");
+                    var db = Environment.GetEnvironmentVariable("ISQEXPLORER_DB_DATABASE") ?? nameof(ISQExplorer);
                     var ssl = Environment.GetEnvironmentVariable("ISQEXPLORER_DB_SSL");
                     var sslSelfSignedString =
                         Environment.GetEnvironmentVariable("ISQEXPLORER_DB_SSL_ALLOW_SELF_SIGNED");
@@ -127,7 +127,7 @@ namespace ISQExplorer
                     var password = Environment.GetEnvironmentVariable("ISQEXPLORER_DB_PASSWORD");
                     var host = Environment.GetEnvironmentVariable("ISQEXPLORER_DB_HOST");
                     var portString = Environment.GetEnvironmentVariable("ISQEXPLORER_DB_PORT");
-                    var db = Environment.GetEnvironmentVariable("ISQEXPLORER_DB_DATABASE");
+                    var db = Environment.GetEnvironmentVariable("ISQEXPLORER_DB_DATABASE") ?? nameof(ISQExplorer);
                     var ssl = Environment.GetEnvironmentVariable("ISQEXPLORER_DB_SSL");
                     var sslSelfSignedString =
                         Environment.GetEnvironmentVariable("ISQEXPLORER_DB_SSL_ALLOW_SELF_SIGNED");
@@ -221,12 +221,16 @@ namespace ISQExplorer
         {
             services.AddControllersWithViews();
 
+            services.AddDbContext<ISQExplorerContext>(options => GetConnection().Make(options));
+
+            /*
             services.AddSingleton<ISQExplorerContext>(provider =>
             {
                 var options = new DbContextOptionsBuilder<ISQExplorerContext>();
                 var newOptions = GetConnection().Make(options);
                 return new ISQExplorerContext(newOptions.Options);
             });
+            */
             
 
             // use dependency injection to make our ISQExplorerContext backed by the sql server we choose 
@@ -237,12 +241,12 @@ namespace ISQExplorer
             services.AddSingleton<IHtmlClient, HtmlClient>(s =>
                 new HtmlClient(() => new RateLimiter(3, 1000)));
 
-            services.AddSingleton<ITermRepository, TermRepository>();
-            services.AddSingleton<IProfessorRepository, ProfessorRepository>();
-            services.AddSingleton<ICourseRepository, CourseRepository>();
-            services.AddSingleton<IDepartmentRepository, DepartmentRepository>();
-            services.AddSingleton<IEntryRepository, EntryRepository>();
-            services.AddSingleton<Scraper, Scraper>();
+            services.AddScoped<ITermRepository, TermRepository>();
+            services.AddScoped<IProfessorRepository, ProfessorRepository>();
+            services.AddScoped<ICourseRepository, CourseRepository>();
+            services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+            services.AddScoped<IEntryRepository, EntryRepository>();
+            services.AddScoped<Scraper, Scraper>();
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/build"; });

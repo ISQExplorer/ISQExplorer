@@ -9,7 +9,7 @@ namespace ISQExplorer.Database
     public class SqlServerConnection : IConnection
     {
         public string? Host { get; set; }
-        public string? Database { get; set; }
+        public string Database { get; set; } = nameof(ISQExplorer);
         public string? Username { get; set; }
         public string? Password { get; set; }
         public int? Port { get; set; }
@@ -57,6 +57,7 @@ namespace ISQExplorer.Database
             }
             builder.InitialCatalog = Database;
             builder.IntegratedSecurity = UseIntegratedSecurity;
+            builder.MultipleActiveResultSets = true;
 
             return input.UseSqlServer(builder.ConnectionString);
         }

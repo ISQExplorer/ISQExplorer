@@ -31,8 +31,11 @@ namespace ISQExplorer.Models
             modelBuilder.Entity<TermModel>()
                  .HasIndex(c => c.Name)
                  .IsUnique();
-            modelBuilder.Entity<ISQEntryModel>()
-                .HasOne<TermModel>();
+
+            modelBuilder.Entity<ProfessorModel>()
+                .HasMany<ISQEntryModel>()
+                .WithOne(x => x.Professor)
+                .OnDelete(DeleteBehavior.NoAction);
 
 
             /*

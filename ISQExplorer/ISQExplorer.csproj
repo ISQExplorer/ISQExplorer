@@ -17,6 +17,10 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.2" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.2">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.2" />
     </ItemGroup>
 
@@ -25,6 +29,12 @@
         <Content Remove="$(SpaRoot)**" />
         <None Remove="$(SpaRoot)**" />
         <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
+        <Compile Remove="Migrations\20200322030225_InitialCreate.cs" />
+        <Compile Remove="Migrations\20200322030225_InitialCreate.Designer.cs" />
+        <Compile Remove="Migrations\20200322031032_InitialCreate.cs" />
+        <Compile Remove="Migrations\20200322031032_InitialCreate.Designer.cs" />
+        <Compile Remove="Migrations\20200322031659_InitialCreate.cs" />
+        <Compile Remove="Migrations\20200322031659_InitialCreate.Designer.cs" />
         <None Include="clientapp\src\Query.ts" />
     </ItemGroup>
 
