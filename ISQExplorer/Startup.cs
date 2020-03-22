@@ -168,7 +168,7 @@ namespace ISQExplorer
                             $"Environment variable ISQEXPLORER_DB_SSL_ALLOW_SELF_SIGNED for SQL Server connections must be set to one of '1', '0'. Was set to '${x}'")
                     };
 
-                    var sslTrustedConnection = sslTrustedConnectionString?.ToLower() switch
+                    var sslTrustedConnection = (user == null && password == null) || sslTrustedConnectionString?.ToLower() switch
                     {
                         var x when
                         x == "yes" ||
