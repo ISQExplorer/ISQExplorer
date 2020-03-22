@@ -221,7 +221,7 @@ Follow the below style guides to ensure that the project's style remains consist
 ### C#
 * Tabs are 4 spaces.
 * Do not leave unused imports.
-* Async functions should
+* Async functions should have "Async" as the last part of their name.
 
 ### CSS
 
