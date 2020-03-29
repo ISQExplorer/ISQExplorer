@@ -33,6 +33,8 @@ namespace ISQExplorer.Repositories
             _entries = new HashSet<ISQEntryModel>();
             _context = context;
             _lock = new ReadWriteLock();
+            
+            _context.IsqEntries.ForEach(_addEntry);
         }
 
         public Task AddAsync(ISQEntryModel entry) => _lock.Write(() =>
@@ -67,6 +69,8 @@ namespace ISQExplorer.Repositories
 
         public IEnumerable<ISQEntryModel> Entries =>
             _lock.Read(() => _courseToEntries.Values.SelectMany(x => x).ToList());
+
+        public IQueryable<ISQEntryModel> AsQueryable() => _context.IsqEntries;
 
         public Task SaveChangesAsync() => _context.SaveChangesAsync();
 

@@ -30,6 +30,8 @@ namespace ISQExplorer.Repositories
             _courseCodes = new HashSet<string>();
             _context = context;
             _lock = new ReadWriteLock();
+            
+            _context.Courses.ForEach(_addCourse);
         }
 
         public Task AddAsync(CourseModel course) => _lock.Write(() =>

@@ -1,9 +1,12 @@
 #nullable enable
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ISQExplorer.Misc;
 using ISQExplorer.Models;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace ISQExplorer.Repositories
@@ -19,7 +22,50 @@ namespace ISQExplorer.Repositories
             _logger = logger;
         }
 
-        public async Task<IQueryable<ISQEntryModel>> QueryClass(string parameter, QueryType qt, TermModel? since = null,
+        public async IAsyncEnumerable<Suggestion> QuerySuggestionsAsync(string parameter, QueryType queryTypes)
+        {
+            parameter = parameter.ToLower();
+
+            int SuggestionOrderer(string s1, string s2)
+            {
+                s1 = s1.ToLower();
+                s2 = s2.ToLower();
+
+                if (s1 == s2)
+                {
+                    return 0;
+                }
+
+                var whitespace = new[] {' ', '\t', '\n'};
+
+                foreach (var pair in new[] {(s1, s2)}.Concat(s1.Split(whitespace).Zip(s2.Split(whitespace))))
+                {
+                    var (word1, word2) = pair;
+
+                    if (word1.StartsWith(parameter))
+                    {
+                        if (word2.StartsWith(parameter))
+                        {
+                            return word1.Length - word2.Length;
+                        }
+
+                        return -1;
+                    }
+
+                    if (word2.StartsWith(parameter))
+                    {
+                        return 1;
+                    }
+                }
+
+                return 0;
+            }
+
+            yield break;
+        }
+
+        public async Task<IQueryable<ISQEntryModel>> QueryEntriesAsync(string parameter, QueryType qt,
+            TermModel? since = null,
             TermModel? until = null) => await Task.Run(() =>
         {
             switch (qt)
@@ -35,34 +81,14 @@ namespace ISQExplorer.Repositories
                     var fname = parameter.Split(" ").SkipLast(1).Join(" ");
                     var lname = parameter.Split(" ").Last();
                     return _context.IsqEntries.Where(x =>
-                        x.Professor.FirstName.Contains(fname) && x.Professor.LastName.Contains(lname));
+                        x.Professor.FirstName.ToUpper().Contains(fname.ToUpper()) &&
+                        x.Professor.LastName.ToUpper().Contains(lname.ToUpper()));
                 }
                 case QueryType.ProfessorName:
-                    return _context.IsqEntries.Where(x => x.Professor.LastName.Contains(parameter)).When(since, until);
+                    return _context.IsqEntries.Where(x => x.Professor.LastName.ToUpper()
+                        .Contains(parameter.ToUpper())).When(since, until);
                 default:
-                    throw new ArgumentException($"Invalid QueryType '{qt}'");
-            }
-        });
-
-        public async Task<IQueryable<ProfessorModel>> NameToProfessors(string professorName) => await Task.Run(() =>
-        {
-            if (!professorName.Contains(" "))
-            {
-                var lname = professorName.ToUpper();
-
-                return from prof in _context.Professors
-                    where prof.LastName.ToUpper().Equals(lname)
-                    select prof;
-            }
-            else
-            {
-                var fname = professorName.Split(" ").SkipLast(1).Join(" ").ToUpper();
-                var lname = professorName.Split(" ").Last().ToUpper();
-
-                return from prof in _context.Professors
-                    where prof.LastName.ToUpper().Equals(lname) &&
-                          prof.FirstName.ToUpper().Equals(fname)
-                    select prof;
+                    throw new ArgumentException($"Invalid QueryType '{qt}'. You can only query one type at a time.");
             }
         });
     }

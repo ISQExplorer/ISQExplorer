@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ISQExplorer.Models;
 
@@ -11,6 +12,7 @@ namespace ISQExplorer.Repositories
         Task AddAsync(ISQEntryModel professor);
         Task AddRangeAsync(IEnumerable<ISQEntryModel> professors);
         IEnumerable<ISQEntryModel> Entries { get; }
+        IQueryable<ISQEntryModel> AsQueryable();
         Task SaveChangesAsync();
     }
 }

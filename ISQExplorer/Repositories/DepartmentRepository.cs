@@ -30,6 +30,8 @@ namespace ISQExplorer.Repositories
             _deptIds = new HashSet<int>();
             _context = context;
             _lock = new ReadWriteLock();
+            
+            context.Departments.ForEach(_addDepartment);
         }
 
         public Task AddAsync(DepartmentModel department) => _lock.Write(() =>

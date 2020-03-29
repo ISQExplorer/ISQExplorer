@@ -39,17 +39,6 @@ namespace ISQExplorer.Controllers
         }
     }
 
-    public class Suggestion
-    {
-        public readonly QueryType Type;
-        public readonly string Parameter;
-
-        public Suggestion(QueryType qt, string parameter)
-        {
-            (Type, Parameter) = (qt, parameter);
-        }
-    }
-
     [ApiController]
     [Route("[controller]")]
     public class QueryController : Controller
@@ -63,45 +52,22 @@ namespace ISQExplorer.Controllers
             _logger = logger;
         }
 
-        private string GpaToStyle(double gpa)
-        {
-            var hue = (int) (gpa / 4.00 * 100.0);
-            return $"color: hsl({hue}, 100%, 35%)";
-        }
-
-        private string RatingToStyle(double rating)
-        {
-            var hue = (int) ((rating - 1.00) / 4.00 * 100.0);
-            return $"color: hsl({hue}, 100%, 35%)";
-        }
-
-        /*
-        [HttpPost]
-        public IActionResult RenderTableRows([FromBody] IEnumerable<IEnumerable<TableCell>> data)
-        {
-            return View(data);
-        }
-        */
-
-        public enum ISQEntriesOrderBy
-        {
-            Time = 0,
-            LastName = 1,
-            Gpa = 2,
-            Rating = 3
-        }
-
-        public async Task<IActionResult> GetSuggestions(string parameter, int count = 0)
+        public async Task<IActionResult> GetSuggestions(string parameter, int? count = null)
         {
             var suggestions = await Task.WhenAll(
-                _repo.QueryClass(parameter, QueryType.CourseCode),
-                _repo.QueryClass(parameter, QueryType.CourseName),
-                _repo.QueryClass(parameter, QueryType.ProfessorName)
+                _repo.QueryEntriesAsync(parameter, QueryType.CourseCode),
+                _repo.QueryEntriesAsync(parameter, QueryType.CourseName),
+                _repo.QueryEntriesAsync(parameter, QueryType.ProfessorName)
             );
 
-            var courseCodes = (count >= 0 ? suggestions[0].Take(count) : suggestions[0]).AsEnumerable();
-            var courseNames = (count >= 0 ? suggestions[1].Take(count) : suggestions[1]).AsEnumerable();
-            var profNames = (count >= 0 ? suggestions[2].Take(count) : suggestions[2]).AsEnumerable();
+            if (count == null)
+            {
+                count = -1;
+            }
+
+            var courseCodes = (count >= 0 ? suggestions[0].Take(count.Value) : suggestions[0]).AsEnumerable();
+            var courseNames = (count >= 0 ? suggestions[1].Take(count.Value) : suggestions[1]).AsEnumerable();
+            var profNames = (count >= 0 ? suggestions[2].Take(count.Value) : suggestions[2]).AsEnumerable();
 
             return Json(
                 courseCodes.Select(x => new Suggestion(QueryType.CourseCode, x.Course.CourseCode))

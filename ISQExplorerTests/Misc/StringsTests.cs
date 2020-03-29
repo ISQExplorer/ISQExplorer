@@ -55,7 +55,23 @@ namespace ISQExplorerTests
         [TestCaseSource(nameof(_matchesTestCases))]
         public void MatchesTest(string input, string pattern, bool substring, bool matches)
         {
-            Assert.Equals(matches, input.Matches(pattern));
+            Assert.AreEqual(matches, input.Matches(pattern));
         }
+
+        private static object[] _indexOfTestCases =
+        {
+            new object[] {"abcdef", "abcdef", 0},
+            new object[] {"abcdef", "bcd", 1},
+            new object[] {"abcdef", "cd", 2},
+            new object[] {"abcdef", "d", 3},
+            new object[] {"ababcdef", "bcd", 2},
+            new object[] {"ababcd", "bcd", 2},
+            new object[] {"ababcdd", "bcd", 2},
+            new object[] {"abc", "bcd", -1},
+            new object[] {"ab", "abc", -1},
+            new object[] {"", "a", -1},
+            new object[] {"", "", 0},
+            new object[] {"a", "", 0}
+        };
     }
 }

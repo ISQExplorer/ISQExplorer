@@ -3,9 +3,38 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Moq;
 
 namespace ISQExplorer.Misc
 {
+    public class PredicateComparer<T> : IComparer<T>
+    {
+        private readonly Func<T, T, int> _comp;
+
+        public PredicateComparer(Func<T, T, int> comparer)
+        {
+            _comp = comparer;
+        }
+
+        public int Compare(T x, T y) => _comp(x, y);
+    }
+
+    public class PredicateEqualityComparer<T> : IEqualityComparer<T>
+    {
+        private readonly Func<T, T, bool> _eq;
+        private readonly Func<T, int> _hash;
+
+        public PredicateEqualityComparer(Func<T, T, bool> equalityComparer, Func<T, int>? hashCodeGenerator = null)
+        {
+            _eq = equalityComparer;
+            _hash = hashCodeGenerator ?? (e => e.GetHashCode());
+        }
+
+        public bool Equals(T x, T y) => _eq(x, y);
+
+        public int GetHashCode(T obj) => _hash(obj);
+    }
+
     public static class Linq
     {
         /// <summary>
@@ -70,9 +99,17 @@ namespace ISQExplorer.Misc
             return (double) accepted / total >= proportion;
         }
 
-        public static IEnumerable<T> Distinct<T>(this IEnumerable<T> enumerable, Func<T, T, bool> equalityPredicate)
+        /// <summary>
+        /// Returns the distinct elements in the enumerable according to the given equality function.
+        /// </summary>
+        /// <param name="enumerable">The enumerable.</param>
+        /// <param name="equalityPredicate">The function to use checking if two elements are equal.</param>
+        /// <param name="hashPredicate">An optional hash function that should ensure that two equal elements have the same hashcode. By default this is T.GetHashCode().</param>
+        /// <typeparam name="T">The type of the elements to compare.</typeparam>
+        /// <returns>An enumerable containing the distinct elements.</returns>
+        public static IEnumerable<T> Distinct<T>(this IEnumerable<T> enumerable, Func<T, T, bool> equalityPredicate, Func<T, int>? hashPredicate = null)
         {
-            var seen = new HashSet<T>();
+            var seen = new HashSet<T>(new PredicateEqualityComparer<T>(equalityPredicate, hashPredicate));
 
             foreach (var elem in enumerable)
             {
@@ -80,6 +117,7 @@ namespace ISQExplorer.Misc
                 {
                     continue;
                 }
+
                 seen.Add(elem);
                 yield return elem;
             }
@@ -172,6 +210,20 @@ namespace ISQExplorer.Misc
         /// <typeparam name="T">The type of the enumerable.</typeparam>
         /// <returns>True if the enumerable contains no elements. False if not.</returns>
         public static bool None<T>(this IEnumerable<T> enumerable) => !enumerable.Any();
+
+        /// <summary>
+        /// Orders by a comparison function. 
+        /// </summary>
+        /// <param name="enumerable">The enumerable to order.</param>
+        /// <param name="comparer">The comparison function. The function should return negative to put the left element before the right, positive to do the opposite, 0 if they are equal.</param>
+        /// <typeparam name="T">The type of the enumerable's elements.</typeparam>
+        /// <returns>A list of the elements sorted according to the given comparer.</returns>
+        public static IList<T> OrderBy<T>(this IEnumerable<T> enumerable, Func<T, T, int> comparer)
+        {
+            var list = enumerable.ToList();
+            list.Sort(new PredicateComparer<T>(comparer));
+            return list;
+        }
 
         /// <summary>
         /// Returns an enumerable of integers in a certain range. Equivalent to Python's range().

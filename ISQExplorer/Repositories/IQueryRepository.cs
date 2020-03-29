@@ -1,10 +1,13 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ISQExplorer.Models;
 
 namespace ISQExplorer.Repositories
 {
+    [Flags]
     public enum QueryType
     {
         CourseCode = 0,
@@ -12,9 +15,22 @@ namespace ISQExplorer.Repositories
         ProfessorName = 2
     }
 
+    public class Suggestion
+    {
+        public readonly QueryType Type;
+        public readonly string Value;
+
+        public Suggestion(QueryType qt, string parameter)
+        {
+            (Type, Value) = (qt, parameter);
+        }
+    }
+
     public interface IQueryRepository
     {
-        Task<IQueryable<ISQEntryModel>> QueryClass(string parameter, QueryType qt, TermModel? since = null, TermModel? until = null);
-        Task<IQueryable<ProfessorModel>> NameToProfessors(string professorName);
+        IAsyncEnumerable<Suggestion> QuerySuggestionsAsync(string parameter, QueryType types);
+
+        Task<IQueryable<ISQEntryModel>> QueryEntriesAsync(string parameter, QueryType qt, TermModel? since = null,
+            TermModel? until = null);
     }
 }
