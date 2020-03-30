@@ -58,7 +58,7 @@ namespace ISQExplorer.Controllers
             return Json(res);
         }
 
-        [Route("Entries")]
+        [Route("Entries/{queryType}/{parameter}")]
         public async Task<IActionResult> GetEntries(string parameter, string queryType, int? since, int? until)
         {
             var qt = int.TryParse(queryType, out var num)
