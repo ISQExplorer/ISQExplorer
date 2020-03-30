@@ -8,99 +8,109 @@ using ISQExplorer.Models;
 
 namespace ISQExplorer.Repositories
 {
+    internal class TermInfo
+    {
+        public readonly OptionalDictionary<int, TermModel> IdToTerm;
+        public readonly OptionalDictionary<string, TermModel> StringToTerm;
+        public readonly SortedSet<int> Ids;
+        public readonly HashSet<int> IdHashSet;
+        public readonly ReadWriteLock Lock;
+
+        public static readonly TermInfo Instance = new TermInfo();
+
+        private TermInfo()
+        {
+            IdToTerm = new OptionalDictionary<int, TermModel>();
+            StringToTerm = new OptionalDictionary<string, TermModel>();
+            Ids = new SortedSet<int>();
+            IdHashSet = new HashSet<int>();
+
+            Lock = new ReadWriteLock();
+        }
+    }
+
     public class TermRepository : ITermRepository
     {
-        private readonly OptionalDictionary<int, TermModel> _idToTerm;
-        private readonly OptionalDictionary<string, TermModel> _stringToTerm;
-        private readonly SortedSet<int> _ids;
-        private readonly HashSet<int> _idHashSet;
+        private readonly TermInfo _info;
         private readonly ISQExplorerContext _context;
 
-        private readonly ReadWriteLock _lock;
+        private void _addTerm(TermModel term)
+        {
+            _info.IdToTerm[term.Id] = term;
+            _info.StringToTerm[term.Name] = term;
+            _info.Ids.Add(term.Id);
+            _info.IdHashSet.Add(term.Id);
+        }
 
         public TermRepository(ISQExplorerContext context)
         {
-            _idToTerm = new OptionalDictionary<int, TermModel>();
-            _stringToTerm = new OptionalDictionary<string, TermModel>();
-            _ids = new SortedSet<int>();
-            _idHashSet = new HashSet<int>();
+            _info = TermInfo.Instance;
             _context = context;
 
-            _lock = new ReadWriteLock();
-
-            _lock.Read(() => _context.Terms.ForEach(term =>
+            _info.Lock.Write(() =>
             {
-                _idToTerm[term.Id] = term;
-                _stringToTerm[term.Name] = term;
-                _ids.Add(term.Id);
-            }));
+                if (_info.IdHashSet.None())
+                {
+                    _context.Terms.ForEach(_addTerm);
+                }
+            });
         }
 
-        public Task AddAsync(TermModel term) => _lock.Write(() =>
+        public Task AddAsync(TermModel term) => _info.Lock.Write(() =>
         {
-            if (_idHashSet.Contains(term.Id))
+            if (_info.IdHashSet.Contains(term.Id))
             {
                 return Task.CompletedTask;
-            } 
-            
-            _idToTerm[term.Id] = term;
-            _stringToTerm[term.Name] = term;
-            _ids.Add(term.Id);
-            _idHashSet.Add(term.Id);
-            
+            }
+
+            _addTerm(term);
             _context.Terms.AddAsync(term);
             return Task.CompletedTask;
         });
 
-        public Task AddRangeAsync(IEnumerable<TermModel> terms) => _lock.Write(() =>
+        public Task AddRangeAsync(IEnumerable<TermModel> terms) => _info.Lock.Write(() =>
         {
-            var t = terms.Where(ter => !_idHashSet.Contains(ter.Id)).ToList();
-
-            foreach (var term in t)
-            {
-                _idToTerm[term.Id] = term;
-                _stringToTerm[term.Name] = term;
-                _ids.Add(term.Id);
-                _idHashSet.Add(term.Id);
-            }
-
+            var t = terms.Where(ter => !_info.IdHashSet.Contains(ter.Id)).ToList();
+            t.ForEach(_addTerm);
             _context.Terms.AddRange(t);
             return Task.CompletedTask;
         });
 
         public async Task<Optional<TermModel>> FromIdAsync(int id) =>
-            await Task.FromResult(_lock.Read(() => _idToTerm.ContainsKey(id) ? _idToTerm[id] : new Optional<TermModel>()));
+            await Task.FromResult(
+                _info.Lock.Read(() => _info.IdToTerm.ContainsKey(id) ? _info.IdToTerm[id] : new Optional<TermModel>()));
 
         public async Task<Optional<TermModel>> FromStringAsync(string str) =>
-            await Task.FromResult(_lock.Read(() => _stringToTerm.ContainsKey(str) ? _stringToTerm[str] : new Optional<TermModel>()));
+            await Task.FromResult(_info.Lock.Read(() =>
+                _info.StringToTerm.ContainsKey(str) ? _info.StringToTerm[str] : new Optional<TermModel>()));
 
-        public Task<Optional<TermModel>> PreviousAsync(TermModel t, int howMany = 1) => _lock.Read(() =>
+        public Task<Optional<TermModel>> PreviousAsync(TermModel t, int howMany = 1) => _info.Lock.Read(() =>
         {
             if (howMany < 0)
             {
                 return NextAsync(t, -howMany);
             }
 
-            var index = _ids.Index(t.Id);
+            var index = _info.Ids.Index(t.Id);
             return Task.FromResult(index - howMany < 0
                 ? new Optional<TermModel>()
-                : _idToTerm[_ids.ElementAt(index - howMany)]);
+                : _info.IdToTerm[_info.Ids.ElementAt(index - howMany)]);
         });
 
-        public Task<Optional<TermModel>> NextAsync(TermModel t, int howMany = 1) => _lock.Read(() =>
+        public Task<Optional<TermModel>> NextAsync(TermModel t, int howMany = 1) => _info.Lock.Read(() =>
         {
             if (howMany < 0)
             {
                 return PreviousAsync(t, -howMany);
             }
 
-            var index = _ids.Index(t.Id);
-            return Task.FromResult(index + howMany >= _ids.Count
+            var index = _info.Ids.Index(t.Id);
+            return Task.FromResult(index + howMany >= _info.Ids.Count
                 ? new Optional<TermModel>()
-                : _idToTerm[_ids.ElementAt(index + howMany)]);
+                : _info.IdToTerm[_info.Ids.ElementAt(index + howMany)]);
         });
 
-        public IEnumerable<TermModel> Terms => _ids.Select(id => _idToTerm[id]).Values();
+        public IEnumerable<TermModel> Terms => _info.Ids.Select(id => _info.IdToTerm[id]).Values();
 
         public Task SaveChangesAsync() => _context.SaveChangesAsync();
 

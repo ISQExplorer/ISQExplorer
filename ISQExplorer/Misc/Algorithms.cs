@@ -25,13 +25,13 @@ namespace ISQExplorer.Misc
             Left = 2,
         }
 
-        public static ISet<(string Substring, int Index)> LongestCommonSubstring(string s1, string s2)
+        public static IEnumerable<(string Substring, int Index)> LongestCommonSubstring(string s1, string s2)
         {
             // ReSharper disable CommentTypo
             // DYNAMICCCCCCCCCCCCC PROGRAMMINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
 
             var table = new int[s2.Length + 1, s1.Length + 1];
-            var buf = new HashSet<(int, int)>();
+            var buf = new HashSet<(int Index, int Length)>();
             var longest = 0;
 
             for (var i = 1; i <= s2.Length; ++i)
@@ -55,8 +55,7 @@ namespace ISQExplorer.Misc
                 }
             }
             
-            var ret = buf.Select(x => (s1.Substring(x.Item1, x.Item2), x.Item1)).ToHashSet();
-            return ret;
+            return buf.Select(x => (s1.Substring(x.Index, x.Length), x.Index));
         }
     }
 }

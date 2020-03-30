@@ -4,8 +4,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AngleSharp.Common;
+using AngleSharp.Text;
 using ISQExplorer.Misc;
 using ISQExplorer.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 
@@ -22,46 +25,93 @@ namespace ISQExplorer.Repositories
             _logger = logger;
         }
 
-        public async IAsyncEnumerable<Suggestion> QuerySuggestionsAsync(string parameter, QueryType queryTypes)
+        public Task<IEnumerable<Suggestion>> QuerySuggestionsAsync(string parameter, QueryType queryTypes)
         {
-            parameter = parameter.ToLower();
+            var whitespace = new[] {' ', '\t', '\n'};
+
+            parameter = parameter.ToLower().Split(whitespace).Join(" ");
 
             int SuggestionOrderer(string s1, string s2)
             {
-                s1 = s1.ToLower();
-                s2 = s2.ToLower();
+                s1 = s1.ToLower().Split(whitespace).Join(" ");
+                s2 = s2.ToLower().Split(whitespace).Join(" ");
 
-                if (s1 == s2)
+                var s1Lcs = Algorithms.LongestCommonSubstring(parameter, s1)
+                    .OrderBy(x => x.Substring.Length)
+                    .ThenBy(x => x.Index)
+                    .ToList();
+                var s2Lcs = Algorithms.LongestCommonSubstring(parameter, s2)
+                    .OrderBy(x => x.Substring.Length)
+                    .ThenBy(x => x.Index)
+                    .ToList();
+
+                if (s1Lcs.None() && s2Lcs.None())
                 {
                     return 0;
                 }
 
-                var whitespace = new[] {' ', '\t', '\n'};
-
-                foreach (var pair in new[] {(s1, s2)}.Concat(s1.Split(whitespace).Zip(s2.Split(whitespace))))
+                if (s1Lcs.None())
                 {
-                    var (word1, word2) = pair;
-
-                    if (word1.StartsWith(parameter))
-                    {
-                        if (word2.StartsWith(parameter))
-                        {
-                            return word1.Length - word2.Length;
-                        }
-
-                        return -1;
-                    }
-
-                    if (word2.StartsWith(parameter))
-                    {
-                        return 1;
-                    }
+                    return 1;
                 }
 
-                return 0;
+                if (s2Lcs.None())
+                {
+                    return -1;
+                }
+
+                if (s1Lcs.First().Substring.Length < s2Lcs.First().Substring.Length)
+                {
+                    return -1;
+                }
+
+                if (s1Lcs.First().Substring.Length > s2Lcs.First().Substring.Length)
+                {
+                    return 1;
+                }
+
+                if (s1Lcs.First().Index < s2Lcs.First().Index)
+                {
+                    return -1;
+                }
+
+                if (s1Lcs.First().Index > s2Lcs.First().Index)
+                {
+                    return 1;
+                }
+
+                return s1Lcs.Count - s2Lcs.Count;
             }
 
-            yield break;
+            IEnumerable<Suggestion> res = new List<Suggestion>();
+            if ((queryTypes & QueryType.CourseCode) > 0)
+            {
+                res = res.Concat(_context.Courses
+                    .Where(c => c.CourseCode.Contains(parameter))
+                    .Take(100)
+                    .AsEnumerable()
+                    .Select(x => new Suggestion(QueryType.CourseCode, x.CourseCode)));
+            }
+
+            if ((queryTypes & QueryType.CourseName) > 0)
+            {
+                res = res.Concat(_context.Courses
+                    .Where(c => c.Name.Contains(parameter))
+                    .Take(100)
+                    .AsEnumerable()
+                    .Select(x => new Suggestion(QueryType.CourseName, x.Name)));
+            }
+
+            if ((queryTypes & QueryType.ProfessorName) > 0)
+            {
+                res = res.Concat(_context.Professors
+                    .Where(c => (c.FirstName + " " + c.LastName).Contains(parameter))
+                    .Take(100)
+                    .AsEnumerable()
+                    .Select(x => new Suggestion(QueryType.CourseName, x.FirstName + " " + x.LastName)));
+            }
+
+            return Task.FromResult(res.OrderBy((s1, s2) => SuggestionOrderer(s1.Value, s2.Value)).AsEnumerable());
         }
 
         public async Task<IQueryable<ISQEntryModel>> QueryEntriesAsync(string parameter, QueryType qt,
@@ -71,22 +121,46 @@ namespace ISQExplorer.Repositories
             switch (qt)
             {
                 case QueryType.CourseCode:
-                    return _context.IsqEntries.Where(x => x.Course.CourseCode.Contains(parameter.ToUpper()))
+                    return _context.IsqEntries
+                        .Include(x => x.Course)
+                        .Include(x => x.Course.Department)
+                        .Include(x => x.Professor)
+                        .Include(x => x.Professor.Department)
+                        .Include(x => x.Term)
+                        .Where(x => x.Course.CourseCode.Contains(parameter.ToUpper()))
                         .When(since, until);
                 case QueryType.CourseName:
-                    return _context.IsqEntries.Where(x => x.Course.Name.ToUpper().Contains(parameter.ToUpper()))
+                    return _context.IsqEntries
+                        .Include(x => x.Course)
+                        .Include(x => x.Course.Department)
+                        .Include(x => x.Professor)
+                        .Include(x => x.Professor.Department)
+                        .Include(x => x.Term)
+                        .Where(x => x.Course.Name.ToUpper().Contains(parameter.ToUpper()))
                         .When(since, until);
                 case QueryType.ProfessorName when parameter.Contains(" "):
                 {
                     var fname = parameter.Split(" ").SkipLast(1).Join(" ");
                     var lname = parameter.Split(" ").Last();
-                    return _context.IsqEntries.Where(x =>
-                        x.Professor.FirstName.ToUpper().Contains(fname.ToUpper()) &&
-                        x.Professor.LastName.ToUpper().Contains(lname.ToUpper()));
+                    return _context.IsqEntries
+                        .Include(x => x.Course)
+                        .Include(x => x.Course.Department)
+                        .Include(x => x.Professor)
+                        .Include(x => x.Professor.Department)
+                        .Include(x => x.Term)
+                        .Where(x =>
+                            x.Professor.FirstName.ToUpper().Contains(fname.ToUpper()) &&
+                            x.Professor.LastName.ToUpper().Contains(lname.ToUpper()));
                 }
                 case QueryType.ProfessorName:
-                    return _context.IsqEntries.Where(x => x.Professor.LastName.ToUpper()
-                        .Contains(parameter.ToUpper())).When(since, until);
+                    return _context.IsqEntries
+                        .Include(x => x.Course)
+                        .Include(x => x.Course.Department)
+                        .Include(x => x.Professor)
+                        .Include(x => x.Professor.Department)
+                        .Include(x => x.Term)
+                        .Where(x => x.Professor.LastName.ToUpper()
+                            .Contains(parameter.ToUpper())).When(since, until);
                 default:
                     throw new ArgumentException($"Invalid QueryType '{qt}'. You can only query one type at a time.");
             }

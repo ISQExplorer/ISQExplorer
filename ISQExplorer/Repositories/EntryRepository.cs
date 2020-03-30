@@ -9,37 +9,55 @@ using ISQExplorer.Models;
 
 namespace ISQExplorer.Repositories
 {
+    internal class EntryInfo
+    {
+        public readonly DefaultDictionary<CourseModel, ISet<ISQEntryModel>> CourseToEntries;
+        public readonly DefaultDictionary<ProfessorModel, ISet<ISQEntryModel>> ProfessorToEntries;
+        public readonly ISet<ISQEntryModel> Entries;
+        public readonly ReadWriteLock Lock;
+        
+        public static readonly EntryInfo Instance = new EntryInfo();
+
+        private EntryInfo()
+        {
+             CourseToEntries =
+                 new DefaultDictionary<CourseModel, ISet<ISQEntryModel>>(() => new HashSet<ISQEntryModel>());
+             ProfessorToEntries =
+                 new DefaultDictionary<ProfessorModel, ISet<ISQEntryModel>>(() => new HashSet<ISQEntryModel>());
+             Entries = new HashSet<ISQEntryModel>();
+             Lock = new ReadWriteLock();           
+        }
+    }
+    
     public class EntryRepository : IEntryRepository
     {
-        private readonly DefaultDictionary<CourseModel, ISet<ISQEntryModel>> _courseToEntries;
-        private readonly DefaultDictionary<ProfessorModel, ISet<ISQEntryModel>> _professorToEntries;
-        private readonly ISet<ISQEntryModel> _entries;
+        private readonly EntryInfo _info;
         private readonly ISQExplorerContext _context;
-        private readonly ReadWriteLock _lock;
 
         private void _addEntry(ISQEntryModel entry)
         {
-            _courseToEntries[entry.Course].Add(entry);
-            _professorToEntries[entry.Professor].Add(entry);
-            _entries.Add(entry);
+            _info.CourseToEntries[entry.Course].Add(entry);
+            _info.ProfessorToEntries[entry.Professor].Add(entry);
+            _info.Entries.Add(entry);
         }
 
         public EntryRepository(ISQExplorerContext context)
         {
-            _courseToEntries =
-                new DefaultDictionary<CourseModel, ISet<ISQEntryModel>>(() => new HashSet<ISQEntryModel>());
-            _professorToEntries =
-                new DefaultDictionary<ProfessorModel, ISet<ISQEntryModel>>(() => new HashSet<ISQEntryModel>());
-            _entries = new HashSet<ISQEntryModel>();
             _context = context;
-            _lock = new ReadWriteLock();
-            
-            _context.IsqEntries.ForEach(_addEntry);
+            _info = EntryInfo.Instance;
+
+            _info.Lock.Write(() =>
+            {
+                if (_info.Entries.None())
+                {
+                    _context.IsqEntries.ForEach(_addEntry);
+                }
+            });
         }
 
-        public Task AddAsync(ISQEntryModel entry) => _lock.Write(() =>
+        public Task AddAsync(ISQEntryModel entry) => _info.Lock.Write(() =>
         {
-            if (_entries.Contains(entry))
+            if (_info.Entries.Contains(entry))
             {
                 return Task.CompletedTask;
             }
@@ -49,26 +67,26 @@ namespace ISQExplorer.Repositories
             return Task.CompletedTask;
         });
 
-        public Task AddRangeAsync(IEnumerable<ISQEntryModel> entries) => _lock.Write(() =>
+        public Task AddRangeAsync(IEnumerable<ISQEntryModel> entries) => _info.Lock.Write(() =>
         {
-            var e = entries.Where(x => !_entries.Contains(x)).ToList();
+            var e = entries.Where(x => !_info.Entries.Contains(x)).ToList();
             e.ForEach(_addEntry);
             _context.IsqEntries.AddRange(e);
             return Task.CompletedTask;
         });
 
         public async Task<IEnumerable<ISQEntryModel>> ByCourseAsync(CourseModel course, TermModel? since = null,
-            TermModel? until = null) => await _lock.Read(() =>
+            TermModel? until = null) => await _info.Lock.Read(() =>
             Task.FromResult(_context.IsqEntries.Where(x => x.Course == course).When(since, until)));
 
         public async Task<IEnumerable<ISQEntryModel>> ByProfessorAsync(ProfessorModel professor,
             TermModel? since = null,
             TermModel? until = null) =>
-            await _lock.Read(() =>
+            await _info.Lock.Read(() =>
                 Task.FromResult(_context.IsqEntries.Where(x => x.Professor == professor).When(since, until)));
 
         public IEnumerable<ISQEntryModel> Entries =>
-            _lock.Read(() => _courseToEntries.Values.SelectMany(x => x).ToList());
+            _info.Lock.Read(() => _info.CourseToEntries.Values.SelectMany(x => x).ToList());
 
         public IQueryable<ISQEntryModel> AsQueryable() => _context.IsqEntries;
 

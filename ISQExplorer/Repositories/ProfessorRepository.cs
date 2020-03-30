@@ -11,59 +11,71 @@ using ISQExplorer.Models;
 
 namespace ISQExplorer.Repositories
 {
+    internal class ProfessorInfo
+    {
+         public readonly DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>
+             LastNameToProfessor;
+         public readonly DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>
+             FirstNameToProfessor;
+         public readonly DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>
+             NameToProfessor;
+         public readonly DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>
+             NNumberToProfessor;
+         public readonly ISet<string> NNumbers;
+         public readonly ReadWriteLock Lock;
+         
+         public static readonly ProfessorInfo Instance = new ProfessorInfo();
+
+         private ProfessorInfo()
+         {
+             LastNameToProfessor =
+                 new DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>(() =>
+                     new OptionalDictionary<string, ProfessorModel>());
+             FirstNameToProfessor =
+                 new DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>(() =>
+                     new OptionalDictionary<string, ProfessorModel>());
+             NameToProfessor =
+                 new DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>(() =>
+                     new OptionalDictionary<string, ProfessorModel>());
+             NNumberToProfessor =
+                 new DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>(() =>
+                     new OptionalDictionary<string, ProfessorModel>());
+             NNumbers = new HashSet<string>();
+             Lock = new ReadWriteLock();
+         }
+    }
+    
     public class ProfessorRepository : IProfessorRepository
     {
-        private readonly DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>
-            _lastNameToProfessor;
-
-        private readonly DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>
-            _firstNameToProfessor;
-
-        private readonly DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>
-            _nameToProfessor;
-
-        private readonly DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>
-            _nNumberToProfessor;
-        
-        private readonly ISet<string> _nNumbers;
-
+        private readonly ProfessorInfo _info;
         private readonly ISQExplorerContext _context;
-
-        private readonly ReadWriteLock _lock;
 
         private void _updateProf(ProfessorModel prof)
         {
-            _lastNameToProfessor[prof.Department][prof.LastName] = prof;
-            _firstNameToProfessor[prof.Department][prof.FirstName] = prof;
-            _nameToProfessor[prof.Department][prof.FirstName + " " + prof.LastName] = prof;
-            _nNumberToProfessor[prof.Department][prof.NNumber] = prof;
-            _nNumbers.Add(prof.NNumber);
+            _info.LastNameToProfessor[prof.Department][prof.LastName] = prof;
+            _info.FirstNameToProfessor[prof.Department][prof.FirstName] = prof;
+            _info.NameToProfessor[prof.Department][prof.FirstName + " " + prof.LastName] = prof;
+            _info.NNumberToProfessor[prof.Department][prof.NNumber] = prof;
+            _info.NNumbers.Add(prof.NNumber);
         }
 
         public ProfessorRepository(ISQExplorerContext context)
         {
-            _lastNameToProfessor =
-                new DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>(() =>
-                    new OptionalDictionary<string, ProfessorModel>());
-            _firstNameToProfessor =
-                new DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>(() =>
-                    new OptionalDictionary<string, ProfessorModel>());
-            _nameToProfessor =
-                new DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>(() =>
-                    new OptionalDictionary<string, ProfessorModel>());
-            _nNumberToProfessor =
-                new DefaultDictionary<DepartmentModel, OptionalDictionary<string, ProfessorModel>>(() =>
-                    new OptionalDictionary<string, ProfessorModel>());
-            _nNumbers = new HashSet<string>();
-            _lock = new ReadWriteLock();
+            _info = ProfessorInfo.Instance;
             _context = context;
 
-            _context.Professors.ForEach(_updateProf);
+            _info.Lock.Write(() =>
+            {
+                if (_info.NNumbers.None())
+                {
+                    _context.Professors.ForEach(_updateProf);
+                }
+            });
         }
 
-        public Task AddAsync(ProfessorModel prof) => _lock.Write(() =>
+        public Task AddAsync(ProfessorModel prof) => _info.Lock.Write(() =>
         {
-            if (_nNumbers.Contains(prof.NNumber))
+            if (_info.NNumbers.Contains(prof.NNumber))
             {
                 return Task.CompletedTask;
             }
@@ -73,27 +85,27 @@ namespace ISQExplorer.Repositories
             return Task.CompletedTask;
         });
 
-        public Task AddRangeAsync(IEnumerable<ProfessorModel> profs) => _lock.Write(() =>
+        public Task AddRangeAsync(IEnumerable<ProfessorModel> profs) => _info.Lock.Write(() =>
         {
-            var pr = profs.Where(p => !_nNumbers.Contains(p.NNumber)).ToList();
+            var pr = profs.Where(p => !_info.NNumbers.Contains(p.NNumber)).ToList();
             pr.ForEach(_updateProf);
             _context.AddRange(pr);
             return Task.CompletedTask;
         });
 
         public async Task<Optional<ProfessorModel>> FromFirstNameAsync(DepartmentModel dept, string firstName) =>
-            await Task.FromResult(_lock.Read(() => _firstNameToProfessor[dept][firstName]));
+            await Task.FromResult(_info.Lock.Read(() => _info.FirstNameToProfessor[dept][firstName]));
 
         public async Task<Optional<ProfessorModel>> FromLastNameAsync(DepartmentModel dept, string lastName) =>
-            await Task.FromResult(_lock.Read(() => _lastNameToProfessor[dept][lastName]));
+            await Task.FromResult(_info.Lock.Read(() => _info.LastNameToProfessor[dept][lastName]));
 
         public async Task<Optional<ProfessorModel>> FromNameAsync(DepartmentModel dept, string name) =>
-            await Task.FromResult(_lock.Read(() => _nameToProfessor[dept][name]));
+            await Task.FromResult(_info.Lock.Read(() => _info.NameToProfessor[dept][name]));
 
         public async Task<Optional<ProfessorModel>> FromNNumberAsync(DepartmentModel dept, string nNumber) =>
-            await Task.FromResult(_lock.Read(() => _nNumberToProfessor[dept][nNumber]));
+            await Task.FromResult(_info.Lock.Read(() => _info.NNumberToProfessor[dept][nNumber]));
 
-        public IEnumerable<ProfessorModel> Professors => _nNumberToProfessor.Values.SelectMany(x => x.Values.Values(),
+        public IEnumerable<ProfessorModel> Professors => _info.NNumberToProfessor.Values.SelectMany(x => x.Values.Values(),
             (_, y) => y);
 
         public Task SaveChangesAsync() => _context.SaveChangesAsync();

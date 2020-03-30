@@ -8,35 +8,53 @@ using ISQExplorer.Models;
 
 namespace ISQExplorer.Repositories
 {
+    internal class DepartmentInfo
+    {
+         public readonly OptionalDictionary<int, DepartmentModel> IdToDepartment;
+         public readonly OptionalDictionary<string, DepartmentModel> NameToDepartment;
+         public readonly ISet<int> DeptIds;
+         public readonly ReadWriteLock Lock;
+
+         public static readonly DepartmentInfo Instance = new DepartmentInfo();
+
+         private DepartmentInfo()
+         {
+             IdToDepartment = new OptionalDictionary<int, DepartmentModel>();
+             NameToDepartment = new OptionalDictionary<string, DepartmentModel>();
+             DeptIds = new HashSet<int>();
+             Lock = new ReadWriteLock();            
+         }
+    }
+    
     public class DepartmentRepository : IDepartmentRepository
     {
-        private readonly OptionalDictionary<int, DepartmentModel> _idToDepartment;
-        private readonly OptionalDictionary<string, DepartmentModel> _nameToDepartment;
-        private readonly ISet<int> _deptIds;
+        private readonly DepartmentInfo _info;
         private readonly ISQExplorerContext _context;
-        private readonly ReadWriteLock _lock;
 
         private void _addDepartment(DepartmentModel department)
         {
-            _idToDepartment[department.Id] = department;
-            _nameToDepartment[department.Name] = department;
-            _deptIds.Add(department.Id);
+            _info.IdToDepartment[department.Id] = department;
+            _info.NameToDepartment[department.Name] = department;
+            _info.DeptIds.Add(department.Id);
         }
 
         public DepartmentRepository(ISQExplorerContext context)
         {
-            _idToDepartment = new OptionalDictionary<int, DepartmentModel>();
-            _nameToDepartment = new OptionalDictionary<string, DepartmentModel>();
-            _deptIds = new HashSet<int>();
             _context = context;
-            _lock = new ReadWriteLock();
-            
-            context.Departments.ForEach(_addDepartment);
+            _info = DepartmentInfo.Instance;
+           
+            _info.Lock.Write(() =>
+            {
+                if (_info.DeptIds.None())
+                {
+                    context.Departments.ForEach(_addDepartment);
+                }
+            });
         }
 
-        public Task AddAsync(DepartmentModel department) => _lock.Write(() =>
+        public Task AddAsync(DepartmentModel department) => _info.Lock.Write(() =>
         {
-            if (_deptIds.Contains(department.Id))
+            if (_info.DeptIds.Contains(department.Id))
             {
                 return Task.CompletedTask;
             }
@@ -46,21 +64,21 @@ namespace ISQExplorer.Repositories
             return Task.CompletedTask;
         });
 
-        public Task AddRangeAsync(IEnumerable<DepartmentModel> departments) => _lock.Write(() =>
+        public Task AddRangeAsync(IEnumerable<DepartmentModel> departments) => _info.Lock.Write(() =>
         {
-            var c = departments.Where(d => !_deptIds.Contains(d.Id)).ToList();
+            var c = departments.Where(d => !_info.DeptIds.Contains(d.Id)).ToList();
             c.ForEach(_addDepartment);
             _context.Departments.AddRange(c);
             return Task.CompletedTask;
         });
 
         public async Task<Optional<DepartmentModel>> FromIdAsync(int id) =>
-            await _lock.Read(() => Task.FromResult(_idToDepartment[id]));
+            await _info.Lock.Read(() => Task.FromResult(_info.IdToDepartment[id]));
 
         public async Task<Optional<DepartmentModel>> FromNameAsync(string name) =>
-            await _lock.Read(() => Task.FromResult(_nameToDepartment[name]));
+            await _info.Lock.Read(() => Task.FromResult(_info.NameToDepartment[name]));
 
-        public IEnumerable<DepartmentModel> Departments => _lock.Read(() =>_idToDepartment
+        public IEnumerable<DepartmentModel> Departments => _info.Lock.Read(() => _info.IdToDepartment
             .Values.Values().ToList());
 
         public Task SaveChangesAsync() => _context.SaveChangesAsync();

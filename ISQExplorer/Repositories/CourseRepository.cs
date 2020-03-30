@@ -8,35 +8,53 @@ using ISQExplorer.Models;
 
 namespace ISQExplorer.Repositories
 {
+    internal class CourseInfo
+    {
+        public readonly OptionalDictionary<string, CourseModel> CourseCodeToCourse;
+        public readonly OptionalDictionary<string, CourseModel> CourseNameToCourse;
+        public readonly ISet<string> CourseCodes;
+        public readonly ReadWriteLock Lock;
+        
+        public static readonly CourseInfo Instance = new CourseInfo();
+        
+        private CourseInfo()
+        {
+            CourseCodeToCourse = new OptionalDictionary<string, CourseModel>();
+            CourseNameToCourse = new OptionalDictionary<string, CourseModel>();
+            CourseCodes = new HashSet<string>();
+            Lock = new ReadWriteLock();
+        }
+    }
+
     public class CourseRepository : ICourseRepository
     {
-        private readonly OptionalDictionary<string, CourseModel> _courseCodeToCourse;
-        private readonly OptionalDictionary<string, CourseModel> _courseNameToCourse;
-        private readonly ISet<string> _courseCodes;
+        private readonly CourseInfo _info;
         private readonly ISQExplorerContext _context;
-        private readonly ReadWriteLock _lock;
 
         private void _addCourse(CourseModel course)
         {
-            _courseCodeToCourse[course.CourseCode] = course;
-            _courseNameToCourse[course.Name] = course;
-            _courseCodes.Add(course.CourseCode);
+            _info.CourseCodeToCourse[course.CourseCode] = course;
+            _info.CourseNameToCourse[course.Name] = course;
+            _info.CourseCodes.Add(course.CourseCode);
         }
 
         public CourseRepository(ISQExplorerContext context)
         {
-            _courseCodeToCourse = new OptionalDictionary<string, CourseModel>();
-            _courseNameToCourse = new OptionalDictionary<string, CourseModel>();
-            _courseCodes = new HashSet<string>();
             _context = context;
-            _lock = new ReadWriteLock();
-            
-            _context.Courses.ForEach(_addCourse);
+            _info = CourseInfo.Instance;
+
+            _info.Lock.Write(() =>
+            {
+                if (_info.CourseCodes.None())
+                {
+                    _context.Courses.ForEach(_addCourse);
+                }  
+            });
         }
 
-        public Task AddAsync(CourseModel course) => _lock.Write(() =>
+        public Task AddAsync(CourseModel course) => _info.Lock.Write(() =>
         {
-            if (_courseCodes.Contains(course.CourseCode))
+            if (_info.CourseCodes.Contains(course.CourseCode))
             {
                 return Task.CompletedTask;
             }
@@ -46,21 +64,21 @@ namespace ISQExplorer.Repositories
             return Task.CompletedTask;
         });
 
-        public Task AddRangeAsync(IEnumerable<CourseModel> courses) => _lock.Write(() =>
+        public Task AddRangeAsync(IEnumerable<CourseModel> courses) => _info.Lock.Write(() =>
         {
-            var c = courses.Where(c => !_courseCodes.Contains(c.CourseCode)).ToList();
+            var c = courses.Where(co => !_info.CourseCodes.Contains(co.CourseCode)).ToList();
             c.ForEach(_addCourse);
             _context.Courses.AddRange(c);
             return Task.CompletedTask;
         });
 
         public async Task<Optional<CourseModel>> FromCourseCodeAsync(string courseCode) =>
-            await _lock.Read(() => Task.FromResult(_courseCodeToCourse[courseCode]));
+            await _info.Lock.Read(() => Task.FromResult(_info.CourseCodeToCourse[courseCode]));
 
         public async Task<Optional<CourseModel>> FromCourseNameAsync(string courseName) =>
-            await _lock.Read(() => Task.FromResult(_courseNameToCourse[courseName]));
+            await _info.Lock.Read(() => Task.FromResult(_info.CourseNameToCourse[courseName]));
 
-        public IEnumerable<CourseModel> Courses => _lock.Read(() => _courseCodeToCourse.Values.Values().ToList());
+        public IEnumerable<CourseModel> Courses => _info.Lock.Read(() => _info.CourseCodeToCourse.Values.Values().ToList());
 
         public Task SaveChangesAsync() => _context.SaveChangesAsync();
 

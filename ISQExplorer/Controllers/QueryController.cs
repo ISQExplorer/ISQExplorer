@@ -1,81 +1,103 @@
 #nullable enable
+using System;
 using System.Linq;
 using System.Threading.Tasks;
+using ISQExplorer.Functional;
+using ISQExplorer.Misc;
+using ISQExplorer.Models;
 using ISQExplorer.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace ISQExplorer.Controllers
 {
-    public class TableCell
-    {
-        public readonly string Contents;
-        public readonly string? Class;
-        public readonly string? Style;
-
-        public TableCell(object contents, string? @class = null, string? style = null)
-        {
-            if (contents is TableCell tc)
-            {
-                (Contents, Class, Style) = (tc.Contents, $"${tc.Class} {@class ?? ""}".Trim(),
-                    $"{tc.Style} {@style ?? ""}".Trim());
-            }
-            else
-            {
-                (Contents, Class, Style) = (contents?.ToString() ?? "null", @class?.Trim(), style?.Trim());
-            }
-        }
-
-        public TableCell(TableCell other)
-        {
-            (Contents, Class, Style) = (other.Contents, other.Class, other.Style);
-        }
-
-        public override string ToString()
-        {
-            var cl = Class != null ? $" class='{Class}'" : "";
-            var st = Style != null ? $" style='{Style}'" : "";
-            return $"<td{cl}{st}>{Contents}</td>";
-        }
-    }
-
     [ApiController]
     [Route("[controller]")]
     public class QueryController : Controller
     {
         private readonly IQueryRepository _repo;
         private readonly ILogger<QueryController> _logger;
+        private readonly ITermRepository _terms;
 
-        public QueryController(IQueryRepository repo, ILogger<QueryController> logger)
+        public QueryController(IQueryRepository repo, ITermRepository termRepo, ILogger<QueryController> logger)
         {
             _repo = repo;
             _logger = logger;
+            _terms = termRepo;
         }
 
+        [Route("QueryTypes")]
+        public IActionResult GetQueryTypes()
+        {
+            var res = Enum.GetValues(typeof(QueryType)).Cast<QueryType>();
+            return Json(res.Select(x => new {Name = x.AsString(), Value = x}));
+        }
+
+        [Route("Terms")]
+        public IActionResult GetTerms()
+        {
+            return Json(_terms.AsEnumerable());
+        }
+
+        [Route("Suggestions/{Parameter}/{Count?}")]
         public async Task<IActionResult> GetSuggestions(string parameter, int? count = null)
         {
-            var suggestions = await Task.WhenAll(
-                _repo.QueryEntriesAsync(parameter, QueryType.CourseCode),
-                _repo.QueryEntriesAsync(parameter, QueryType.CourseName),
-                _repo.QueryEntriesAsync(parameter, QueryType.ProfessorName)
-            );
+            var res = await _repo.QuerySuggestionsAsync(parameter,
+                QueryType.CourseCode | QueryType.CourseName | QueryType.ProfessorName);
 
-            if (count == null)
+            if (count != null)
             {
-                count = -1;
+                if (count.Value > 100)
+                {
+                    count = 100;
+                }
+
+                res = res.Take(count.Value);
             }
 
-            var courseCodes = (count >= 0 ? suggestions[0].Take(count.Value) : suggestions[0]).AsEnumerable();
-            var courseNames = (count >= 0 ? suggestions[1].Take(count.Value) : suggestions[1]).AsEnumerable();
-            var profNames = (count >= 0 ? suggestions[2].Take(count.Value) : suggestions[2]).AsEnumerable();
-
-            return Json(
-                courseCodes.Select(x => new Suggestion(QueryType.CourseCode, x.Course.CourseCode))
-                .Concat(courseNames.Select(x => new Suggestion(QueryType.CourseName, x.Course.Name)))
-                .Concat(profNames.Select(x =>
-                    new Suggestion(QueryType.ProfessorName, $"{x.Professor.FirstName} {x.Professor.LastName}"))));
+            return Json(res);
         }
-        
+
+        [Route("Entries")]
+        public async Task<IActionResult> GetEntries(string parameter, string queryType, int? since, int? until)
+        {
+            var qt = int.TryParse(queryType, out var num)
+                ? EnumConversions.FromInt<QueryType>(num)
+                : EnumConversions.FromString<QueryType>(queryType);
+
+            if (!qt)
+            {
+                return BadRequest($"Invalid query type '{queryType}'.");
+            }
+
+            TermModel? termSince = null;
+            if (since != null)
+            {
+                var tmp = await _terms.FromIdAsync(since.Value);
+                if (!tmp)
+                {
+                    return BadRequest($"Invalid since term '{since}'.");
+                }
+
+                termSince = tmp.Value;
+            }
+
+           
+            TermModel? termUntil = null;
+            if (until != null)
+            {
+                 var tmp = await _terms.FromIdAsync(until.Value);
+                 if (!tmp)
+                 {
+                     return BadRequest($"Invalid since term '{since}'.");
+                 }
+
+                 termUntil = tmp.Value;
+            }
+
+            return Json(await _repo.QueryEntriesAsync(parameter, qt.Value, termSince, termUntil));
+        }
+
 
         /*
         public async Task<IActionResult> RenderTableISQEntries(string parameter, QueryType qt,

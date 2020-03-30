@@ -27,7 +27,7 @@ namespace ISQExplorer.Misc
         public PredicateEqualityComparer(Func<T, T, bool> equalityComparer, Func<T, int>? hashCodeGenerator = null)
         {
             _eq = equalityComparer;
-            _hash = hashCodeGenerator ?? (e => e.GetHashCode());
+            _hash = hashCodeGenerator ?? (e => e?.GetHashCode() ?? 0);
         }
 
         public bool Equals(T x, T y) => _eq(x, y);

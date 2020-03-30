@@ -79,7 +79,8 @@ namespace ISQExplorer.Functional
         /// <typeparam name="T">The type of the desired value.</typeparam>
         /// <typeparam name="TException">The type of the exception to catch.</typeparam>
         /// <returns>A Task of the given Try.</returns>
-        public static async Task<Try<T, TException>> OfAsync<T, TException>(Func<Task<T>> func) where TException : Exception
+        public static async Task<Try<T, TException>> OfAsync<T, TException>(Func<Task<T>> func)
+            where TException : Exception
         {
             try
             {
@@ -461,6 +462,14 @@ namespace ISQExplorer.Functional
             return !(left == right);
         }
 
+        public static bool operator true(Try<T> r) => r.HasValue;
+
+        public static bool operator false(Try<T> r) => !r.HasValue;
+
+        public static Try<T> operator &(Try<T> t1, Try<T> t2) => !t1 ? t1 : t2;
+
+        public static Try<T> operator |(Try<T> t1, Try<T> t2) => t1 ? t1 : t2;
+
         public override string ToString() => Match(val => val!.ToString(), ex => ex!.ToString())!;
     }
 
@@ -750,6 +759,14 @@ namespace ISQExplorer.Functional
         {
             return !(left == right);
         }
+
+        public static bool operator true(Try<T, TException> r) => r.HasValue;
+
+        public static bool operator false(Try<T, TException> r) => !r.HasValue;
+
+        public static Try<T, TException> operator &(Try<T, TException> t1, Try<T, TException> t2) => !t1 ? t1 : t2;
+
+        public static Try<T, TException> operator |(Try<T, TException> t1, Try<T, TException> t2) => t1 ? t1 : t2;
 
         public override string ToString() => Match(val => val!.ToString(), ex => ex!.ToString())!;
     }

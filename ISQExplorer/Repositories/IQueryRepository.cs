@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,9 +11,9 @@ namespace ISQExplorer.Repositories
     [Flags]
     public enum QueryType
     {
-        CourseCode = 0,
-        CourseName = 1,
-        ProfessorName = 2
+        CourseCode = 1 << 0,
+        CourseName = 1 << 1,
+        ProfessorName = 1 << 2
     }
 
     public class Suggestion
@@ -28,7 +29,7 @@ namespace ISQExplorer.Repositories
 
     public interface IQueryRepository
     {
-        IAsyncEnumerable<Suggestion> QuerySuggestionsAsync(string parameter, QueryType types);
+        Task<IEnumerable<Suggestion>> QuerySuggestionsAsync(string parameter, QueryType types);
 
         Task<IQueryable<ISQEntryModel>> QueryEntriesAsync(string parameter, QueryType qt, TermModel? since = null,
             TermModel? until = null);
