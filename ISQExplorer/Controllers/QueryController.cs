@@ -97,57 +97,5 @@ namespace ISQExplorer.Controllers
 
             return Json(await _repo.QueryEntriesAsync(parameter, qt.Value, termSince, termUntil));
         }
-
-
-        /*
-        public async Task<IActionResult> RenderTableISQEntries(string parameter, QueryType qt,
-            Season? sinceSeason = null, int? sinceYear = null,
-            Season? untilSeason = null, int? untilYear = null, ISQEntriesOrderBy orderBy = ISQEntriesOrderBy.Time,
-            bool descending = true)
-        {
-            var query = await _repo.QueryClass(parameter, qt, Term.FromNullable(sinceSeason, sinceYear),
-                Term.FromNullable(untilSeason, untilYear));
-
-            var res = descending
-                ? orderBy switch
-                {
-                    ISQEntriesOrderBy.Time => query.OrderByDescending(x => x.Year).ThenByDescending(x => x.Season),
-                    ISQEntriesOrderBy.LastName => query.OrderByDescending(x => x.Professor.LastName),
-                    ISQEntriesOrderBy.Gpa => query.OrderByDescending(x => x.MeanGpa),
-                    ISQEntriesOrderBy.Rating => query.OrderByDescending(x =>
-                        x.Pct5 * 5 + x.Pct4 * 4 + x.Pct3 * 3 + x.Pct2 * 2 + x.Pct1 * 1),
-                    _ => throw new ArgumentException($"Invalid orderBy value '{orderBy}'.")
-                }
-                : orderBy switch
-                {
-                    ISQEntriesOrderBy.Time => query.OrderBy(x => x.Year).ThenBy(x => x.Season),
-                    ISQEntriesOrderBy.LastName => query.OrderBy(x => x.Professor.LastName),
-                    ISQEntriesOrderBy.Gpa => query.OrderBy(x => x.MeanGpa),
-                    ISQEntriesOrderBy.Rating => query.OrderBy(x =>
-                        x.Pct5 * 5 + x.Pct4 * 4 + x.Pct3 * 3 + x.Pct2 * 2 + x.Pct1 * 1),
-                    _ => throw new ArgumentException($"Invalid orderBy value '{orderBy}'.")
-                };
-
-            return View("RenderTableRows", res.AsEnumerable().Select(mod =>
-            {
-                var avgRating = mod.Pct5 * 0.05 + mod.Pct4 * 0.04 + mod.Pct3 * 0.03 + mod.Pct2 * 0.02 + mod.Pct1 * 0.01;
-                return new object[]
-                {
-                    new Term(mod.Season, mod.Year),
-                    mod.Crn,
-                    mod.Course?.CourseCode,
-                    mod.Professor?.LastName,
-                    (100.0 * mod.NResponded / mod.NEnrolled).ToString("#.00"),
-                    new TableCell(avgRating.ToString("#.00"), style: RatingToStyle(avgRating)),
-                    new TableCell(mod.MeanGpa.ToString("#.00"), style: GpaToStyle(avgRating)),
-                }.Select(x => new TableCell(x));
-            }));
-        }
-
-        public IActionResult QueryEntries()
-        {
-            return View();
-        }
-        */
     }
 }

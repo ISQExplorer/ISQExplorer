@@ -36,11 +36,11 @@ namespace ISQExplorer.Repositories
                 s1 = s1.ToLower().Split(whitespace).Join(" ");
                 s2 = s2.ToLower().Split(whitespace).Join(" ");
 
-                var s1Lcs = Algorithms.LongestCommonSubstring(parameter, s1)
+                var s1Lcs = Algorithms.LongestCommonSubstring(s1, parameter)
                     .OrderBy(x => x.Substring.Length)
                     .ThenBy(x => x.Index)
                     .ToList();
-                var s2Lcs = Algorithms.LongestCommonSubstring(parameter, s2)
+                var s2Lcs = Algorithms.LongestCommonSubstring(s2, parameter)
                     .OrderBy(x => x.Substring.Length)
                     .ThenBy(x => x.Index)
                     .ToList();
@@ -87,7 +87,7 @@ namespace ISQExplorer.Repositories
             if ((queryTypes & QueryType.CourseCode) > 0)
             {
                 res = res.Concat(_context.Courses
-                    .Where(c => c.CourseCode.Contains(parameter))
+                    .Where(c => c.CourseCode.ToLower().Contains(parameter))
                     .Take(100)
                     .AsEnumerable()
                     .Select(x => new Suggestion(QueryType.CourseCode, x.CourseCode)));
@@ -96,7 +96,7 @@ namespace ISQExplorer.Repositories
             if ((queryTypes & QueryType.CourseName) > 0)
             {
                 res = res.Concat(_context.Courses
-                    .Where(c => c.Name.Contains(parameter))
+                    .Where(c => c.Name.ToLower().Contains(parameter))
                     .Take(100)
                     .AsEnumerable()
                     .Select(x => new Suggestion(QueryType.CourseName, x.Name)));
@@ -105,10 +105,10 @@ namespace ISQExplorer.Repositories
             if ((queryTypes & QueryType.ProfessorName) > 0)
             {
                 res = res.Concat(_context.Professors
-                    .Where(c => (c.FirstName + " " + c.LastName).Contains(parameter))
+                    .Where(c => (c.FirstName + " " + c.LastName).ToLower().Contains(parameter))
                     .Take(100)
                     .AsEnumerable()
-                    .Select(x => new Suggestion(QueryType.CourseName, x.FirstName + " " + x.LastName)));
+                    .Select(x => new Suggestion(QueryType.ProfessorName, x.FirstName + " " + x.LastName)));
             }
 
             return Task.FromResult(res.OrderBy((s1, s2) => SuggestionOrderer(s1.Value, s2.Value)).AsEnumerable());

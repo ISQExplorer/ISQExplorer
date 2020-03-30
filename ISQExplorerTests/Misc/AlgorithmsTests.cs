@@ -22,7 +22,8 @@ namespace ISQExplorerTests.Misc
             new object[] {"xabxcdx", "abcd", new[] {("ab", 1), ("cd", 4)}},
             new object[] {"abababab", "abxabx", new[] {("ab", 0), ("ab", 2), ("ab", 4), ("ab", 6)}},
             new object[] {"abxabxabxab", "abzabz", new[] {("ab", 0), ("ab", 3), ("ab", 6), ("ab", 9)}},
-            new object[] {"aaa", "a", new[]{("a", 0), ("a", 1), ("a", 2)}}
+            new object[] {"aaa", "a", new[] {("a", 0), ("a", 1), ("a", 2)}},
+            new object[] {"math workshop", "a", new[] {("a", 1)}}
         };
 
         [Test]
