@@ -7,6 +7,7 @@ using ISQExplorer.Misc;
 using ISQExplorer.Models;
 using ISQExplorer.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace ISQExplorer.Controllers
@@ -18,12 +19,15 @@ namespace ISQExplorer.Controllers
         private readonly IQueryRepository _repo;
         private readonly ILogger<QueryController> _logger;
         private readonly ITermRepository _terms;
+        private readonly ISQExplorerContext _context;
 
-        public QueryController(IQueryRepository repo, ITermRepository termRepo, ILogger<QueryController> logger)
+        public QueryController(IQueryRepository repo, ITermRepository termRepo, ISQExplorerContext context,
+            ILogger<QueryController> logger)
         {
             _repo = repo;
             _logger = logger;
             _terms = termRepo;
+            _context = context;
         }
 
         [Route("QueryTypes")]
@@ -55,7 +59,7 @@ namespace ISQExplorer.Controllers
                 res = res.Take(count.Value);
             }
 
-            return Json(res);
+            return Ok(res);
         }
 
         [Route("Entries/{queryType}/{parameter}")]
@@ -82,20 +86,46 @@ namespace ISQExplorer.Controllers
                 termSince = tmp.Value;
             }
 
-           
+
             TermModel? termUntil = null;
             if (until != null)
             {
-                 var tmp = await _terms.FromIdAsync(until.Value);
-                 if (!tmp)
-                 {
-                     return BadRequest($"Invalid since term '{since}'.");
-                 }
+                var tmp = await _terms.FromIdAsync(until.Value);
+                if (!tmp)
+                {
+                    return BadRequest($"Invalid since term '{since}'.");
+                }
 
-                 termUntil = tmp.Value;
+                termUntil = tmp.Value;
             }
 
-            return Json(await _repo.QueryEntriesAsync(parameter, qt.Value, termSince, termUntil));
+            return Ok(await _repo.QueryEntriesAsync(parameter, qt.Value, termSince, termUntil));
+        }
+
+        [Route("Course/{courseCode}")]
+        public IActionResult GetCourseFromCourseCode(string courseCode)
+        {
+            var res = _context.Courses.Include(x => x.Department)
+                .SingleOrDefault(x => x.CourseCode == courseCode.ToUpper());
+            if (res == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(res);
+        }
+
+        [Route("Professor/{nNumber}")]
+        public IActionResult GetProfessorFromNNumber(string nNumber)
+        {
+            var res = _context.Professors.Include(x => x.Department)
+                .SingleOrDefault(x => x.NNumber == nNumber.ToUpper());
+            if (res == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(res);
         }
     }
 }
