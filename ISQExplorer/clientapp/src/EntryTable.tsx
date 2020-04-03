@@ -8,6 +8,7 @@ export interface EntryTableProps {
     queryType: QueryType;
 }
 
+// hsifhdsoifs
 export interface EntryTableState {
     entries: ISQEntry[];
     orderBy: EntryOrderBy;
