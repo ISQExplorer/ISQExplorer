@@ -94,8 +94,7 @@ export class EntryTable extends React.Component<EntryTableProps, EntryTableState
     // noinspection JSMethodCanBeStatic
     private makeColoredCell(val: number, min: number, max: number, minHue: number = 0, maxHue: number = 100, saturation: number = 90, luminance: number = 35) {
         const pct = (maxHue - minHue) * ((val - min) / (max - min)) + minHue;
-        return <td
-            style={{color: `hsl(${Math.round(pct)}, ${Math.round(saturation)}%, ${Math.round(saturation)}, ${Math.round(luminance)})`}}>
+        return <td style={{color: `hsl(${Math.round(pct)}, ${Math.round(saturation)}%, ${Math.round(luminance)}%)`}}>
             {val}
         </td>;
     }
