@@ -1,134 +1,146 @@
 export interface Department {
-    Name: string;
+    id: number;
+    name: string;
+    lastUpdated: string;
 }
 
 export interface Course {
-    CourseCode: string;
-    Department: Department;
-    Name: string;
+    courseCode: string;
+    department: Department;
+    name: string;
 }
 
 export interface Professor {
-    FirstName: string
-    Department: Department;
-    LastName: string;
-    NNumber: string;
-}
-
-export enum Season {
-    Spring = 0,
-    Summer = 1,
-    Fall = 2
-}
-
-export const seasonToString = (s: Season) => {
-    switch (s) {
-    case Season.Spring:
-        return "Spring";
-    case Season.Summer:
-        return "Summer";
-    case Season.Fall:
-        return "Fall";
-    }
-};
-
-export interface ISQEntry {
-    Season: Season;
-    Year: number;
-    Professor: Professor;
-    Course: Course;
-    Crn: number;
-    NResponded: number;
-    NEnrolled: number;
-    Pct5: number;
-    Pct4: number;
-    Pct3: number;
-    Pct2: number;
-    Pct1: number;
-    PctNa: number;
-    PctA: number;
-    PctAMinus: number;
-    PctBPlus: number;
-    PctB: number;
-    PctCPlus: number;
-    PctC: number;
-    PctD: number;
-    PctF: number;
-    PctWithdraw: number;
-    MeanGpa: number;
-}
-
-export enum ISQQueryType {
-    CourseCode = 0,
-    CourseName = 1,
-    ProfessorName = 2
+    firstName: string
+    department: Department;
+    lastName: string;
+    nNumber: string;
 }
 
 export interface Term {
-    Season: Season,
-    Year: number
+    id: number;
+    name: string;
 }
 
-export enum QueryOrderBy {
-    Time,
-    LastName,
+export interface ISQEntry {
+    course: Course;
+    term: Term;
+    professor: Professor;
+    crn: number;
+    nResponded: number;
+    nEnrolled: number;
+    pct5: number;
+    pct4: number;
+    pct3: number;
+    pct2: number;
+    pct1: number;
+    pctNa: number;
+    pctA: number;
+    pctAMinus: number;
+    pctBPlus: number;
+    pctB: number;
+    pctCPlus: number;
+    pctC: number;
+    pctD: number;
+    pctF: number;
+    pctWithdraw: number;
+    meanGpa: number;
+}
+
+export enum QueryType {
+    // eslint-disable-next-line no-unused-vars
+    CourseCode = 1 << 0,
+    // eslint-disable-next-line no-unused-vars
+    CourseName = 1 << 1,
+    // eslint-disable-next-line no-unused-vars
+    ProfessorName = 1 << 2
+}
+
+export const queryTypeToString = (q: QueryType): string => {
+    switch (q) {
+    case QueryType.CourseCode:
+        return "Course Code";
+    case QueryType.CourseName:
+        return "Course Name";
+    case QueryType.ProfessorName:
+        return "Professor Name";
+    default:
+        throw new Error(`${q} is not a valid query type.`);
+    }
+};
+
+export interface Suggestion {
+    type: QueryType;
+    value: string;
+}
+
+const queryString = (params: { [key: string]: any }): string =>
+    Object.keys(params).length > 0 ?
+        "?" + Object.keys(params).map(param => `${param}=${params[param]}`).join("&") :
+        "";
+
+export const suggestions = async (parameter: string): Promise<Suggestion[]> => {
+    const res = await fetch(`/Query/Suggestions/${parameter}`);
+    return await res.json();
+};
+
+export const entries = async (parameter: string, queryType: QueryType, since?: Term, until?: Term): Promise<ISQEntry[]> => {
+    const params: { [key: string]: any } = {};
+    if (since != null) {
+        params["since"] = since.id;
+    }
+    if (until != null) {
+        params["until"] = until.id;
+    }
+
+    const res = await fetch(`/Query/Entries/${queryType}/${parameter}${queryString(params)}`);
+    if (res.ok) {
+        return await res.json();
+    }
+    throw new Error(await res.text());
+};
+
+export const entryAvgRating = (entry: ISQEntry): number => {
+    return entry.pct1 * 0.01 + entry.pct2 * 0.02 + entry.pct3 * 0.03 + entry.pct4 * 0.04 + entry.pct5 * 0.05;
+};
+
+export enum EntryOrderBy {
+    // eslint-disable-next-line no-unused-vars
     Gpa,
+    // eslint-disable-next-line no-unused-vars
+    LastName,
+    // eslint-disable-next-line no-unused-vars
     Rating,
+    // eslint-disable-next-line no-unused-vars
+    Time,
+    // eslint-disable-next-line no-unused-vars
     Course
 }
 
-export const suggestions = async (parameter: string): Promise<ISQEntry[]> => {
-    const res = await fetch(`/Query/Suggestions?parameter=${parameter}`);
-    return await res.json();
-};
-
-const queryString = (params: { [key: string]: any }): string =>
-    Object.keys(params).map(param => `${param}=${params[param]}`).join("&");
-
-export const entries = async (parameter: string, queryType: ISQQueryType, since?: Term, until?: Term): Promise<ISQEntry[]> => {
-    const params: { [key: string]: any } = {"parameter": parameter, "QueryType": queryType};
-    if (since != null) {
-        params["SinceSeason"] = since.Season;
-        params["SinceYear"] = since.Year;
-    }
-    if (until != null) {
-        params["UntilSeason"] = until.Season;
-        params["UntilYear"] = until.Year;
-    }
-
-    const res = await fetch(`/Query/Suggestions?${queryString(params)}`);
-    return await res.json();
-};
-
-export const avgRating = (entry: ISQEntry): number => {
-    return entry.Pct1 * 0.01 + entry.Pct2 * 0.02 + entry.Pct3 * 0.03 + entry.Pct4 * 0.04 + entry.Pct5 * 0.05;
-};
-
-export const termCompare = (t1: Term, t2: Term): number => {
-    return (t2.Year - t1.Year) * 3 + t1.Season - t2.Season;
-};
-
-export const sortedEntries = (entries: ISQEntry[], orderBy: QueryOrderBy, descending: boolean = false): ISQEntry[] => {
-    return [...entries].sort((a, b) => {
+export const entrySort = (entries: ISQEntry[], orderBy: EntryOrderBy | EntryOrderBy[], descending: boolean = false): ISQEntry[] => {
+    const entryComparator = (a: ISQEntry, b: ISQEntry, order: EntryOrderBy): number => {
         let comp: number = 0;
-        switch (orderBy) {
-        case QueryOrderBy.Gpa:
-            comp = a.MeanGpa - b.MeanGpa;
+        switch (order) {
+        case EntryOrderBy.Gpa:
+            comp = a.meanGpa - b.meanGpa;
             break;
-        case QueryOrderBy.LastName:
-            comp = a.Professor.LastName.localeCompare(b.Professor.LastName);
+        case EntryOrderBy.LastName:
+            comp = a.professor.lastName.localeCompare(b.professor.lastName);
             break;
-        case QueryOrderBy.Rating:
-            comp = avgRating(a) - avgRating(b);
+        case EntryOrderBy.Rating:
+            comp = entryAvgRating(a) - entryAvgRating(b);
             break;
-        case QueryOrderBy.Time:
-            comp = termCompare({Season: a.Season, Year: a.Year}, {Season: a.Season, Year: a.Year});
+        case EntryOrderBy.Time:
+            comp = a.term.id - b.term.id;
             break;
-        case QueryOrderBy.Course:
-            comp = a.Course.CourseCode.localeCompare(b.Course.CourseCode);
+        case EntryOrderBy.Course:
+            comp = a.course.courseCode.localeCompare(b.course.courseCode);
             break;
-                
         }
         return comp * (descending ? -1 : 1);
-    });
+    };
+
+    const ordArr = Array.isArray(orderBy) ? orderBy : [orderBy];
+
+    return [...entries].sort((x, y) => ordArr.reduce((a, c) => a !== 0 ? a : entryComparator(x, y, c), 0));
 };

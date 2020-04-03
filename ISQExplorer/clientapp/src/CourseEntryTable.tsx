@@ -1,28 +1,29 @@
-import {avgRating, entries, ISQEntry, ISQQueryType, QueryOrderBy, seasonToString, sortedEntries} from "./Query";
 import React from "react";
+// eslint-disable-next-line no-unused-vars
+import {entryAvgRating, entries, ISQEntry, EntryOrderBy, entrySort, QueryType} from "./Query";
 
-export interface ISQQueryProfessorEntryTableProps {
+export interface CourseEntryTableProps{
     className: string;
     parameter: string;
 }
 
-export interface ISQQueryProfessorEntryTableState {
+export interface CourseEntryTableState {
     entries: ISQEntry[];
-    orderBy: QueryOrderBy;
+    orderBy: EntryOrderBy;
     orderByDescending: boolean;
 }
 
-export class ISQQueryProfessorEntryTable extends React.Component<ISQQueryProfessorEntryTableProps, ISQQueryProfessorEntryTableState> {
-    public static defaultProps: Partial<ISQQueryProfessorEntryTableProps> = {
+export class CourseEntryTable extends React.Component<CourseEntryTableProps, CourseEntryTableState> {
+    public static defaultProps: Partial<CourseEntryTableProps> = {
         className: ""
     };
-
-    public constructor(props: ISQQueryProfessorEntryTableProps) {
+    
+    public constructor(props: CourseEntryTableProps) {
         super(props);
 
         this.state = {
             entries: [],
-            orderBy: QueryOrderBy.Time,
+            orderBy: EntryOrderBy.Time,
             orderByDescending: true
         };
 
@@ -32,52 +33,52 @@ export class ISQQueryProfessorEntryTable extends React.Component<ISQQueryProfess
 
         const res = entries(this.props.parameter,
             /[A-Za-z]{3}[0-9]{4,}/.test(this.props.parameter) ?
-                ISQQueryType.CourseCode :
-                ISQQueryType.CourseName);
-        res.then(entries => {
-            this.setState({entries: sortedEntries(entries, this.state.orderBy, this.state.orderByDescending)});
+                QueryType.CourseCode :
+                QueryType.CourseName);
+        res.then(ent => {
+            this.setState({entries: entrySort(ent, this.state.orderBy, this.state.orderByDescending)});
         });
     }
 
-    private updateOrder(clicked: QueryOrderBy) {
+    private updateOrder(clicked: EntryOrderBy) {
         if (clicked === this.state.orderBy) {
             this.setState({
-                entries: sortedEntries(this.state.entries, this.state.orderBy, !this.state.orderByDescending),
+                entries: entrySort(this.state.entries, this.state.orderBy, !this.state.orderByDescending),
                 orderByDescending: !this.state.orderByDescending
             });
         } else {
             this.setState({
-                entries: sortedEntries(this.state.entries, clicked, clicked === QueryOrderBy.Time),
+                entries: entrySort(this.state.entries, clicked, clicked === EntryOrderBy.Time),
                 orderBy: clicked,
-                orderByDescending: clicked === QueryOrderBy.Time
+                orderByDescending: clicked === EntryOrderBy.Time
             });
         }
     }
-
-    private makeHeading(orderBy: QueryOrderBy) {
+    
+    private makeHeading(orderBy: EntryOrderBy) {
         let innerString = "";
         switch (orderBy) {
-        case QueryOrderBy.Gpa:
+        case EntryOrderBy.Gpa:
             innerString = "Average GPA";
             break;
-        case QueryOrderBy.Time:
+        case EntryOrderBy.Time:
             innerString = "Semester";
             break;
-        case QueryOrderBy.Course:
-            innerString = "Course";
+        case EntryOrderBy.LastName:
+            innerString = "Professor";
             break;
-        case QueryOrderBy.Rating:
+        case EntryOrderBy.Rating:
             innerString = "Average Rating";
             break;
         }
-
+        
         return (
             <th onClick={() => this.updateOrder(orderBy)}>
                 {innerString}{this.state.orderBy === orderBy && this.state.orderByDescending ? " ▼" : " ▲"}
             </th>
         );
     }
-
+    
     // noinspection JSMethodCanBeStatic
     private makeColoredCell(val: number, min: number, max: number, minHue: number = 0, maxHue: number = 100, saturation: number = 90, luminance: number = 35) {
         const pct = (maxHue - minHue) * ((val - min) / (max - min)) + minHue;
@@ -95,23 +96,23 @@ export class ISQQueryProfessorEntryTable extends React.Component<ISQQueryProfess
             <table className={this.props.className}>
                 <thead>
                     <tr>
-                        {this.makeHeading(QueryOrderBy.Time)}
+                        {this.makeHeading(EntryOrderBy.Time)}
                         <th>CRN</th>
-                        {this.makeHeading(QueryOrderBy.Course)}
+                        {this.makeHeading(EntryOrderBy.LastName)}
                         <th>Percent Responded</th>
-                        {this.makeHeading(QueryOrderBy.Rating)}
-                        {this.makeHeading(QueryOrderBy.Gpa)}
+                        {this.makeHeading(EntryOrderBy.Rating)}
+                        {this.makeHeading(EntryOrderBy.Gpa)}
                     </tr>
                 </thead>
                 <tbody>
                     {this.state.entries.map(entry => (
-                        <tr key={entry.Crn}>
-                            <td>{`${seasonToString(entry.Season)} ${entry.Year}`}</td>
-                            <td>{entry.Crn}</td>
-                            <td>{entry.Course.CourseCode}</td>
-                            {this.makeColoredCell(100.0 * entry.NResponded / entry.NEnrolled, 0, 100)}
-                            {this.makeColoredCell(avgRating(entry), 1, 5)}
-                            {this.makeColoredCell(entry.MeanGpa, 0, 4)}
+                        <tr key={entry.crn}>
+                            <td>{entry.term.name}</td>
+                            <td>{entry.crn}</td>
+                            <td>{entry.professor.lastName}</td>
+                            {this.makeColoredCell(100.0 * entry.nResponded / entry.nEnrolled, 0, 100)}
+                            {this.makeColoredCell(entryAvgRating(entry), 1, 5)}
+                            {this.makeColoredCell(entry.meanGpa, 0, 4)}
                         </tr>
                     ))}
                 </tbody>

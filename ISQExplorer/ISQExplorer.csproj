@@ -37,7 +37,7 @@
         <Compile Remove="Migrations\20200322031032_InitialCreate.Designer.cs" />
         <Compile Remove="Migrations\20200322031659_InitialCreate.cs" />
         <Compile Remove="Migrations\20200322031659_InitialCreate.Designer.cs" />
-        <None Include="clientapp\src\Query.ts" />
+        <None Include="clientapp\public\Query.ts" />
     </ItemGroup>
 
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
