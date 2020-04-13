@@ -7,3 +7,12 @@
 .link:hover {
     color: #1f89c5;
 }
+
+.suggestion-link {
+    cursor: pointer;
+    transition: 0.05s;
+}
+
+.suggestion-link:hover {
+    background-color: gray;
+}
