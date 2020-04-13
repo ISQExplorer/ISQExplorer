@@ -16,7 +16,7 @@ namespace ISQExplorer.Repositories
         ProfessorName = 1 << 2
     }
 
-    public class Suggestion
+    public class Suggestion : IEquatable<Suggestion>
     {
         public readonly QueryType Type;
         public readonly string Value;
@@ -24,6 +24,36 @@ namespace ISQExplorer.Repositories
         public Suggestion(QueryType qt, string parameter)
         {
             (Type, Value) = (qt, parameter);
+        }
+
+        public bool Equals(Suggestion? other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Type == other.Type && Value == other.Value;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((Suggestion) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine((int) Type, Value);
+        }
+
+        public static bool operator ==(Suggestion? left, Suggestion? right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(Suggestion? left, Suggestion? right)
+        {
+            return !Equals(left, right);
         }
     }
 

@@ -46,8 +46,8 @@ namespace ISQExplorer.Controllers
         [Route("Suggestions/{Parameter}/{Count?}")]
         public async Task<IActionResult> GetSuggestions(string parameter, int? count = null)
         {
-            var res = await _repo.QuerySuggestionsAsync(parameter,
-                QueryType.CourseCode | QueryType.CourseName | QueryType.ProfessorName);
+            var res = (await _repo.QuerySuggestionsAsync(parameter,
+                QueryType.CourseCode | QueryType.CourseName | QueryType.ProfessorName)).Distinct();
 
             if (count != null)
             {
