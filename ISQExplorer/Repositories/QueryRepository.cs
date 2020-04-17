@@ -127,7 +127,7 @@ namespace ISQExplorer.Repositories
                         .Include(x => x.Professor)
                         .Include(x => x.Professor.Department)
                         .Include(x => x.Term)
-                        .Where(x => x.Course.CourseCode.Contains(parameter.ToUpper()))
+                        .Where(x => x.Course.CourseCode == parameter.ToUpper())
                         .When(since, until);
                 case QueryType.CourseName:
                     return _context.IsqEntries
@@ -136,7 +136,7 @@ namespace ISQExplorer.Repositories
                         .Include(x => x.Professor)
                         .Include(x => x.Professor.Department)
                         .Include(x => x.Term)
-                        .Where(x => x.Course.Name.ToUpper().Contains(parameter.ToUpper()))
+                        .Where(x => x.Course.Name.ToUpper() == parameter.ToUpper())
                         .When(since, until);
                 case QueryType.ProfessorName when parameter.Contains(" "):
                 {
@@ -149,8 +149,8 @@ namespace ISQExplorer.Repositories
                         .Include(x => x.Professor.Department)
                         .Include(x => x.Term)
                         .Where(x =>
-                            x.Professor.FirstName.ToUpper().Contains(fname.ToUpper()) &&
-                            x.Professor.LastName.ToUpper().Contains(lname.ToUpper()));
+                            x.Professor.FirstName.ToUpper() == fname.ToUpper() &&
+                            x.Professor.LastName.ToUpper() == lname.ToUpper());
                 }
                 case QueryType.ProfessorName:
                     return _context.IsqEntries
@@ -159,8 +159,7 @@ namespace ISQExplorer.Repositories
                         .Include(x => x.Professor)
                         .Include(x => x.Professor.Department)
                         .Include(x => x.Term)
-                        .Where(x => x.Professor.LastName.ToUpper()
-                            .Contains(parameter.ToUpper())).When(since, until);
+                        .Where(x => x.Professor.LastName.ToUpper() == parameter.ToUpper()).When(since, until);
                 default:
                     throw new ArgumentException($"Invalid QueryType '{qt}'. You can only query one type at a time.");
             }
