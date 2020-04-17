@@ -4,6 +4,7 @@ import {QueryType, queryTypeToString, Suggestion, suggestions} from "./Query";
 export interface SearchBarProps {
     className: string;
     onSubmit: (parameter: string, type: QueryType) => void;
+   
 }
 
 export interface SearchBarState {
@@ -19,7 +20,6 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
     public constructor(props: SearchBarProps) {
         super(props);
         this.keyUp = this.keyUp.bind(this);
-
         this.state = {hideSuggestions: true, suggestions: []};
     }
 
@@ -31,15 +31,16 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
 
             if (val === "") {
                 return;
-            }
+            } 
 
             if (this.state.suggestions.length === 0) {
                 return;
             }
 
             const s = this.state.suggestions[0];
+            e.currentTarget.value = s.value;
             this.props.onSubmit(s.value, s.type);
-
+            
             return;
         }
 
@@ -60,19 +61,23 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
 
     public clickSuggestionFactory(parameter: string, type: QueryType) {
         return () => {
+            parameter = this.state.suggestions[0].value;
             this.setState({hideSuggestions: true});
-            this.props.onSubmit(parameter, type);
         };
     }
+    
+    
 
     public render() {
         return (<>
             <input
                 className="w-75 py-2 px-4 m-2"
                 onKeyUp={this.keyUp}
-                placeholder="Enter some shit..."
+                placeholder="Enter Runescape username and password"
                 onFocus={e => this.setState({hideSuggestions: e.currentTarget.value === ""})}
-                onBlur={() => this.setState({hideSuggestions: true})}/>
+                onBlur={() => this.setState({hideSuggestions: true})}
+            />
+                
             <div className={`position-relative w-75 ${this.state.hideSuggestions ? "d-none" : ""}`}>
                 <div className="position-absolute w-100 d-flex flex-column bg-light border py-2 my-2">
                     {this.state.suggestions.map(s => <div
