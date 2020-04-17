@@ -92,8 +92,8 @@ export class EntryTable extends React.Component<EntryTableProps, EntryTableState
     }
 
     // noinspection JSMethodCanBeStatic
-    private makeColoredCell(val: number, min: number, max: number, minHue: number = 0, maxHue: number = 100, saturation: number = 90, luminance: number = 35) {
-        const pct = (maxHue - minHue) * ((val - min) / (max - min)) + minHue;
+    private makeColoredCell(val: string, min: number, max: number, minHue: number = 0, maxHue: number = 100, saturation: number = 90, luminance: number = 35) {
+        const pct = (maxHue - minHue) * ((parseFloat(val) - min) / (max - min)) + minHue;
         return <td style={{color: `hsl(${Math.round(pct)}, ${Math.round(saturation)}%, ${Math.round(luminance)}%)`}}>
             {val}
         </td>;
@@ -125,9 +125,9 @@ export class EntryTable extends React.Component<EntryTableProps, EntryTableState
                                 <td>{entry.crn}</td>
                                 <td>{entry.course.courseCode}</td>
                                 <td>{entry.professor.lastName}</td>
-                                {this.makeColoredCell(100.0 * entry.nResponded / entry.nEnrolled, 0, 100)}
-                                {this.makeColoredCell(entryAvgRating(entry), 1, 5)}
-                                {this.makeColoredCell(entry.meanGpa, 0, 4)}
+                                {this.makeColoredCell(((100.0 * entry.nResponded) / entry.nEnrolled).toFixed(2), 0, 100)}
+                                {this.makeColoredCell(entryAvgRating(entry).toFixed(2), 1, 5)}
+                                {this.makeColoredCell((entry.meanGpa).toFixed(2), 0, 4)}
                             </tr>
                         ))}
                     </tbody>
