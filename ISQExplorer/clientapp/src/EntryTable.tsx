@@ -106,11 +106,11 @@ export class EntryTable extends React.Component<EntryTableProps, EntryTableState
 
         return (
             <>
-                <table className={this.props.className}>
+                <table  className="table table-striped table-sm">
                     <thead>
                         <tr>
                             {this.makeHeading(EntryOrderBy.Time)}
-                            <th>CRN</th>
+                            <th> CRN</th>
                             {this.makeHeading(EntryOrderBy.Course)}
                             {this.makeHeading(EntryOrderBy.LastName)}
                             <th>Percent Responded</th>
