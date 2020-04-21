@@ -37,7 +37,6 @@
         <Compile Remove="Migrations\20200322031032_InitialCreate.Designer.cs" />
         <Compile Remove="Migrations\20200322031659_InitialCreate.cs" />
         <Compile Remove="Migrations\20200322031659_InitialCreate.Designer.cs" />
-        <None Include="clientapp\public\Query.ts" />
         <None Include="clientapp\src\SearchBar.tsx" />
     </ItemGroup>
 

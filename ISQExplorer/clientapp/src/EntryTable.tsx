@@ -1,6 +1,8 @@
 import React from "react";
 // eslint-disable-next-line no-unused-vars
-import {entryAvgRating, entries, ISQEntry, EntryOrderBy, entrySort, QueryType} from "./Query";
+import {entries, entryAvgRating, EntryOrderBy, entrySort, ISQEntry, QueryType} from "./Query";
+import {makeColoredCell} from "./CommonTsx";
+import {ProfessorInfo} from "./ProfessorInfo";
 
 export interface EntryTableProps {
     className: string;
@@ -29,7 +31,6 @@ export class EntryTable extends React.Component<EntryTableProps, EntryTableState
         };
 
         this.updateOrder = this.updateOrder.bind(this);
-        this.makeColoredCell = this.makeColoredCell.bind(this);
         this.makeHeading = this.makeHeading.bind(this);
 
         const res = entries(this.props.parameter, this.props.queryType);
@@ -63,7 +64,7 @@ export class EntryTable extends React.Component<EntryTableProps, EntryTableState
             });
         }
     }
-
+    
     private makeHeading(orderBy: EntryOrderBy) {
         let innerString = "";
         switch (orderBy) {
@@ -91,14 +92,6 @@ export class EntryTable extends React.Component<EntryTableProps, EntryTableState
         );
     }
 
-    // noinspection JSMethodCanBeStatic
-    private makeColoredCell(val: number, min: number, max: number, minHue: number = 0, maxHue: number = 100, saturation: number = 90, luminance: number = 35) {
-        const pct = (maxHue - minHue) * ((val - min) / (max - min)) + minHue;
-        return <td style={{color: `hsl(${Math.round(pct)}, ${Math.round(saturation)}%, ${Math.round(luminance)}%)`}}>
-            {val}
-        </td>;
-    }
-
     public render() {
         if (this.state.entries === []) {
             return <h2>Loading...</h2>;
@@ -106,11 +99,14 @@ export class EntryTable extends React.Component<EntryTableProps, EntryTableState
 
         return (
             <>
-                <table className={this.props.className}>
+                {this.props.queryType === QueryType.ProfessorName &&
+                    this.state.entries.length > 0 &&
+                <ProfessorInfo professor={this.state.entries[0].professor} entries={this.state.entries}/>}
+                <table className={"table table-striped table-sm " + this.props.className}>
                     <thead>
                         <tr>
                             {this.makeHeading(EntryOrderBy.Time)}
-                            <th>CRN</th>
+                            <th> CRN</th>
                             {this.makeHeading(EntryOrderBy.Course)}
                             {this.makeHeading(EntryOrderBy.LastName)}
                             <th>Percent Responded</th>
@@ -125,9 +121,9 @@ export class EntryTable extends React.Component<EntryTableProps, EntryTableState
                                 <td>{entry.crn}</td>
                                 <td>{entry.course.courseCode}</td>
                                 <td>{entry.professor.lastName}</td>
-                                {this.makeColoredCell(100.0 * entry.nResponded / entry.nEnrolled, 0, 100)}
-                                {this.makeColoredCell(entryAvgRating(entry), 1, 5)}
-                                {this.makeColoredCell(entry.meanGpa, 0, 4)}
+                                {makeColoredCell(((100.0 * entry.nResponded) / entry.nEnrolled).toFixed(2), 0, 100)}
+                                {makeColoredCell(entryAvgRating(entry).toFixed(2), 1, 5)}
+                                {makeColoredCell((entry.meanGpa).toFixed(2), 0, 4)}
                             </tr>
                         ))}
                     </tbody>

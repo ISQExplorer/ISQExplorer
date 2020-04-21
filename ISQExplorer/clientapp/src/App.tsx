@@ -23,7 +23,7 @@ export class App extends React.Component<{}, AppState> {
     
     public render() {
         return (
-            <div className="d-flex flex-column align-items-center w-100 p-4 m-4">
+            <div className="d-flex flex-column align-items-center w-100 p-4">
                 <SearchBar onSubmit={this.doSearch} />
                 {this.state.query !== "" && <EntryTable className="w-100" queryType={this.state.type} parameter={this.state.query}/>}
             </div>

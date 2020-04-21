@@ -16,3 +16,8 @@
 .suggestion-link:hover {
     background-color: gray;
 }
+
+div.vl {
+    width: 1px;
+    background-color: black;
+}
