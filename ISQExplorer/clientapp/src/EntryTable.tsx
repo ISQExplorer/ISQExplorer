@@ -1,8 +1,10 @@
 import React from "react";
 // eslint-disable-next-line no-unused-vars
 import {entries, entryAvgRating, EntryOrderBy, entrySort, ISQEntry, QueryType} from "./Query";
-import {makeColoredCell} from "./CommonTsx";
+import {makeColoredSpan} from "./CommonTsx";
 import {ProfessorInfo} from "./ProfessorInfo";
+import {SortableTable} from "./SortableTable";
+import {CourseInfo} from "./CourseInfo";
 
 export interface EntryTableProps {
     className: string;
@@ -93,15 +95,46 @@ export class EntryTable extends React.Component<EntryTableProps, EntryTableState
     }
 
     public render() {
-        if (this.state.entries === []) {
+        if (this.state.entries.length === 0) {
             return <h2>Loading...</h2>;
+        }
+
+        const elems = this.state.entries.map(x =>
+            [
+                {element: <>{x.term.name}</>, order: x.term.id},
+                {element: <>{x.crn}</>},
+                {element: <>{x.course.name}</>, order: x.course.name},
+                {element: <>{x.professor.lastName}</>, order: x.professor.lastName},
+                {element: makeColoredSpan(((100.0 * x.nResponded) / x.nEnrolled).toFixed(2), 0, 100)},
+                {element: makeColoredSpan(entryAvgRating(x).toFixed(2), 1, 5), order: entryAvgRating(x)},
+                {element: makeColoredSpan((x.meanGpa).toFixed(2), 0, 4), order: x.meanGpa}
+            ]
+        );
+        
+        let infoComponent: JSX.Element = <></>;
+        switch (this.props.queryType) {
+        case QueryType.ProfessorName:
+            infoComponent = <ProfessorInfo professor={this.state.entries[0].professor} entries={this.state.entries}/>;
+            break;
+        case QueryType.CourseCode:
+        case QueryType.CourseName:
+            infoComponent = <CourseInfo course={this.state.entries[0].course} entries={this.state.entries} />;
+            break;
         }
 
         return (
             <>
-                {this.props.queryType === QueryType.ProfessorName &&
-                    this.state.entries.length > 0 &&
-                <ProfessorInfo professor={this.state.entries[0].professor} entries={this.state.entries}/>}
+                {infoComponent}
+                <SortableTable className={"table table-striped table-sm " + this.props.className} rows={elems} headings={[
+                    "Term",
+                    "CRN",
+                    "Course Name",
+                    "Last Name",
+                    "Percent Responded",
+                    "Average Rating",
+                    "Average GPA"
+                ]} />
+                {/*
                 <table className={"table table-striped table-sm " + this.props.className}>
                     <thead>
                         <tr>
@@ -128,6 +161,7 @@ export class EntryTable extends React.Component<EntryTableProps, EntryTableState
                         ))}
                     </tbody>
                 </table>
+                */}
             </>
         );
     }

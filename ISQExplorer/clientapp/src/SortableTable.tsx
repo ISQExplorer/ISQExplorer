@@ -31,6 +31,10 @@ export class SortableTable extends React.Component<SortableTableProps, SortableT
         if (rowLen === 0) {
             throw new Error("Cannot make a table out of no headings");
         }
+        
+        if (props.rows.length === 0) {
+            throw new Error("Cannot make a table out of no rows");
+        }
 
         for (const row of props.rows) {
             if (row.length != rowLen) {
