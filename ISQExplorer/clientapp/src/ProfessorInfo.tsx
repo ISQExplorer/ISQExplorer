@@ -2,6 +2,7 @@ import React from "react";
 // eslint-disable-next-line no-unused-vars
 import {entryAvgRating, entries, ISQEntry, EntryOrderBy, entrySort, QueryType, Professor, Term} from "./Query";
 import {makeColoredCell, makeColoredStyle} from "./CommonTsx";
+import {SortableTable} from "./SortableTable";
 
 export interface ProfessorInfoProps {
     professor: Professor
@@ -28,6 +29,16 @@ export const ProfessorInfo: React.FC<ProfessorInfoProps> = (props: ProfessorInfo
     const avgGpa = avg(props.entries.map(x => x.meanGpa));
     const avgRating = avg(props.entries.map(x => entryAvgRating(x)));
     
+    const elems = Object.values(courseObj).map(x => 
+        [
+            {element: <>{x.courseName}</>, innerText: x.courseName, order: x.courseName},
+            {element: <span style={makeColoredStyle(x.avgGpa.toFixed(2), 0, 4)}>{x.avgGpa.toFixed(2)}</span>, order: x.avgGpa},
+            {element: <span style={makeColoredStyle(x.avgRating.toFixed(2), 1, 5)}>{x.avgRating.toFixed(2)}</span>, order: x.avgRating},
+            {element: <>{x.lastTaught.name}</>, order: x.lastTaught.id}
+        ]
+    );
+    
+
     return (
         <div className="d-flex w-100 py-4">
             <div className="pr-4 d-flex flex-column align-items-center">
@@ -38,25 +49,33 @@ export const ProfessorInfo: React.FC<ProfessorInfoProps> = (props: ProfessorInfo
             <div className="vl"/>
             <div className="pl-4 flex-grow-1 d-flex flex-column align-items-center">
                 <h5><u>Courses</u></h5>
+                <SortableTable className="flex-grow-1 w-100 table table-striped table-sm" headings={[
+                    "Course Name",
+                    "Average GPA",
+                    "Average Rating",
+                    "Last Taught"
+                ]} rows={elems} key={props.professor.nNumber}/>
+                {/*
                 <table className="flex-grow-1 w-100 table table-striped table-sm">
                     <thead>
-                        <tr>
-                            <th>Course Name</th>
-                            <th>Average GPA</th>
-                            <th>Average Rating</th>
-                            <th>Last Taught</th>
-                        </tr>
+                    <tr>
+                        <th>Course Name</th>
+                        <th>Average GPA</th>
+                        <th>Average Rating</th>
+                        <th>Last Taught</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        {Object.values(courseObj).sort((a, b) => a.courseName.localeCompare(b.courseName)).map(x => <tr>
-                            <td>{x.courseName}</td>
-                            {makeColoredCell(x.avgGpa.toFixed(2), 0, 4)}
-                            {makeColoredCell(x.avgRating.toFixed(2), 1, 5)}
-                            <td>{x.lastTaught.name}</td>
-                        </tr>)}
+                    {Object.values(courseObj).sort((a, b) => a.courseName.localeCompare(b.courseName)).map(x => <tr>
+                        <td>{x.courseName}</td>
+                        {makeColoredCell(x.avgGpa.toFixed(2), 0, 4)}
+                        {makeColoredCell(x.avgRating.toFixed(2), 1, 5)}
+                        <td>{x.lastTaught.name}</td>
+                    </tr>)}
                     </tbody>
                 </table>
+                */}
             </div>
         </div>
-    );  
+    );
 };

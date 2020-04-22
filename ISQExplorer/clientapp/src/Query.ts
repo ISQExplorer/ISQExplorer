@@ -117,6 +117,11 @@ export enum EntryOrderBy {
     Course
 }
 
+export const terms = async (): Promise<Term[]> => {
+    const res = await fetch("/Query/Terms");
+    return await res.json();   
+};
+
 export const entrySort = (entries: ISQEntry[], orderBy: EntryOrderBy | EntryOrderBy[], descending: boolean = false): ISQEntry[] => {
     const entryComparator = (a: ISQEntry, b: ISQEntry, order: EntryOrderBy): number => {
         let comp: number = 0;
