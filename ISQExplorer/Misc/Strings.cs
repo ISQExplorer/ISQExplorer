@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -40,6 +41,23 @@ namespace ISQExplorer.Misc
         /// <param name="s">The input string.</param>
         /// <returns>The escaped string.</returns>
         public static string HtmlEncode(this string s) => HttpUtility.HtmlEncode(s);
+
+        /// <summary>
+        /// Gets the index of all matches of the given pattern.
+        /// </summary>
+        /// <param name="s">The input string.</param>
+        /// <param name="pattern">A regular expression to match.</param>
+        /// <param name="options">Regex options, if any.</param>
+        /// <returns>The position of the first character of each match in the string.</returns>
+        public static IEnumerable<int> IndexOfAll(this string s, string pattern, RegexOptions options = RegexOptions.None)
+        {
+            var res = Regex.Match(s, pattern, options);
+            while (res.Success)
+            {
+                yield return res.Index;
+                res = res.NextMatch();
+            }
+        }
 
         /// <summary>
         /// Returns true if a string is null, empty, or contains only whitespace.

@@ -72,6 +72,7 @@ export const queryTypeToString = (q: QueryType): string => {
 export interface Suggestion {
     type: QueryType;
     value: string;
+    altText: string | null;
 }
 
 const queryString = (params: { [key: string]: any }): string =>

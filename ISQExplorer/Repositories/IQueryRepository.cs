@@ -20,17 +20,18 @@ namespace ISQExplorer.Repositories
     {
         public readonly QueryType Type;
         public readonly string Value;
+        public readonly string? AltText;
 
-        public Suggestion(QueryType qt, string parameter)
+        public Suggestion(QueryType qt, string parameter, string? altText = null)
         {
-            (Type, Value) = (qt, parameter);
+            (Type, Value, AltText) = (qt, parameter, altText);
         }
 
         public bool Equals(Suggestion? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Type == other.Type && Value == other.Value;
+            return Type == other.Type && Value == other.Value && AltText == other.AltText;
         }
 
         public override bool Equals(object? obj)
@@ -43,7 +44,7 @@ namespace ISQExplorer.Repositories
 
         public override int GetHashCode()
         {
-            return HashCode.Combine((int) Type, Value);
+            return HashCode.Combine((int) Type, Value, AltText);
         }
 
         public static bool operator ==(Suggestion? left, Suggestion? right)

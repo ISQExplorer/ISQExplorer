@@ -1,4 +1,5 @@
 #nullable enable
+using System.Linq;
 using ISQExplorer.Misc;
 using NUnit.Framework;
 
@@ -58,20 +59,24 @@ namespace ISQExplorerTests
             Assert.AreEqual(matches, input.Matches(pattern));
         }
 
-        private static object[] _indexOfTestCases =
+        private static object[] _indexOfAllTestCases =
         {
-            new object[] {"abcdef", "abcdef", 0},
-            new object[] {"abcdef", "bcd", 1},
-            new object[] {"abcdef", "cd", 2},
-            new object[] {"abcdef", "d", 3},
-            new object[] {"ababcdef", "bcd", 2},
-            new object[] {"ababcd", "bcd", 2},
-            new object[] {"ababcdd", "bcd", 2},
-            new object[] {"abc", "bcd", -1},
-            new object[] {"ab", "abc", -1},
-            new object[] {"", "a", -1},
-            new object[] {"", "", 0},
-            new object[] {"a", "", 0}
+            new object[] {"abcxdef", "x", new[] {3}},
+            new object[] {"xabcdef", "x", new[] {0}},
+            new object[] {"abcdef", "x", new int []{}},
+            new object[] {"xabcxdef", "x", new[] {0, 4}},
+            new object[] {"abcdefx", "x", new[] {6}},
+            new object[] {"xx", "x", new[] {0, 1}},
+            new object[] {"abcdef", ".+", new[] {0}},
+            new object[] {"abcdef", "..", new[] {0, 2, 4}}
         };
+
+        [Test]
+        [TestCaseSource(nameof(_indexOfAllTestCases))]
+        public void IndexOfAllTest(string input, string pattern, int[] expected)
+        {
+            var res = input.IndexOfAll(pattern).ToArray();
+            Assert.That(res, Is.EquivalentTo(expected));
+        }
     }
 }

@@ -38,6 +38,72 @@ namespace ISQExplorer.Misc
     public static class Linq
     {
         /// <summary>
+        /// Gets the maximum element of the enumerable given the provided function.
+        /// </summary>
+        /// <param name="enumerable">The enumerable.</param>
+        /// <param name="expr">A function outputting comparable values.</param>
+        /// <typeparam name="TElem">The type of the elements in the enumerable.</typeparam>
+        /// <typeparam name="TExpr">The type of the elements to be compared.</typeparam>
+        /// <returns>The value corresponding to the maximum value the function outputs.</returns>
+        public static TElem ArgMax<TElem, TExpr>(this IEnumerable<TElem> enumerable, Func<TElem, TExpr> expr)
+            where TExpr : IComparable<TExpr>
+        {
+            using var walker = enumerable.GetEnumerator();
+            if (!walker.MoveNext())
+            {
+                throw new InvalidOperationException("Cannot find the max of an empty sequence.");
+            }
+
+            var elem = walker.Current;
+            var val = expr(elem);
+
+            while (walker.MoveNext())
+            {
+                var tmp = expr(walker.Current);
+                if (tmp.CompareTo(val) > 0)
+                {
+                    elem = walker.Current;
+                    val = tmp;
+                }
+            }
+
+            return elem;
+        }
+
+        /// <summary>
+        /// Gets the minimum element of the enumerable given the provided function.
+        /// </summary>
+        /// <param name="enumerable">The enumerable.</param>
+        /// <param name="expr">A function outputting comparable values.</param>
+        /// <typeparam name="TElem">The type of the elements in the enumerable.</typeparam>
+        /// <typeparam name="TExpr">The type of the elements to be compared.</typeparam>
+        /// <returns>The value corresponding to the minimum value the function outputs.</returns>
+        public static TElem ArgMin<TElem, TExpr>(this IEnumerable<TElem> enumerable, Func<TElem, TExpr> expr)
+            where TExpr : IComparable<TExpr>
+        {
+            using var walker = enumerable.GetEnumerator();
+            if (!walker.MoveNext())
+            {
+                throw new InvalidOperationException("Cannot find the min of an empty sequence.");
+            }
+
+            var elem = walker.Current;
+            var val = expr(elem);
+
+            while (walker.MoveNext())
+            {
+                var tmp = expr(walker.Current);
+                if (tmp.CompareTo(val) < 0)
+                {
+                    elem = walker.Current;
+                    val = tmp;
+                }
+            }
+
+            return elem;
+        }
+
+        /// <summary>
         /// Returns true if at least a certain number of the elements of an enumerable satisfy a predicate, false if not.
         /// </summary>
         /// <param name="enumerable">The enumerable.</param>
@@ -107,7 +173,8 @@ namespace ISQExplorer.Misc
         /// <param name="hashPredicate">An optional hash function that should ensure that two equal elements have the same hashcode. By default this is T.GetHashCode().</param>
         /// <typeparam name="T">The type of the elements to compare.</typeparam>
         /// <returns>An enumerable containing the distinct elements.</returns>
-        public static IEnumerable<T> Distinct<T>(this IEnumerable<T> enumerable, Func<T, T, bool> equalityPredicate, Func<T, int>? hashPredicate = null)
+        public static IEnumerable<T> Distinct<T>(this IEnumerable<T> enumerable, Func<T, T, bool> equalityPredicate,
+            Func<T, int>? hashPredicate = null)
         {
             var seen = new HashSet<T>(new PredicateEqualityComparer<T>(equalityPredicate, hashPredicate));
 
@@ -138,6 +205,54 @@ namespace ISQExplorer.Misc
                 yield return (Index: i, Elem: y);
                 i++;
             }
+        }
+
+        /// <summary>
+        /// Returns the first element that satisfies the predicate or the given value if none of them satisfy it.
+        /// </summary>
+        /// <param name="enumerable">The enumerable.</param>
+        /// <param name="value">The default value.</param>
+        /// <param name="predicate">The predicate, if any.</param>
+        /// <typeparam name="T">The type of the enumerable's elements.</typeparam>
+        /// <returns>The first element that satisfies the predicate, or the first element if no predicate is given, or value if this sequence is empty.</returns>
+        public static T FirstOr<T>(this IEnumerable<T> enumerable, T value, Func<T, bool>? predicate)
+        {
+            if (predicate != null)
+            {
+                enumerable = enumerable.Where(predicate);
+            }
+
+            foreach (var item in enumerable)
+            {
+                return item;
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Returns the last element that satisfies the predicate or the given value if none of them satisfy it.
+        /// </summary>
+        /// <param name="enumerable">The enumerable.</param>
+        /// <param name="value">The default value.</param>
+        /// <param name="predicate">The predicate, if any.</param>
+        /// <typeparam name="T">The type of the enumerable's elements.</typeparam>
+        /// <returns>The last element that satisfies the predicate, or the last element if no predicate is given, or value if this sequence is empty.</returns>
+        public static T LastOr<T>(this IEnumerable<T> enumerable, T value, Func<T, bool>? predicate)
+        {
+            T ret = value;
+
+            if (predicate != null)
+            {
+                enumerable = enumerable.Where(predicate);
+            }
+
+            foreach (var item in enumerable)
+            {
+                ret = item;
+            }
+
+            return ret;
         }
 
         /// <summary>
