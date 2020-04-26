@@ -1,5 +1,6 @@
 import React from "react";
 import {QueryType, queryTypeToString, Suggestion, suggestions} from "./Query";
+import logo from "./isqexplorer.svg";
 
 export interface SearchBarProps {
     className: string;
@@ -80,12 +81,17 @@ export class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
 
     public render() {
         return (<>
-            <input
-                className="w-75 py-2 px-4 m-2"
-                onKeyUp={this.keyUp}
-                placeholder="Enter some shit..."
-                onFocus={e => this.setState({hideSuggestions: e.currentTarget.value === ""})}
-                onBlur={() => this.setState({hideSuggestions: true})}/>
+            <div className="d-flex flex-row justify-content-center w-100">
+                <div className="align-self-start h-100" style={{width: "7%"}}>
+                    <img className="align-self-start" src={logo} alt="ISQExplorer" />
+                </div>
+                <input
+                    className="w-75 py-2 px-4 m-2"
+                    onKeyUp={this.keyUp}
+                    placeholder="Enter some shit..."
+                    onFocus={e => this.setState({hideSuggestions: e.currentTarget.value === ""})}
+                    onBlur={() => this.setState({hideSuggestions: true})}/>
+            </div>
             <div className={`position-relative w-75 ${this.state.hideSuggestions ? "d-none" : ""}`}>
                 <div className="position-absolute w-100 d-flex flex-column bg-light border py-2 my-2">
                     {this.state.suggestions.map(s => <div

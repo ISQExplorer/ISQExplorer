@@ -51,9 +51,9 @@ export const CourseInfo: React.FC<CourseInfoProps> = (props: CourseInfoProps) =>
             </div>
             <div className="vl"/>
             <div className="pl-4 flex-grow-1 d-flex flex-column align-items-center">
-                <h5><u>Courses</u></h5>
+                <h5><u>Professors</u></h5>
                 <SortableTable className="flex-grow-1 w-100 table table-striped table-sm" headings={[
-                    "Course Name",
+                    "Name",
                     "Average GPA",
                     "Average Rating",
                     "Last Taught"
